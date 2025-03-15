@@ -12,10 +12,7 @@ import Auth from "./pages/Auth";
 import HealthRecords from "./pages/HealthRecords";
 import Reminders from "./pages/Reminders";
 import PetProfile from "./pages/PetProfile";
-import AddPet from "./pages/AddPet";
-import EditPet from "./pages/EditPet";
 import AddHealthRecord from "./pages/AddHealthRecord";
-import OwnerProfile from "./pages/OwnerProfile";
 import LocalServices from "./pages/LocalServices";
 import NotFound from "./pages/NotFound";
 import Navbar from "./components/layout/Navbar";
@@ -91,30 +88,6 @@ const App = () => (
                   element={
                     <ProtectedRoute>
                       <PetProfile />
-                    </ProtectedRoute>
-                  } 
-                />
-                <Route 
-                  path="/pets/:id/edit" 
-                  element={
-                    <ProtectedRoute>
-                      <EditPet />
-                    </ProtectedRoute>
-                  } 
-                />
-                <Route 
-                  path="/pets/add" 
-                  element={
-                    <ProtectedRoute>
-                      <AddPet />
-                    </ProtectedRoute>
-                  } 
-                />
-                <Route 
-                  path="/profile" 
-                  element={
-                    <ProtectedRoute>
-                      <OwnerProfile />
                     </ProtectedRoute>
                   } 
                 />
