@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -25,7 +26,7 @@ const LocalServices = () => {
   const [categories, setCategories] = useState<ServiceCategory[]>([]);
   const [loading, setLoading] = useState(true);
   const [externalLoading, setExternalLoading] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState<string>('');
+  const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState('internal');
   const [selectedCity, setSelectedCity] = useState('jakarta');
@@ -85,7 +86,7 @@ const LocalServices = () => {
         service_categories(name)
       `);
     
-    if (selectedCategory) {
+    if (selectedCategory && selectedCategory !== "all") {
       query = query.eq('category_id', selectedCategory);
     }
     
@@ -140,13 +141,13 @@ const LocalServices = () => {
         // Search across platforms
         externalData = await externalPlatformsService.searchAcrossAll(
           searchQuery, 
-          selectedCategory, 
+          selectedCategory === "all" ? undefined : selectedCategory, 
           selectedCity
         );
       } else {
         // Fetch by category and location
         externalData = await externalPlatformsService.fetchServicesFromAll(
-          selectedCategory || 'all',
+          selectedCategory === "all" ? "all" : selectedCategory,
           selectedCity
         );
       }

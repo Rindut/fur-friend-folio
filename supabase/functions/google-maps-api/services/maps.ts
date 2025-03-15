@@ -46,6 +46,8 @@ export async function getCoordinatesForLocation(location: string) {
  * Map our category identifiers to Google Maps place type
  */
 export function mapCategoryToGoogleType(category: string): string {
+  if (!category || category === "all") return "";
+  
   const categoryMap: { [key: string]: string } = {
     veterinary_clinics: "veterinary_care",
     pet_shops: "pet_store",
@@ -64,6 +66,8 @@ export function mapCategoryToGoogleType(category: string): string {
  * Get relevant keyword for Google Maps search based on our category
  */
 export function getCategoryKeyword(category: string): string {
+  if (!category || category === "all") return "pet";
+  
   const keywordMap: { [key: string]: string } = {
     veterinary_clinics: "veterinary clinic pet",
     pet_shops: "pet shop store",

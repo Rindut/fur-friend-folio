@@ -3,37 +3,115 @@ import { Service, Review, ServiceSource, ExternalPlatformService, mapDbServiceTo
 import { useGoogleMapsApi } from '@/hooks/useGoogleMapsApi';
 import GoogleMapsService from './GoogleMapsService';
 
-// Google Maps API key - Replace with your actual API key or use Supabase secrets
-const GOOGLE_MAPS_API_KEY = 'YOUR_GOOGLE_MAPS_API_KEY';
+// Google Maps API key - This will use the Edge Function instead
+const GOOGLE_MAPS_API_KEY = 'EDGE_FUNCTION';
 
 class RealGoogleMapsService implements ExternalPlatformService {
   name = 'Google Maps';
   enabled = true;
   private googleMapsService: GoogleMapsService;
+  private useGoogleMapsApi: any;
   
   constructor(apiKey: string) {
-    this.googleMapsService = new GoogleMapsService(apiKey);
+    // If we're using the Edge Function approach
+    if (apiKey === 'EDGE_FUNCTION') {
+      // Initialize the hook-like implementation
+      this.useGoogleMapsApi = {
+        searchNearbyPlaces: async (category: string, location: string, radius?: number) => {
+          const { data } = await supabase.functions.invoke('google-maps-api', {
+            body: { action: 'searchNearby', params: { category, location, radius } }
+          });
+          
+          // Map the results to our Service interface
+          return this.mapGooglePlacesToServices(data?.results || [], category);
+        },
+        searchPlacesByText: async (query: string, category?: string, location?: string) => {
+          const { data } = await supabase.functions.invoke('google-maps-api', {
+            body: { action: 'textSearch', params: { query, category, location } }
+          });
+          
+          // Map the results to our Service interface
+          return this.mapGooglePlacesToServices(data?.results || [], category || 'all');
+        }
+      };
+    } else {
+      // Use the direct API approach if we have an API key
+      this.googleMapsService = new GoogleMapsService(apiKey);
+    }
   }
 
   async fetchServices(category: string, location: string): Promise<Service[]> {
     console.log(`Fetching ${category} services in ${location} from Google Maps API`);
-    return this.googleMapsService.searchNearbyPlaces(category, location);
+    
+    try {
+      if (GOOGLE_MAPS_API_KEY === 'EDGE_FUNCTION') {
+        return await this.useGoogleMapsApi.searchNearbyPlaces(category, location);
+      } else {
+        return await this.googleMapsService.searchNearbyPlaces(category, location);
+      }
+    } catch (error) {
+      console.error('Error fetching from Google Maps:', error);
+      return [];
+    }
   }
 
   async fetchReviews(serviceId: string): Promise<Review[]> {
     console.log(`Fetching reviews for service ${serviceId} from Google Maps`);
     // Google Maps API doesn't easily allow review fetching without significant complexity
-    // Would require additional API calls and processing
     return [];
   }
 
   async searchServices(query: string, category?: string, location?: string): Promise<Service[]> {
     console.log(`Searching for ${query} in ${category || 'all categories'} at ${location || 'all locations'} on Google Maps`);
-    return this.googleMapsService.searchPlacesByText(query, category, location);
+    
+    try {
+      if (GOOGLE_MAPS_API_KEY === 'EDGE_FUNCTION') {
+        return await this.useGoogleMapsApi.searchPlacesByText(query, category, location);
+      } else {
+        return await this.googleMapsService.searchPlacesByText(query, category, location);
+      }
+    } catch (error) {
+      console.error('Error searching on Google Maps:', error);
+      return [];
+    }
+  }
+  
+  private mapGooglePlacesToServices(places: any[], category: string): Service[] {
+    return places.map(place => {
+      // Extract city from address
+      const addressParts = (place.formatted_address || place.vicinity || '').split(',');
+      let city = addressParts.length > 1 ? addressParts[addressParts.length - 2].trim() : 'Unknown';
+      // Clean up city name (remove postal codes, etc.)
+      city = city.replace(/\d+/g, '').trim();
+      
+      // Map to our Service interface
+      const service: Service = {
+        id: `gmaps-${place.place_id}`,
+        name: place.name,
+        address: place.formatted_address || place.vicinity || '',
+        city: city,
+        categoryId: category !== 'all' ? category : 'unknown',
+        contactPhone: place.formatted_phone_number || '',
+        website: place.website || `https://www.google.com/maps/place/?q=place_id:${place.place_id}`,
+        operatingHours: place.opening_hours?.weekday_text?.join(', ') || '',
+        priceRange: place.price_level || 2,
+        latitude: place.geometry?.location?.lat,
+        longitude: place.geometry?.location?.lng,
+        verified: true,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        avgRating: place.rating || 0,
+        reviewCount: place.user_ratings_total || 0,
+        source: ServiceSource.GOOGLE_MAPS,
+        externalId: place.place_id,
+        externalUrl: `https://www.google.com/maps/place/?q=place_id:${place.place_id}`
+      };
+      
+      return service;
+    });
   }
 }
 
-// Continue with mock services for other platforms
 class MockInstagramService implements ExternalPlatformService {
   name = 'Instagram';
   enabled = true;
