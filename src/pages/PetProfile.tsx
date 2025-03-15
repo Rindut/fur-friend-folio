@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { PawPrint, CalendarClock, Heart, Edit, ArrowLeft, Trash2, Pencil } from 'lucide-react';
@@ -94,13 +93,41 @@ const PetProfile = () => {
       if (!id || !user) return;
       
       try {
-        const { data, error } = await supabase
+        console.log("Fetching pet with ID:", id);
+        
+        let query = supabase
           .from('pets')
           .select('*')
-          .eq('id', id)
-          .eq('user_id', user.id)
-          .single();
+          .eq('user_id', user.id);
+        
+        // Check if id is a valid UUID
+        const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+        
+        if (UUID_REGEX.test(id)) {
+          // If ID is in UUID format, use it directly
+          query = query.eq('id', id);
+        } else {
+          // For numeric IDs or other formats, we need a different approach
+          // First, get all pets for this user and then filter by position
+          const { data: allPets, error: petsError } = await supabase
+            .from('pets')
+            .select('*')
+            .eq('user_id', user.id)
+            .order('created_at', { ascending: true });
+            
+          if (petsError) throw petsError;
           
+          // Parse the ID as a number (1-based index) and get that pet
+          const petIndex = parseInt(id) - 1;
+          if (allPets && petIndex >= 0 && petIndex < allPets.length) {
+            setPet(mapDbPetToPet(allPets[petIndex]));
+          }
+          setLoading(false);
+          return;
+        }
+          
+        const { data, error } = await query.single();
+        
         if (error) throw error;
         
         if (data) {
