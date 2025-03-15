@@ -16,6 +16,12 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/components/ui/tabs";
+import {
   MapPin,
   Phone,
   Mail,
@@ -29,9 +35,14 @@ import {
   Check,
   Bookmark,
   Share2,
+  ExternalLink,
+  RefreshCw,
+  AlertCircle,
 } from 'lucide-react';
-import { Service, ServiceCategory, mapDbCategoryToServiceCategory, mapDbServiceToService } from '@/types/petServices';
+import { Service, ServiceCategory, ServiceSource, mapDbCategoryToServiceCategory, mapDbServiceToService } from '@/types/petServices';
 import { useLanguage } from '@/context/LanguageContext';
+import externalPlatformsService from '@/services/ExternalPlatformsService';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
 const LocalServices = () => {
   const { user } = useAuth();
@@ -40,10 +51,17 @@ const LocalServices = () => {
   const { language } = useLanguage();
   
   const [services, setServices] = useState<Service[]>([]);
+  const [externalServices, setExternalServices] = useState<Service[]>([]);
   const [categories, setCategories] = useState<ServiceCategory[]>([]);
   const [loading, setLoading] = useState(true);
+  const [externalLoading, setExternalLoading] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string>('');
   const [searchQuery, setSearchQuery] = useState('');
+  const [activeTab, setActiveTab] = useState('internal');
+  const [selectedCity, setSelectedCity] = useState('jakarta');
+  const [enabledPlatforms, setEnabledPlatforms] = useState<string[]>([
+    'Google Maps', 'Instagram', 'Facebook', 'Tokopedia', 'Shopee'
+  ]);
   
   const translations = {
     en: {
@@ -66,6 +84,20 @@ const LocalServices = () => {
       viewProfile: 'View Profile',
       saveToFavorites: 'Save to Favorites',
       share: 'Share',
+      localDatabase: 'Our Database',
+      externalPlatforms: 'External Platforms',
+      source: 'Source',
+      fetchExternal: 'Fetch from External Platforms',
+      refreshing: 'Refreshing data...',
+      platforms: 'Platforms',
+      city: 'City',
+      jakarta: 'Jakarta',
+      bandung: 'Bandung',
+      surabaya: 'Surabaya',
+      externalLink: 'View Original',
+      importToDb: 'Import to Database',
+      importSuccess: 'Service imported successfully',
+      importError: 'Error importing service',
     },
     id: {
       title: 'Layanan Hewan Peliharaan Lokal',
@@ -87,6 +119,20 @@ const LocalServices = () => {
       viewProfile: 'Lihat Profil',
       saveToFavorites: 'Simpan ke Favorit',
       share: 'Bagikan',
+      localDatabase: 'Database Kami',
+      externalPlatforms: 'Platform Eksternal',
+      source: 'Sumber',
+      fetchExternal: 'Ambil dari Platform Eksternal',
+      refreshing: 'Memperbarui data...',
+      platforms: 'Platform',
+      city: 'Kota',
+      jakarta: 'Jakarta',
+      bandung: 'Bandung',
+      surabaya: 'Surabaya',
+      externalLink: 'Lihat Asli',
+      importToDb: 'Impor ke Database',
+      importSuccess: 'Layanan berhasil diimpor',
+      importError: 'Gagal mengimpor layanan',
     }
   };
   
@@ -164,7 +210,110 @@ const LocalServices = () => {
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    fetchServices();
+    if (activeTab === 'internal') {
+      fetchServices();
+    } else {
+      handleFetchExternal();
+    }
+  };
+
+  const handleFetchExternal = async () => {
+    setExternalLoading(true);
+    try {
+      let externalData: Service[] = [];
+      
+      if (searchQuery) {
+        // Search across platforms
+        externalData = await externalPlatformsService.searchAcrossAll(
+          searchQuery, 
+          selectedCategory, 
+          selectedCity
+        );
+      } else {
+        // Fetch by category and location
+        externalData = await externalPlatformsService.fetchServicesFromAll(
+          selectedCategory || 'all',
+          selectedCity
+        );
+      }
+      
+      // Filter by enabled platforms
+      const filteredData = externalData.filter(service => 
+        service.source && 
+        enabledPlatforms.includes(getSourceDisplayName(service.source))
+      );
+      
+      setExternalServices(filteredData);
+      
+      toast({
+        title: 'Success',
+        description: `Found ${filteredData.length} external services`,
+      });
+    } catch (error) {
+      console.error('Error fetching external services:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to fetch from external platforms',
+        variant: 'destructive',
+      });
+    } finally {
+      setExternalLoading(false);
+    }
+  };
+
+  const handleImportService = async (service: Service) => {
+    try {
+      const result = await externalPlatformsService.saveExternalService(service);
+      
+      if (result) {
+        toast({
+          title: 'Success',
+          description: t.importSuccess,
+        });
+        
+        // Refresh internal services list
+        fetchServices();
+      } else {
+        toast({
+          title: 'Error',
+          description: t.importError,
+          variant: 'destructive',
+        });
+      }
+    } catch (error) {
+      console.error('Error importing service:', error);
+      toast({
+        title: 'Error',
+        description: t.importError,
+        variant: 'destructive',
+      });
+    }
+  };
+
+  const getSourceDisplayName = (source?: ServiceSource): string => {
+    switch (source) {
+      case ServiceSource.GOOGLE_MAPS: return 'Google Maps';
+      case ServiceSource.INSTAGRAM: return 'Instagram';
+      case ServiceSource.FACEBOOK: return 'Facebook';
+      case ServiceSource.TOKOPEDIA: return 'Tokopedia';
+      case ServiceSource.SHOPEE: return 'Shopee';
+      case ServiceSource.INTERNAL: return 'Our Database';
+      case ServiceSource.OTHER: return 'Other';
+      default: return 'Unknown';
+    }
+  };
+
+  const getSourceBadgeColor = (source?: ServiceSource): string => {
+    switch (source) {
+      case ServiceSource.GOOGLE_MAPS: return 'bg-red-500';
+      case ServiceSource.INSTAGRAM: return 'bg-purple-500';
+      case ServiceSource.FACEBOOK: return 'bg-blue-500';
+      case ServiceSource.TOKOPEDIA: return 'bg-green-500';
+      case ServiceSource.SHOPEE: return 'bg-orange-500';
+      case ServiceSource.INTERNAL: return 'bg-gray-500';
+      case ServiceSource.OTHER: return 'bg-gray-400';
+      default: return 'bg-gray-300';
+    }
   };
 
   const renderRatingStars = (rating?: number) => {
@@ -199,164 +348,330 @@ const LocalServices = () => {
     );
   };
 
+  const togglePlatform = (platform: string) => {
+    setEnabledPlatforms(prev => {
+      if (prev.includes(platform)) {
+        return prev.filter(p => p !== platform);
+      } else {
+        return [...prev, platform];
+      }
+    });
+  };
+
+  const renderServiceCard = (service: Service, isExternal: boolean = false) => (
+    <Card key={service.id} className="overflow-hidden">
+      <div className="h-48 bg-gray-100 relative">
+        {service.photos && service.photos.length > 0 ? (
+          <img 
+            src={service.photos.find(p => p.isPrimary)?.url || service.photos[0].url} 
+            alt={service.name}
+            className="w-full h-full object-cover"
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center bg-gray-100 text-gray-400">
+            <MapPin className="w-12 h-12 opacity-20" />
+          </div>
+        )}
+        {service.categoryName && (
+          <Badge className="absolute top-3 left-3 bg-coral text-white">
+            {service.categoryName}
+          </Badge>
+        )}
+        {service.verified && (
+          <Badge className="absolute top-3 right-3 bg-green-500 text-white">
+            <Check className="mr-1 h-3 w-3" /> {t.verified}
+          </Badge>
+        )}
+        {service.source && service.source !== ServiceSource.INTERNAL && (
+          <Badge className={`absolute bottom-3 right-3 text-white ${getSourceBadgeColor(service.source)}`}>
+            {getSourceDisplayName(service.source)}
+          </Badge>
+        )}
+      </div>
+      
+      <CardHeader>
+        <CardTitle className="flex justify-between items-start">
+          <div>
+            {service.name}
+            <div className="flex mt-1 text-sm font-normal">
+              {renderRatingStars(service.avgRating)}
+              {service.reviewCount && (
+                <span className="ml-2 text-gray-500">
+                  ({service.reviewCount} {t.reviews})
+                </span>
+              )}
+            </div>
+          </div>
+          <div>{renderPriceRange(service.priceRange)}</div>
+        </CardTitle>
+      </CardHeader>
+      
+      <CardContent className="space-y-2 pb-0">
+        <div className="flex items-start">
+          <MapPin className="mr-2 h-4 w-4 text-muted-foreground mt-0.5 shrink-0" />
+          <span className="text-sm">{service.address}, {service.city}</span>
+        </div>
+        
+        {service.operatingHours && (
+          <div className="flex items-start">
+            <Clock className="mr-2 h-4 w-4 text-muted-foreground mt-0.5 shrink-0" />
+            <span className="text-sm">{service.operatingHours}</span>
+          </div>
+        )}
+        
+        {service.contactPhone && (
+          <div className="flex items-start">
+            <Phone className="mr-2 h-4 w-4 text-muted-foreground mt-0.5 shrink-0" />
+            <span className="text-sm">{service.contactPhone}</span>
+          </div>
+        )}
+      </CardContent>
+      
+      <CardFooter className="flex justify-between pt-4">
+        {isExternal && service.externalUrl ? (
+          <Button 
+            onClick={() => window.open(service.externalUrl, '_blank')} 
+            variant="default"
+            className="flex items-center"
+          >
+            {t.externalLink}
+            <ExternalLink className="ml-2 h-4 w-4" />
+          </Button>
+        ) : (
+          <Button 
+            onClick={() => navigate(`/services/${service.id}`)} 
+            variant="default"
+          >
+            {t.viewProfile}
+          </Button>
+        )}
+        
+        <div className="flex gap-2">
+          {isExternal && (
+            <Button onClick={() => handleImportService(service)} variant="outline">
+              {t.importToDb}
+            </Button>
+          )}
+          <Button size="icon" variant="outline">
+            <Bookmark className="h-4 w-4" />
+          </Button>
+          <Button size="icon" variant="outline">
+            <Share2 className="h-4 w-4" />
+          </Button>
+        </div>
+      </CardFooter>
+    </Card>
+  );
+
   return (
     <div className="container px-4 py-8">
       <h1 className="text-3xl font-bold mb-6">{t.title}</h1>
       
-      {/* Search and Filter Section */}
-      <div className="mb-8 bg-white p-4 rounded-lg shadow-sm">
-        <form onSubmit={handleSearch} className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder={t.searchPlaceholder}
-              className="pl-10"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-          </div>
-          
-          <Select 
-            value={selectedCategory} 
-            onValueChange={setSelectedCategory}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder={t.allCategories} />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="">{t.allCategories}</SelectItem>
-              {categories.map((category) => (
-                <SelectItem key={category.id} value={category.id}>
-                  {category.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          
-          <Button type="submit">
-            <Filter className="mr-2 h-4 w-4" />
-            {t.search}
-          </Button>
-        </form>
-      </div>
-      
-      {/* Services Listing */}
-      {loading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {[...Array(6)].map((_, i) => (
-            <Card key={i} className="animate-pulse">
-              <div className="h-48 bg-gray-200 rounded-t-lg"></div>
-              <CardHeader>
-                <div className="h-6 bg-gray-200 rounded w-3/4 mb-2"></div>
-                <div className="h-4 bg-gray-200 rounded w-1/2"></div>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-2">
-                  <div className="h-4 bg-gray-200 rounded w-full"></div>
-                  <div className="h-4 bg-gray-200 rounded w-5/6"></div>
-                  <div className="h-4 bg-gray-200 rounded w-4/6"></div>
-                </div>
-              </CardContent>
-              <CardFooter>
-                <div className="h-9 bg-gray-200 rounded w-full"></div>
-              </CardFooter>
-            </Card>
-          ))}
-        </div>
-      ) : services.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {services.map((service) => (
-            <Card key={service.id} className="overflow-hidden">
-              <div className="h-48 bg-gray-100 relative">
-                {service.photos && service.photos.length > 0 ? (
-                  <img 
-                    src={service.photos.find(p => p.isPrimary)?.url || service.photos[0].url} 
-                    alt={service.name}
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center bg-gray-100 text-gray-400">
-                    <MapPin className="w-12 h-12 opacity-20" />
-                  </div>
-                )}
-                {service.categoryName && (
-                  <Badge className="absolute top-3 left-3 bg-coral text-white">
-                    {service.categoryName}
-                  </Badge>
-                )}
-                {service.verified && (
-                  <Badge className="absolute top-3 right-3 bg-green-500 text-white">
-                    <Check className="mr-1 h-3 w-3" /> {t.verified}
-                  </Badge>
-                )}
+      <Tabs defaultValue="internal" value={activeTab} onValueChange={setActiveTab} className="mb-8">
+        <TabsList className="mb-4">
+          <TabsTrigger value="internal">{t.localDatabase}</TabsTrigger>
+          <TabsTrigger value="external">{t.externalPlatforms}</TabsTrigger>
+        </TabsList>
+        
+        <TabsContent value="internal">
+          {/* Search and Filter Section for Internal */}
+          <div className="mb-8 bg-white p-4 rounded-lg shadow-sm">
+            <form onSubmit={handleSearch} className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder={t.searchPlaceholder}
+                  className="pl-10"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
               </div>
               
-              <CardHeader>
-                <CardTitle className="flex justify-between items-start">
-                  <div>
-                    {service.name}
-                    <div className="flex mt-1 text-sm font-normal">
-                      {renderRatingStars(service.avgRating)}
-                      {service.reviewCount && (
-                        <span className="ml-2 text-gray-500">
-                          ({service.reviewCount} {t.reviews})
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                  <div>{renderPriceRange(service.priceRange)}</div>
-                </CardTitle>
-              </CardHeader>
+              <Select 
+                value={selectedCategory} 
+                onValueChange={setSelectedCategory}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder={t.allCategories} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="">{t.allCategories}</SelectItem>
+                  {categories.map((category) => (
+                    <SelectItem key={category.id} value={category.id}>
+                      {category.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
               
-              <CardContent className="space-y-2 pb-0">
-                <div className="flex items-start">
-                  <MapPin className="mr-2 h-4 w-4 text-muted-foreground mt-0.5 shrink-0" />
-                  <span className="text-sm">{service.address}, {service.city}</span>
-                </div>
-                
-                {service.operatingHours && (
-                  <div className="flex items-start">
-                    <Clock className="mr-2 h-4 w-4 text-muted-foreground mt-0.5 shrink-0" />
-                    <span className="text-sm">{service.operatingHours}</span>
-                  </div>
-                )}
-                
-                {service.contactPhone && (
-                  <div className="flex items-start">
-                    <Phone className="mr-2 h-4 w-4 text-muted-foreground mt-0.5 shrink-0" />
-                    <span className="text-sm">{service.contactPhone}</span>
-                  </div>
-                )}
-              </CardContent>
-              
-              <CardFooter className="flex justify-between pt-4">
-                <Button 
-                  onClick={() => navigate(`/services/${service.id}`)} 
-                  variant="default"
-                >
-                  {t.viewProfile}
-                </Button>
-                <div className="flex gap-2">
-                  <Button size="icon" variant="outline">
-                    <Bookmark className="h-4 w-4" />
-                  </Button>
-                  <Button size="icon" variant="outline">
-                    <Share2 className="h-4 w-4" />
-                  </Button>
-                </div>
-              </CardFooter>
-            </Card>
-          ))}
-        </div>
-      ) : (
-        <div className="text-center py-12">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-100 mb-4">
-            <Search className="h-8 w-8 text-gray-400" />
+              <Button type="submit">
+                <Filter className="mr-2 h-4 w-4" />
+                {t.search}
+              </Button>
+            </form>
           </div>
-          <h3 className="text-lg font-medium mb-2">{t.noServices}</h3>
-          <p className="text-gray-500">{t.tryDifferent}</p>
-        </div>
-      )}
+          
+          {/* Internal Services Listing */}
+          {loading ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {[...Array(6)].map((_, i) => (
+                <Card key={i} className="animate-pulse">
+                  <div className="h-48 bg-gray-200 rounded-t-lg"></div>
+                  <CardHeader>
+                    <div className="h-6 bg-gray-200 rounded w-3/4 mb-2"></div>
+                    <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-2">
+                      <div className="h-4 bg-gray-200 rounded w-full"></div>
+                      <div className="h-4 bg-gray-200 rounded w-5/6"></div>
+                      <div className="h-4 bg-gray-200 rounded w-4/6"></div>
+                    </div>
+                  </CardContent>
+                  <CardFooter>
+                    <div className="h-9 bg-gray-200 rounded w-full"></div>
+                  </CardFooter>
+                </Card>
+              ))}
+            </div>
+          ) : services.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {services.map((service) => renderServiceCard(service))}
+            </div>
+          ) : (
+            <div className="text-center py-12">
+              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-100 mb-4">
+                <Search className="h-8 w-8 text-gray-400" />
+              </div>
+              <h3 className="text-lg font-medium mb-2">{t.noServices}</h3>
+              <p className="text-gray-500">{t.tryDifferent}</p>
+            </div>
+          )}
+        </TabsContent>
+        
+        <TabsContent value="external">
+          {/* External Platforms Search and Filter */}
+          <div className="mb-8 bg-white p-4 rounded-lg shadow-sm">
+            <form onSubmit={handleSearch} className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    placeholder={t.searchPlaceholder}
+                    className="pl-10"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                  />
+                </div>
+                
+                <Select 
+                  value={selectedCategory} 
+                  onValueChange={setSelectedCategory}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder={t.allCategories} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="">{t.allCategories}</SelectItem>
+                    {categories.map((category) => (
+                      <SelectItem key={category.id} value={category.id}>
+                        {category.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                
+                <Select
+                  value={selectedCity}
+                  onValueChange={setSelectedCity}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder={t.city} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="jakarta">{t.jakarta}</SelectItem>
+                    <SelectItem value="bandung">{t.bandung}</SelectItem>
+                    <SelectItem value="surabaya">{t.surabaya}</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              <div className="border-t pt-4">
+                <h4 className="text-sm font-medium mb-2">{t.platforms}</h4>
+                <div className="flex flex-wrap gap-2">
+                  {['Google Maps', 'Instagram', 'Facebook', 'Tokopedia', 'Shopee'].map((platform) => (
+                    <Badge 
+                      key={platform}
+                      variant={enabledPlatforms.includes(platform) ? "default" : "outline"}
+                      className="cursor-pointer"
+                      onClick={() => togglePlatform(platform)}
+                    >
+                      {platform}
+                      {enabledPlatforms.includes(platform) && <Check className="ml-1 h-3 w-3" />}
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+              
+              <Button 
+                type="button" 
+                onClick={handleFetchExternal} 
+                disabled={externalLoading} 
+                className="w-full"
+              >
+                {externalLoading ? (
+                  <>
+                    <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
+                    {t.refreshing}
+                  </>
+                ) : (
+                  <>
+                    <Search className="mr-2 h-4 w-4" />
+                    {t.fetchExternal}
+                  </>
+                )}
+              </Button>
+            </form>
+          </div>
+          
+          {/* External Results */}
+          {externalLoading ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {[...Array(6)].map((_, i) => (
+                <Card key={i} className="animate-pulse">
+                  <div className="h-48 bg-gray-200 rounded-t-lg"></div>
+                  <CardHeader>
+                    <div className="h-6 bg-gray-200 rounded w-3/4 mb-2"></div>
+                    <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-2">
+                      <div className="h-4 bg-gray-200 rounded w-full"></div>
+                      <div className="h-4 bg-gray-200 rounded w-5/6"></div>
+                      <div className="h-4 bg-gray-200 rounded w-4/6"></div>
+                    </div>
+                  </CardContent>
+                  <CardFooter>
+                    <div className="h-9 bg-gray-200 rounded w-full"></div>
+                  </CardFooter>
+                </Card>
+              ))}
+            </div>
+          ) : externalServices.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {externalServices.map((service) => renderServiceCard(service, true))}
+            </div>
+          ) : (
+            <div className="text-center py-12 border border-dashed rounded-lg">
+              <AlertCircle className="mx-auto h-12 w-12 text-gray-300 mb-4" />
+              <h3 className="text-lg font-medium mb-2">No external data</h3>
+              <p className="text-gray-500 max-w-md mx-auto">
+                Use the search form above to fetch data from external platforms like Google Maps, Instagram, Facebook, etc.
+              </p>
+            </div>
+          )}
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };

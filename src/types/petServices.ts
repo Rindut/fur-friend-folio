@@ -33,6 +33,20 @@ export interface Service {
   avgRating?: number;
   reviewCount?: number;
   photos?: ServicePhoto[];
+  source?: ServiceSource; // Added source tracking
+  externalId?: string;    // ID from external platform
+  externalUrl?: string;   // Link to the service on external platform
+}
+
+// External Data Sources
+export enum ServiceSource {
+  INTERNAL = 'internal',
+  GOOGLE_MAPS = 'google_maps',
+  INSTAGRAM = 'instagram',
+  FACEBOOK = 'facebook',
+  TOKOPEDIA = 'tokopedia',
+  SHOPEE = 'shopee',
+  OTHER = 'other'
 }
 
 // Service Photo
@@ -44,6 +58,7 @@ export interface ServicePhoto {
   isPrimary: boolean;
   createdAt: string;
   updatedBy?: string;
+  source?: ServiceSource;
 }
 
 // Review
@@ -69,6 +84,8 @@ export interface Review {
   username?: string;
   userAvatar?: string;
   photos?: ReviewPhoto[];
+  source?: ServiceSource;
+  externalReviewUrl?: string;
 }
 
 // Review Photo
@@ -77,6 +94,16 @@ export interface ReviewPhoto {
   reviewId: string;
   url: string;
   createdAt: string;
+  source?: ServiceSource;
+}
+
+// External Platform Service Interface
+export interface ExternalPlatformService {
+  fetchServices: (category: string, location: string) => Promise<Service[]>;
+  fetchReviews: (serviceId: string) => Promise<Review[]>;
+  searchServices: (query: string, category?: string, location?: string) => Promise<Service[]>;
+  name: string;
+  enabled: boolean;
 }
 
 // Helper functions to map DB records to our application types
@@ -111,7 +138,10 @@ export const mapDbServiceToService = (dbService: any): Service => {
     createdAt: dbService.created_at,
     updatedAt: dbService.updated_at,
     avgRating: dbService.avg_rating,
-    reviewCount: dbService.review_count
+    reviewCount: dbService.review_count,
+    source: dbService.source || ServiceSource.INTERNAL,
+    externalId: dbService.external_id,
+    externalUrl: dbService.external_url
   };
 };
 
@@ -123,7 +153,8 @@ export const mapDbPhotoToServicePhoto = (dbPhoto: any): ServicePhoto => {
     caption: dbPhoto.caption,
     isPrimary: dbPhoto.is_primary,
     createdAt: dbPhoto.created_at,
-    updatedBy: dbPhoto.updated_by
+    updatedBy: dbPhoto.updated_by,
+    source: dbPhoto.source || ServiceSource.INTERNAL
   };
 };
 
@@ -148,7 +179,9 @@ export const mapDbReviewToReview = (dbReview: any): Review => {
     createdAt: dbReview.created_at,
     updatedAt: dbReview.updated_at,
     username: dbReview.username,
-    userAvatar: dbReview.user_avatar
+    userAvatar: dbReview.user_avatar,
+    source: dbReview.source || ServiceSource.INTERNAL,
+    externalReviewUrl: dbReview.external_review_url
   };
 };
 
@@ -157,6 +190,7 @@ export const mapDbPhotoToReviewPhoto = (dbPhoto: any): ReviewPhoto => {
     id: dbPhoto.id,
     reviewId: dbPhoto.review_id,
     url: dbPhoto.url,
-    createdAt: dbPhoto.created_at
+    createdAt: dbPhoto.created_at,
+    source: dbPhoto.source || ServiceSource.INTERNAL
   };
 };
