@@ -1,6 +1,6 @@
 
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { 
   Heart, 
@@ -14,99 +14,25 @@ import {
 import { Button } from '@/components/ui/button';
 import PetAvatar from '@/components/ui/PetAvatar';
 import { useLanguage } from '@/context/LanguageContext';
-
-interface HealthRecord {
-  id: string;
-  type: 'vaccination' | 'medication' | 'weight' | 'visit';
-  title: string;
-  date: string;
-  details?: string;
-  petId: string;
-}
-
-interface Pet {
-  id: string;
-  name: string;
-  imageUrl?: string;
-}
-
-// Sample data
-const samplePets: Pet[] = [
-  {
-    id: '1',
-    name: 'Luna',
-    imageUrl: 'https://images.unsplash.com/photo-1552053831-71594a27632d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8ZG9nfGVufDB8fDB8fA%3D%3D&auto=format&fit=crop&w=500&q=60',
-  },
-  {
-    id: '2',
-    name: 'Oliver',
-    imageUrl: 'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8Y2F0fGVufDB8fDB8fA%3D%3D&auto=format&fit=crop&w=500&q=60',
-  }
-];
-
-const sampleHealthRecords: HealthRecord[] = [
-  {
-    id: '1',
-    type: 'vaccination',
-    title: 'Rabies Vaccination',
-    date: 'May 15, 2023',
-    details: 'Three-year vaccination.',
-    petId: '1'
-  },
-  {
-    id: '2',
-    type: 'vaccination',
-    title: 'DHPP Booster',
-    date: 'May 15, 2023',
-    details: 'Annual booster shot.',
-    petId: '1'
-  },
-  {
-    id: '3',
-    type: 'medication',
-    title: 'Heart Medication',
-    date: 'Started: January 10, 2023',
-    details: '10mg daily with food.',
-    petId: '1'
-  },
-  {
-    id: '4',
-    type: 'visit',
-    title: 'Annual Checkup',
-    date: 'May 15, 2023',
-    details: 'All vitals normal. Slight tartar buildup on teeth.',
-    petId: '1'
-  },
-  {
-    id: '5',
-    type: 'weight',
-    title: 'Weight Check',
-    date: 'May 15, 2023',
-    details: '65 lbs - Healthy weight range.',
-    petId: '1'
-  },
-  {
-    id: '6',
-    type: 'vaccination',
-    title: 'FVRCP Vaccination',
-    date: 'April 3, 2023',
-    details: 'Annual vaccination.',
-    petId: '2'
-  },
-  {
-    id: '7',
-    type: 'medication',
-    title: 'Flea Treatment',
-    date: 'Started: April 3, 2023',
-    details: 'Monthly application.',
-    petId: '2'
-  }
-];
+import { useAuth } from '@/context/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
+import { Pet, mapDbPetToPet } from '@/types/pet';
+import { HealthRecord, mapDbHealthRecordToHealthRecord } from '@/types/healthRecord';
+import { useToast } from '@/hooks/use-toast';
 
 const HealthRecords = () => {
-  const [selectedPet, setSelectedPet] = useState<string>(samplePets[0].id);
+  const [searchParams] = useSearchParams();
+  const preSelectedPetId = searchParams.get('pet');
+  const { toast } = useToast();
+  const { user } = useAuth();
+  
+  const [selectedPet, setSelectedPet] = useState<string>('');
   const [activeTab, setActiveTab] = useState<string>('all');
   const { language } = useLanguage();
+  
+  const [pets, setPets] = useState<Pet[]>([]);
+  const [healthRecords, setHealthRecords] = useState<HealthRecord[]>([]);
+  const [loading, setLoading] = useState(true);
   
   const translations = {
     en: {
@@ -115,9 +41,13 @@ const HealthRecords = () => {
       vaccinations: 'Vaccinations',
       medications: 'Medications',
       visits: 'Vet Visits',
+      weights: 'Weight Records',
       addRecord: 'Add Record',
       noRecords: 'No health records found. Add a new record to get started.',
-      details: 'Details'
+      details: 'Details',
+      loadingPets: 'Loading pets...',
+      errorLoadingPets: 'Error loading pets',
+      errorLoadingRecords: 'Error loading health records'
     },
     id: {
       pageTitle: 'Catatan Kesehatan',
@@ -125,13 +55,101 @@ const HealthRecords = () => {
       vaccinations: 'Vaksinasi',
       medications: 'Pengobatan',
       visits: 'Kunjungan Dokter',
+      weights: 'Catatan Berat',
       addRecord: 'Tambah Catatan',
       noRecords: 'Tidak ada catatan kesehatan. Tambahkan catatan baru untuk memulai.',
-      details: 'Detail'
+      details: 'Detail',
+      loadingPets: 'Memuat hewan...',
+      errorLoadingPets: 'Kesalahan saat memuat hewan',
+      errorLoadingRecords: 'Kesalahan saat memuat catatan kesehatan'
     }
   };
   
   const t = translations[language];
+  
+  useEffect(() => {
+    const fetchPets = async () => {
+      if (!user) return;
+      
+      try {
+        const { data, error } = await supabase
+          .from('pets')
+          .select('*')
+          .eq('user_id', user.id)
+          .order('name', { ascending: true });
+          
+        if (error) throw error;
+        
+        if (data && data.length > 0) {
+          const petsList = data.map(pet => mapDbPetToPet(pet));
+          setPets(petsList);
+          
+          // Set default selection to preselected pet or first active pet
+          let petToSelect = '';
+          
+          if (preSelectedPetId) {
+            // If there's a pet ID in the URL, use it if it exists in the list
+            const preselectedPetExists = petsList.some(pet => pet.id === preSelectedPetId);
+            if (preselectedPetExists) {
+              petToSelect = preSelectedPetId;
+            }
+          }
+          
+          // If no pet is selected yet, use the first active one
+          if (!petToSelect) {
+            const activePet = petsList.find(pet => pet.is_active);
+            if (activePet) {
+              petToSelect = activePet.id;
+            } else if (petsList.length > 0) {
+              // If no active pets, use the first one
+              petToSelect = petsList[0].id;
+            }
+          }
+          
+          setSelectedPet(petToSelect);
+        }
+      } catch (error) {
+        console.error('Error fetching pets:', error);
+        toast({
+          title: t.errorLoadingPets,
+          variant: 'destructive'
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchPets();
+  }, [user, toast, t, preSelectedPetId]);
+  
+  useEffect(() => {
+    const fetchHealthRecords = async () => {
+      if (!selectedPet || !user) return;
+      
+      try {
+        const { data, error } = await supabase
+          .from('health_records')
+          .select('*')
+          .eq('pet_id', selectedPet)
+          .eq('user_id', user.id)
+          .order('date', { ascending: false });
+          
+        if (error) throw error;
+        
+        if (data) {
+          setHealthRecords(data.map(record => mapDbHealthRecordToHealthRecord(record)));
+        }
+      } catch (error) {
+        console.error('Error fetching health records:', error);
+        toast({
+          title: t.errorLoadingRecords,
+          variant: 'destructive'
+        });
+      }
+    };
+    
+    fetchHealthRecords();
+  }, [selectedPet, user, toast, t]);
   
   const getRecordIcon = (type: HealthRecord['type']) => {
     switch (type) {
@@ -159,10 +177,22 @@ const HealthRecords = () => {
     }
   };
   
-  const currentPetRecords = sampleHealthRecords.filter(record => 
-    record.petId === selectedPet && 
+  const formatDate = (dateString: string) => {
+    const options: Intl.DateTimeFormatOptions = { year: 'numeric', month: 'long', day: 'numeric' };
+    return new Date(dateString).toLocaleDateString(language === 'id' ? 'id-ID' : 'en-US', options);
+  };
+  
+  const currentPetRecords = healthRecords.filter(record => 
     (activeTab === 'all' || record.type === activeTab)
   );
+  
+  if (loading) {
+    return (
+      <div className="container px-4 mx-auto py-12 flex items-center justify-center">
+        <div className="animate-pulse">{t.loadingPets}</div>
+      </div>
+    );
+  }
   
   return (
     <div className="min-h-screen pb-20">
@@ -172,7 +202,7 @@ const HealthRecords = () => {
           
           {/* Pet Selector */}
           <div className="flex flex-wrap gap-3 mb-8">
-            {samplePets.map(pet => (
+            {pets.map(pet => (
               <button
                 key={pet.id}
                 className={`px-4 py-2 rounded-full flex items-center gap-2 transition-all duration-200 ${
@@ -183,11 +213,16 @@ const HealthRecords = () => {
                 onClick={() => setSelectedPet(pet.id)}
               >
                 <PetAvatar 
-                  src={pet.imageUrl} 
+                  src={pet.image_url} 
                   name={pet.name} 
                   size="sm" 
                 />
                 <span>{pet.name}</span>
+                {!pet.is_active && (
+                  <span className="ml-1 text-xs px-1.5 py-0.5 bg-gray-200 text-gray-600 rounded-full">
+                    Inactive
+                  </span>
+                )}
               </button>
             ))}
           </div>
@@ -223,6 +258,13 @@ const HealthRecords = () => {
                   {t.medications}
                 </TabsTrigger>
                 <TabsTrigger 
+                  value="weight"
+                  className="data-[state=active]:bg-lavender/30 data-[state=active]:text-charcoal rounded-lg"
+                >
+                  <Weight className="w-4 h-4 mr-2" />
+                  {t.weights}
+                </TabsTrigger>
+                <TabsTrigger 
                   value="visit"
                   className="data-[state=active]:bg-lavender/30 data-[state=active]:text-charcoal rounded-lg"
                 >
@@ -231,8 +273,8 @@ const HealthRecords = () => {
                 </TabsTrigger>
               </TabsList>
               
-              <Button className="rounded-full bg-lavender hover:bg-lavender/90" asChild>
-                <Link to="/health/add">
+              <Button className="rounded-full bg-lavender hover:bg-lavender/90 ml-2" asChild>
+                <Link to={`/health/add${selectedPet ? `?pet=${selectedPet}` : ''}`}>
                   <Plus className="w-4 h-4 mr-2" />
                   {t.addRecord}
                 </Link>
@@ -244,6 +286,7 @@ const HealthRecords = () => {
                 records={currentPetRecords} 
                 getRecordIcon={getRecordIcon} 
                 getRecordTypeColor={getRecordTypeColor} 
+                formatDate={formatDate}
                 detailsText={t.details}
                 noRecordsText={t.noRecords}
               />
@@ -252,7 +295,8 @@ const HealthRecords = () => {
               <HealthRecordsList 
                 records={currentPetRecords} 
                 getRecordIcon={getRecordIcon} 
-                getRecordTypeColor={getRecordTypeColor} 
+                getRecordTypeColor={getRecordTypeColor}
+                formatDate={formatDate}
                 detailsText={t.details}
                 noRecordsText={t.noRecords}
               />
@@ -261,7 +305,18 @@ const HealthRecords = () => {
               <HealthRecordsList 
                 records={currentPetRecords} 
                 getRecordIcon={getRecordIcon} 
-                getRecordTypeColor={getRecordTypeColor} 
+                getRecordTypeColor={getRecordTypeColor}
+                formatDate={formatDate} 
+                detailsText={t.details}
+                noRecordsText={t.noRecords}
+              />
+            </TabsContent>
+            <TabsContent value="weight" className="mt-0">
+              <HealthRecordsList 
+                records={currentPetRecords} 
+                getRecordIcon={getRecordIcon} 
+                getRecordTypeColor={getRecordTypeColor}
+                formatDate={formatDate}
                 detailsText={t.details}
                 noRecordsText={t.noRecords}
               />
@@ -270,7 +325,8 @@ const HealthRecords = () => {
               <HealthRecordsList 
                 records={currentPetRecords} 
                 getRecordIcon={getRecordIcon} 
-                getRecordTypeColor={getRecordTypeColor} 
+                getRecordTypeColor={getRecordTypeColor}
+                formatDate={formatDate}
                 detailsText={t.details}
                 noRecordsText={t.noRecords}
               />
@@ -286,6 +342,7 @@ interface HealthRecordsListProps {
   records: HealthRecord[];
   getRecordIcon: (type: HealthRecord['type']) => JSX.Element;
   getRecordTypeColor: (type: HealthRecord['type']) => string;
+  formatDate: (dateString: string) => string;
   detailsText: string;
   noRecordsText: string;
 }
@@ -294,6 +351,7 @@ const HealthRecordsList = ({
   records, 
   getRecordIcon, 
   getRecordTypeColor,
+  formatDate,
   detailsText,
   noRecordsText
 }: HealthRecordsListProps) => {
@@ -323,7 +381,7 @@ const HealthRecordsList = ({
                   <h3 className="font-medium">{record.title}</h3>
                   <div className="flex items-center gap-2 text-sm text-muted-foreground mt-1">
                     <Calendar className="w-3 h-3" />
-                    <span>{record.date}</span>
+                    <span>{formatDate(record.date)}</span>
                   </div>
                 </div>
                 
