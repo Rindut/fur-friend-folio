@@ -28,7 +28,7 @@ const AddHealthRecord = () => {
   
   const [formData, setFormData] = useState<HealthRecordFormData>({
     pet_id: preSelectedPetId || '',
-    type: '',
+    type: 'vaccination', // Setting a default valid type instead of empty string
     title: '',
     date: new Date().toISOString().split('T')[0],
     details: ''
