@@ -30,6 +30,236 @@ export type Database = {
         }
         Relationships: []
       }
+      review_photos: {
+        Row: {
+          created_at: string
+          id: string
+          review_id: string
+          url: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          review_id: string
+          url: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          review_id?: string
+          url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "review_photos_review_id_fkey"
+            columns: ["review_id"]
+            isOneToOne: false
+            referencedRelation: "reviews"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      reviews: {
+        Row: {
+          cleanliness: number | null
+          content: string | null
+          created_at: string
+          facility_quality: number | null
+          helpful_count: number | null
+          id: string
+          location_accessibility: number | null
+          overall_rating: number
+          price_paid: number | null
+          service_id: string
+          service_quality: number | null
+          service_used: string | null
+          staff_friendliness: number | null
+          updated_at: string
+          user_id: string
+          value_for_money: number | null
+          visit_date: string | null
+          would_recommend: boolean | null
+        }
+        Insert: {
+          cleanliness?: number | null
+          content?: string | null
+          created_at?: string
+          facility_quality?: number | null
+          helpful_count?: number | null
+          id?: string
+          location_accessibility?: number | null
+          overall_rating: number
+          price_paid?: number | null
+          service_id: string
+          service_quality?: number | null
+          service_used?: string | null
+          staff_friendliness?: number | null
+          updated_at?: string
+          user_id: string
+          value_for_money?: number | null
+          visit_date?: string | null
+          would_recommend?: boolean | null
+        }
+        Update: {
+          cleanliness?: number | null
+          content?: string | null
+          created_at?: string
+          facility_quality?: number | null
+          helpful_count?: number | null
+          id?: string
+          location_accessibility?: number | null
+          overall_rating?: number
+          price_paid?: number | null
+          service_id?: string
+          service_quality?: number | null
+          service_used?: string | null
+          staff_friendliness?: number | null
+          updated_at?: string
+          user_id?: string
+          value_for_money?: number | null
+          visit_date?: string | null
+          would_recommend?: boolean | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reviews_service_id_fkey"
+            columns: ["service_id"]
+            isOneToOne: false
+            referencedRelation: "services"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      service_categories: {
+        Row: {
+          created_at: string
+          description: string | null
+          icon: string | null
+          id: string
+          name: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          icon?: string | null
+          id?: string
+          name: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          icon?: string | null
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
+      service_photos: {
+        Row: {
+          caption: string | null
+          created_at: string
+          id: string
+          is_primary: boolean | null
+          service_id: string
+          updated_by: string | null
+          url: string
+        }
+        Insert: {
+          caption?: string | null
+          created_at?: string
+          id?: string
+          is_primary?: boolean | null
+          service_id: string
+          updated_by?: string | null
+          url: string
+        }
+        Update: {
+          caption?: string | null
+          created_at?: string
+          id?: string
+          is_primary?: boolean | null
+          service_id?: string
+          updated_by?: string | null
+          url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "service_photos_service_id_fkey"
+            columns: ["service_id"]
+            isOneToOne: false
+            referencedRelation: "services"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      services: {
+        Row: {
+          address: string
+          category_id: string
+          city: string
+          contact_email: string | null
+          contact_phone: string | null
+          created_at: string
+          description: string | null
+          id: string
+          latitude: number | null
+          longitude: number | null
+          name: string
+          operating_hours: string | null
+          owner_id: string | null
+          price_range: number | null
+          updated_at: string
+          verified: boolean | null
+          website: string | null
+        }
+        Insert: {
+          address: string
+          category_id: string
+          city: string
+          contact_email?: string | null
+          contact_phone?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          latitude?: number | null
+          longitude?: number | null
+          name: string
+          operating_hours?: string | null
+          owner_id?: string | null
+          price_range?: number | null
+          updated_at?: string
+          verified?: boolean | null
+          website?: string | null
+        }
+        Update: {
+          address?: string
+          category_id?: string
+          city?: string
+          contact_email?: string | null
+          contact_phone?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          latitude?: number | null
+          longitude?: number | null
+          name?: string
+          operating_hours?: string | null
+          owner_id?: string | null
+          price_range?: number | null
+          updated_at?: string
+          verified?: boolean | null
+          website?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "services_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "service_categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never

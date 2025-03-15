@@ -3,44 +3,12 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion';
-import { PawPrint, Heart, Calendar, Bell, ArrowRight } from 'lucide-react';
+import { PawPrint, Heart, Calendar, Bell, ArrowRight, Map } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import PetProfileCard, { PetData } from '@/components/ui/PetProfileCard';
 import AddPetButton from '@/components/ui/AddPetButton';
 import { useLanguage } from '@/context/LanguageContext';
-
-// Conditionally import Clerk components to avoid errors if Clerk is not available
-const ClerkComponents = () => {
-  // Only try to import Clerk components if the publishable key exists
-  if (import.meta.env.VITE_CLERK_PUBLISHABLE_KEY) {
-    try {
-      // Dynamic import for Clerk components
-      const { SignedIn, SignedOut, SignInButton, SignUpButton } = require('@clerk/clerk-react');
-      
-      return {
-        SignedIn,
-        SignedOut,
-        SignInButton,
-        SignUpButton,
-        isAvailable: true
-      };
-    } catch (e) {
-      console.error('Failed to load Clerk components:', e);
-    }
-  }
-  
-  // Return mock components if Clerk is not available
-  return {
-    SignedIn: ({ children }) => <>{children}</>,
-    SignedOut: ({ children }) => <>{children}</>,
-    SignInButton: ({ children }) => <Button>{children || 'Sign In'}</Button>,
-    SignUpButton: ({ children }) => <Button>{children || 'Sign Up'}</Button>,
-    isAvailable: false
-  };
-};
-
-// Get Clerk components or fallbacks
-const { SignedIn, SignedOut, SignInButton, SignUpButton, isAvailable } = ClerkComponents();
+import { useAuth } from '@/context/AuthContext';
 
 // Sample data
 const samplePets: PetData[] = [
@@ -73,6 +41,7 @@ const samplePets: PetData[] = [
 const Index = () => {
   const [mounted, setMounted] = useState(false);
   const { language } = useLanguage();
+  const { user } = useAuth();
 
   useEffect(() => {
     setMounted(true);
@@ -93,13 +62,17 @@ const Index = () => {
       smartRemindersDesc: 'Never miss important pet care tasks with customizable reminders for medications, vet visits, and more.',
       careCalendar: 'Care Calendar',
       careCalendarDesc: 'View all upcoming care tasks in a convenient calendar view for better planning.',
+      localServices: 'Local Pet Services',
+      localServicesDesc: 'Find and review local pet services - vets, groomers, pet shops, and more in your area.',
       petFamily: 'Your Pet Family',
       viewAll: 'View All',
       ctaHeading: 'Ready to give your pets the care they deserve?',
       ctaDesc: 'Join thousands of pet owners who have simplified pet care with ANABULKU.',
       ctaButton: 'Get Started Now',
       signIn: 'Sign In',
-      signUp: 'Sign Up'
+      signUp: 'Sign Up',
+      dashboard: 'Go to Dashboard',
+      findServices: 'Find Local Services'
     },
     id: {
       tagline: 'Perawatan Hewan Peliharaan Jadi Mudah',
@@ -115,13 +88,17 @@ const Index = () => {
       smartRemindersDesc: 'Jangan lewatkan tugas perawatan hewan peliharaan penting dengan pengingat yang dapat disesuaikan untuk pengobatan, kunjungan dokter hewan, dan lainnya.',
       careCalendar: 'Kalender Perawatan',
       careCalendarDesc: 'Lihat semua tugas perawatan mendatang dalam tampilan kalender yang nyaman untuk perencanaan yang lebih baik.',
+      localServices: 'Layanan Hewan Lokal',
+      localServicesDesc: 'Temukan dan ulas layanan hewan peliharaan lokal - dokter hewan, salon, toko hewan, dan lainnya di area Anda.',
       petFamily: 'Keluarga Hewan Peliharaan Anda',
       viewAll: 'Lihat Semua',
       ctaHeading: 'Siap memberikan hewan peliharaan Anda perawatan yang mereka layak?',
       ctaDesc: 'Bergabunglah dengan ribuan pemilik hewan peliharaan yang telah menyederhanakan perawatan hewan peliharaan dengan ANABULKU.',
       ctaButton: 'Mulai Sekarang',
       signIn: 'Masuk',
-      signUp: 'Daftar'
+      signUp: 'Daftar',
+      dashboard: 'Ke Dasbor',
+      findServices: 'Temukan Layanan Lokal'
     }
   };
 
@@ -152,12 +129,11 @@ const Index = () => {
 
   // The authentication UI for the CTA section
   const renderAuthButtons = () => {
-    if (!isAvailable) {
-      // Fallback when Clerk is not available
+    if (user) {
       return (
         <Button size="lg" className="rounded-full bg-coral hover:bg-coral/90">
           <Link to="/dashboard" className="flex items-center gap-2">
-            {t.getStarted} <ArrowRight className="w-4 h-4" />
+            {t.dashboard} <ArrowRight className="w-4 h-4" />
           </Link>
         </Button>
       );
@@ -165,59 +141,38 @@ const Index = () => {
 
     return (
       <>
-        <SignedIn>
-          <Button size="lg" className="rounded-full bg-coral hover:bg-coral/90">
-            <Link to="/dashboard" className="flex items-center gap-2">
-              {t.getStarted} <ArrowRight className="w-4 h-4" />
-            </Link>
-          </Button>
-        </SignedIn>
-        <SignedOut>
-          <SignUpButton mode="modal">
-            <Button size="lg" className="rounded-full bg-coral hover:bg-coral/90">
-              {t.signUp}
-            </Button>
-          </SignUpButton>
-          <SignInButton mode="modal">
-            <Button size="lg" variant="outline" className="rounded-full">
-              {t.signIn}
-            </Button>
-          </SignInButton>
-        </SignedOut>
+        <Button size="lg" className="rounded-full bg-coral hover:bg-coral/90">
+          <Link to="/auth" className="flex items-center gap-2">
+            {t.signUp} <ArrowRight className="w-4 h-4" />
+          </Link>
+        </Button>
+        <Button size="lg" variant="outline" className="rounded-full">
+          <Link to="/auth" className="flex items-center gap-2">
+            {t.signIn}
+          </Link>
+        </Button>
       </>
     );
   };
 
   // The authentication UI for the final CTA section
   const renderFinalCta = () => {
-    if (!isAvailable) {
-      // Fallback when Clerk is not available
+    if (user) {
       return (
         <Button size="lg" className="rounded-full bg-coral hover:bg-coral/90">
           <Link to="/dashboard" className="flex items-center gap-2">
-            {t.ctaButton} <ArrowRight className="w-4 h-4" />
+            {t.dashboard} <ArrowRight className="w-4 h-4" />
           </Link>
         </Button>
       );
     }
 
     return (
-      <>
-        <SignedIn>
-          <Button size="lg" className="rounded-full bg-coral hover:bg-coral/90">
-            <Link to="/dashboard" className="flex items-center gap-2">
-              {t.ctaButton} <ArrowRight className="w-4 h-4" />
-            </Link>
-          </Button>
-        </SignedIn>
-        <SignedOut>
-          <SignUpButton mode="modal">
-            <Button size="lg" className="rounded-full bg-coral hover:bg-coral/90">
-              {t.signUp} <ArrowRight className="w-4 h-4" />
-            </Button>
-          </SignUpButton>
-        </SignedOut>
-      </>
+      <Button size="lg" className="rounded-full bg-coral hover:bg-coral/90">
+        <Link to="/auth" className="flex items-center gap-2">
+          {t.signUp} <ArrowRight className="w-4 h-4" />
+        </Link>
+      </Button>
     );
   };
 
@@ -255,7 +210,9 @@ const Index = () => {
                 {renderAuthButtons()}
                 
                 <Button size="lg" variant="outline" className="rounded-full">
-                  {t.learnMore}
+                  <Link to="/services">
+                    {t.findServices}
+                  </Link>
                 </Button>
               </div>
             </motion.div>
@@ -296,7 +253,7 @@ const Index = () => {
           </motion.div>
           
           <motion.div 
-            className="grid grid-cols-1 md:grid-cols-3 gap-8"
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8"
             variants={containerVariants}
             initial="hidden"
             animate={mounted ? "visible" : "hidden"}
@@ -330,28 +287,40 @@ const Index = () => {
                 {t.careCalendarDesc}
               </p>
             </motion.div>
+            
+            <motion.div variants={itemVariants} className="glass-morphism rounded-2xl p-6 text-center">
+              <div className="bg-lavender/20 text-lavender p-3 rounded-full w-14 h-14 flex items-center justify-center mx-auto mb-4">
+                <Map className="w-6 h-6" />
+              </div>
+              <h3 className="text-xl font-semibold mb-3">{t.localServices}</h3>
+              <p className="text-muted-foreground">
+                {t.localServicesDesc}
+              </p>
+            </motion.div>
           </motion.div>
         </div>
       </section>
 
       {/* Pet Profiles Section */}
-      <section className="py-16 bg-cream/30">
-        <div className="container px-4 mx-auto">
-          <div className="flex flex-wrap items-center justify-between mb-8">
-            <h2 className="section-heading">{t.petFamily}</h2>
-            <Link to="/dashboard" className="text-coral hover:text-coral/80 font-medium flex items-center gap-1">
-              {t.viewAll} <ArrowRight className="w-4 h-4" />
-            </Link>
+      {user && (
+        <section className="py-16 bg-cream/30">
+          <div className="container px-4 mx-auto">
+            <div className="flex flex-wrap items-center justify-between mb-8">
+              <h2 className="section-heading">{t.petFamily}</h2>
+              <Link to="/dashboard" className="text-coral hover:text-coral/80 font-medium flex items-center gap-1">
+                {t.viewAll} <ArrowRight className="w-4 h-4" />
+              </Link>
+            </div>
+            
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {samplePets.map(pet => (
+                <PetProfileCard key={pet.id} pet={pet} />
+              ))}
+              <AddPetButton />
+            </div>
           </div>
-          
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {samplePets.map(pet => (
-              <PetProfileCard key={pet.id} pet={pet} />
-            ))}
-            <AddPetButton />
-          </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* CTA Section */}
       <section className="py-20 bg-gradient-to-br from-coral/10 via-white to-lavender/20">

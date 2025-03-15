@@ -1,53 +1,45 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { LanguageProvider } from "./context/LanguageContext";
-import { ClerkProvider } from "@clerk/clerk-react";
+import { AuthProvider, useAuth } from "./context/AuthContext";
 import Index from "./pages/Index";
 import Dashboard from "./pages/Dashboard";
+import Auth from "./pages/Auth";
 import HealthRecords from "./pages/HealthRecords";
 import Reminders from "./pages/Reminders";
 import PetProfile from "./pages/PetProfile";
 import AddHealthRecord from "./pages/AddHealthRecord";
+import LocalServices from "./pages/LocalServices";
 import NotFound from "./pages/NotFound";
 import Navbar from "./components/layout/Navbar";
 import PageBreadcrumb from "./components/layout/PageBreadcrumb";
 
-const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY || ""; 
-
 const queryClient = new QueryClient();
 
-// Create a wrapper component that conditionally renders ClerkProvider
-const AuthProvider = ({ children }) => {
-  // If we don't have a publishable key, just render children directly
-  if (!PUBLISHABLE_KEY) {
-    return <>{children}</>;
+// Protected route component
+const ProtectedRoute = ({ children }) => {
+  const { user, loading } = useAuth();
+  
+  // Show loading state while auth is being checked
+  if (loading) {
+    return <div className="flex items-center justify-center min-h-screen">Loading...</div>;
   }
-
-  // Otherwise, use ClerkProvider
-  return (
-    <ClerkProvider
-      publishableKey={PUBLISHABLE_KEY}
-      clerkJSVersion="5.56.0-snapshot.v20250312225817"
-      signInUrl="/sign-in"
-      signUpUrl="/sign-up"
-      signInFallbackRedirectUrl="/dashboard"
-      signUpFallbackRedirectUrl="/"
-      signInForceRedirectUrl="/dashboard"
-      signUpForceRedirectUrl="/"
-      afterSignOutUrl="/"
-      waitlistUrl="/"
-    >
-      {children}
-    </ClerkProvider>
-  );
+  
+  // Redirect to auth page if not logged in
+  if (!user) {
+    return <Navigate to="/auth" replace />;
+  }
+  
+  return children;
 };
 
 const App = () => (
-  <AuthProvider>
-    <QueryClientProvider client={queryClient}>
+  <QueryClientProvider client={queryClient}>
+    <AuthProvider>
       <LanguageProvider>
         <TooltipProvider>
           <Toaster />
@@ -58,20 +50,64 @@ const App = () => (
               <PageBreadcrumb />
               <Routes>
                 <Route path="/" element={<Index />} />
-                <Route path="/dashboard" element={<Dashboard />} />
-                <Route path="/health" element={<HealthRecords />} />
-                <Route path="/health/add" element={<AddHealthRecord />} />
-                <Route path="/reminders" element={<Reminders />} />
-                <Route path="/pets/:id" element={<PetProfile />} />
-                <Route path="/analytics" element={<HealthRecords />} />
+                <Route path="/auth" element={<Auth />} />
+                <Route 
+                  path="/dashboard" 
+                  element={
+                    <ProtectedRoute>
+                      <Dashboard />
+                    </ProtectedRoute>
+                  } 
+                />
+                <Route 
+                  path="/health" 
+                  element={
+                    <ProtectedRoute>
+                      <HealthRecords />
+                    </ProtectedRoute>
+                  } 
+                />
+                <Route 
+                  path="/health/add" 
+                  element={
+                    <ProtectedRoute>
+                      <AddHealthRecord />
+                    </ProtectedRoute>
+                  } 
+                />
+                <Route 
+                  path="/reminders" 
+                  element={
+                    <ProtectedRoute>
+                      <Reminders />
+                    </ProtectedRoute>
+                  } 
+                />
+                <Route 
+                  path="/pets/:id" 
+                  element={
+                    <ProtectedRoute>
+                      <PetProfile />
+                    </ProtectedRoute>
+                  } 
+                />
+                <Route path="/services" element={<LocalServices />} />
+                <Route 
+                  path="/analytics" 
+                  element={
+                    <ProtectedRoute>
+                      <HealthRecords />
+                    </ProtectedRoute>
+                  } 
+                />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </main>
           </BrowserRouter>
         </TooltipProvider>
       </LanguageProvider>
-    </QueryClientProvider>
-  </AuthProvider>
+    </AuthProvider>
+  </QueryClientProvider>
 );
 
 export default App;
