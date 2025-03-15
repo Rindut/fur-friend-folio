@@ -8,7 +8,7 @@ import { useLanguage } from '@/context/LanguageContext';
 import externalPlatformsService from '@/services/ExternalPlatformsService';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-// Import our new components
+// Import our components
 import ServiceSearch from '@/components/local-services/ServiceSearch';
 import ExternalServiceSearch from '@/components/local-services/ExternalServiceSearch';
 import ServicesList from '@/components/local-services/ServicesList';
@@ -130,7 +130,7 @@ const LocalServices = () => {
       handleFetchExternal();
     }
   };
-
+  
   const handleFetchExternal = async () => {
     setExternalLoading(true);
     try {

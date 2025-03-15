@@ -1,73 +1,38 @@
-
 import { supabase } from '@/integrations/supabase/client';
 import { Service, Review, ServiceSource, ExternalPlatformService, mapDbServiceToService } from '@/types/petServices';
+import GoogleMapsService from './GoogleMapsService';
 
-class MockGoogleMapsService implements ExternalPlatformService {
+// Google Maps API key - Replace with your actual API key or use Supabase secrets
+const GOOGLE_MAPS_API_KEY = 'YOUR_GOOGLE_MAPS_API_KEY';
+
+class RealGoogleMapsService implements ExternalPlatformService {
   name = 'Google Maps';
   enabled = true;
+  private googleMapsService: GoogleMapsService;
+  
+  constructor(apiKey: string) {
+    this.googleMapsService = new GoogleMapsService(apiKey);
+  }
 
   async fetchServices(category: string, location: string): Promise<Service[]> {
-    console.log(`Fetching ${category} services in ${location} from Google Maps`);
-    // Mock response for demonstration purposes
-    const mockData = this.generateMockData(category, location, 6);
-    return mockData;
+    console.log(`Fetching ${category} services in ${location} from Google Maps API`);
+    return this.googleMapsService.searchNearbyPlaces(category, location);
   }
 
   async fetchReviews(serviceId: string): Promise<Review[]> {
     console.log(`Fetching reviews for service ${serviceId} from Google Maps`);
+    // Google Maps API doesn't easily allow review fetching without significant complexity
+    // Would require additional API calls and processing
     return [];
   }
 
   async searchServices(query: string, category?: string, location?: string): Promise<Service[]> {
     console.log(`Searching for ${query} in ${category || 'all categories'} at ${location || 'all locations'} on Google Maps`);
-    return this.generateMockData(category || 'search', location || 'nearby', 3, query);
-  }
-
-  private generateMockData(category: string, location: string, count: number, query?: string): Service[] {
-    const services: Service[] = [];
-    const categoryNames = {
-      'veterinary_clinics': 'Veterinary Clinics',
-      'pet_shops': 'Pet Shops',
-      'grooming_services': 'Grooming Services',
-      'pet_hotels': 'Pet Hotels/Boarding',
-      'pet_cafes': 'Pet Cafés',
-      'pet_training': 'Pet Training Centers',
-      'pet_friendly_restaurants': 'Pet-friendly Restaurants',
-      'pet_parks': 'Pet Parks/Recreation Areas',
-      'search': 'Various Services'
-    };
-
-    const searchTerm = query ? ` ${query}` : '';
-    const categoryName = categoryNames[category as keyof typeof categoryNames] || category;
-
-    for (let i = 0; i < count; i++) {
-      const name = `${categoryName}${searchTerm} #${i + 1} (Maps)`;
-      services.push({
-        id: `gmaps-${category}-${i}-${Date.now()}`,
-        name,
-        address: `${i + 100} ${location.charAt(0).toUpperCase() + location.slice(1)} Street`,
-        city: location.charAt(0).toUpperCase() + location.slice(1),
-        categoryId: category,
-        categoryName: categoryName,
-        contactPhone: `+62 821-${Math.floor(10000000 + Math.random() * 90000000)}`,
-        website: `https://maps.google.com/example-${i}`,
-        priceRange: Math.floor(1 + Math.random() * 3),
-        latitude: -6.2 + Math.random() * 0.1,
-        longitude: 106.8 + Math.random() * 0.1,
-        verified: Math.random() > 0.3,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-        avgRating: 3 + Math.random() * 2,
-        reviewCount: Math.floor(Math.random() * 50),
-        source: ServiceSource.GOOGLE_MAPS,
-        externalId: `gmaps-${i}-${Date.now()}`,
-        externalUrl: `https://maps.google.com/example-${i}`
-      });
-    }
-    return services;
+    return this.googleMapsService.searchPlacesByText(query, category, location);
   }
 }
 
+// Continue with mock services for other platforms
 class MockInstagramService implements ExternalPlatformService {
   name = 'Instagram';
   enabled = true;
@@ -270,7 +235,7 @@ export class ExternalPlatformsService {
   constructor() {
     // Initialize supported platforms
     this.platforms = [
-      new MockGoogleMapsService(),
+      new RealGoogleMapsService(GOOGLE_MAPS_API_KEY),
       new MockInstagramService(),
       new MockFacebookService(),
       new MockTokopediaService(),
