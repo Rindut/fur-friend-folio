@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import CareTaskCard, { CareTask } from '@/components/ui/CareTaskCard';
 import { Plus, Calendar as CalendarIcon, ListTodo } from 'lucide-react';
 import { Calendar } from '@/components/ui/calendar';
+import { CareTask as CareTaskType } from '@/types/reminders';
 
 // Sample data
 const sampleTasks: CareTask[] = [
