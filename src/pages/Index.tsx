@@ -8,7 +8,39 @@ import { Button } from '@/components/ui/button';
 import PetProfileCard, { PetData } from '@/components/ui/PetProfileCard';
 import AddPetButton from '@/components/ui/AddPetButton';
 import { useLanguage } from '@/context/LanguageContext';
-import { SignedIn, SignedOut, SignInButton, SignUpButton, UserButton } from '@clerk/clerk-react';
+
+// Conditionally import Clerk components to avoid errors if Clerk is not available
+const ClerkComponents = () => {
+  // Only try to import Clerk components if the publishable key exists
+  if (import.meta.env.VITE_CLERK_PUBLISHABLE_KEY) {
+    try {
+      // Dynamic import for Clerk components
+      const { SignedIn, SignedOut, SignInButton, SignUpButton } = require('@clerk/clerk-react');
+      
+      return {
+        SignedIn,
+        SignedOut,
+        SignInButton,
+        SignUpButton,
+        isAvailable: true
+      };
+    } catch (e) {
+      console.error('Failed to load Clerk components:', e);
+    }
+  }
+  
+  // Return mock components if Clerk is not available
+  return {
+    SignedIn: ({ children }) => <>{children}</>,
+    SignedOut: ({ children }) => <>{children}</>,
+    SignInButton: ({ children }) => <Button>{children || 'Sign In'}</Button>,
+    SignUpButton: ({ children }) => <Button>{children || 'Sign Up'}</Button>,
+    isAvailable: false
+  };
+};
+
+// Get Clerk components or fallbacks
+const { SignedIn, SignedOut, SignInButton, SignUpButton, isAvailable } = ClerkComponents();
 
 // Sample data
 const samplePets: PetData[] = [
@@ -118,6 +150,77 @@ const Index = () => {
     }
   };
 
+  // The authentication UI for the CTA section
+  const renderAuthButtons = () => {
+    if (!isAvailable) {
+      // Fallback when Clerk is not available
+      return (
+        <Button size="lg" className="rounded-full bg-coral hover:bg-coral/90">
+          <Link to="/dashboard" className="flex items-center gap-2">
+            {t.getStarted} <ArrowRight className="w-4 h-4" />
+          </Link>
+        </Button>
+      );
+    }
+
+    return (
+      <>
+        <SignedIn>
+          <Button size="lg" className="rounded-full bg-coral hover:bg-coral/90">
+            <Link to="/dashboard" className="flex items-center gap-2">
+              {t.getStarted} <ArrowRight className="w-4 h-4" />
+            </Link>
+          </Button>
+        </SignedIn>
+        <SignedOut>
+          <SignUpButton mode="modal">
+            <Button size="lg" className="rounded-full bg-coral hover:bg-coral/90">
+              {t.signUp}
+            </Button>
+          </SignUpButton>
+          <SignInButton mode="modal">
+            <Button size="lg" variant="outline" className="rounded-full">
+              {t.signIn}
+            </Button>
+          </SignInButton>
+        </SignedOut>
+      </>
+    );
+  };
+
+  // The authentication UI for the final CTA section
+  const renderFinalCta = () => {
+    if (!isAvailable) {
+      // Fallback when Clerk is not available
+      return (
+        <Button size="lg" className="rounded-full bg-coral hover:bg-coral/90">
+          <Link to="/dashboard" className="flex items-center gap-2">
+            {t.ctaButton} <ArrowRight className="w-4 h-4" />
+          </Link>
+        </Button>
+      );
+    }
+
+    return (
+      <>
+        <SignedIn>
+          <Button size="lg" className="rounded-full bg-coral hover:bg-coral/90">
+            <Link to="/dashboard" className="flex items-center gap-2">
+              {t.ctaButton} <ArrowRight className="w-4 h-4" />
+            </Link>
+          </Button>
+        </SignedIn>
+        <SignedOut>
+          <SignUpButton mode="modal">
+            <Button size="lg" className="rounded-full bg-coral hover:bg-coral/90">
+              {t.signUp} <ArrowRight className="w-4 h-4" />
+            </Button>
+          </SignUpButton>
+        </SignedOut>
+      </>
+    );
+  };
+
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
@@ -149,25 +252,7 @@ const Index = () => {
               </p>
               
               <div className="flex flex-wrap gap-4">
-                <SignedIn>
-                  <Button size="lg" className="rounded-full bg-coral hover:bg-coral/90">
-                    <Link to="/dashboard" className="flex items-center gap-2">
-                      {t.getStarted} <ArrowRight className="w-4 h-4" />
-                    </Link>
-                  </Button>
-                </SignedIn>
-                <SignedOut>
-                  <SignUpButton mode="modal">
-                    <Button size="lg" className="rounded-full bg-coral hover:bg-coral/90">
-                      {t.signUp}
-                    </Button>
-                  </SignUpButton>
-                  <SignInButton mode="modal">
-                    <Button size="lg" variant="outline" className="rounded-full">
-                      {t.signIn}
-                    </Button>
-                  </SignInButton>
-                </SignedOut>
+                {renderAuthButtons()}
                 
                 <Button size="lg" variant="outline" className="rounded-full">
                   {t.learnMore}
@@ -281,20 +366,7 @@ const Index = () => {
             <p className="text-lg text-muted-foreground mb-8">
               {t.ctaDesc}
             </p>
-            <SignedIn>
-              <Button size="lg" className="rounded-full bg-coral hover:bg-coral/90">
-                <Link to="/dashboard" className="flex items-center gap-2">
-                  {t.ctaButton} <ArrowRight className="w-4 h-4" />
-                </Link>
-              </Button>
-            </SignedIn>
-            <SignedOut>
-              <SignUpButton mode="modal">
-                <Button size="lg" className="rounded-full bg-coral hover:bg-coral/90">
-                  {t.signUp} <ArrowRight className="w-4 h-4" />
-                </Button>
-              </SignUpButton>
-            </SignedOut>
+            {renderFinalCta()}
           </motion.div>
         </div>
       </section>
