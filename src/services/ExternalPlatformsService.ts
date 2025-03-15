@@ -1,5 +1,6 @@
 import { supabase } from '@/integrations/supabase/client';
 import { Service, Review, ServiceSource, ExternalPlatformService, mapDbServiceToService } from '@/types/petServices';
+import { useGoogleMapsApi } from '@/hooks/useGoogleMapsApi';
 import GoogleMapsService from './GoogleMapsService';
 
 // Google Maps API key - Replace with your actual API key or use Supabase secrets
