@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { PawPrint, Clock, ArrowRight, Calendar, Plus, Heart, Bell } from 'lucide-react';
@@ -6,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import PetProfileCard, { PetData } from '@/components/ui/PetProfileCard';
 import CareTaskCard, { CareTask } from '@/components/ui/CareTaskCard';
 import AddPetButton from '@/components/ui/AddPetButton';
+import PetProgressAnalytics from '@/components/analytics/PetProgressAnalytics';
 
 // Sample data
 const samplePets: PetData[] = [
@@ -232,6 +232,9 @@ const Dashboard = () => {
             </div>
           </div>
         </div>
+        
+        {/* Pet Progress & Analytics */}
+        <PetProgressAnalytics />
       </div>
     </div>
   );

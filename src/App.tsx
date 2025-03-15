@@ -28,6 +28,7 @@ const App = () => (
             <Route path="/health" element={<HealthRecords />} />
             <Route path="/reminders" element={<Reminders />} />
             <Route path="/pets/:id" element={<PetProfile />} />
+            <Route path="/analytics" element={<HealthRecords />} /> {/* Analytics route for now points to HealthRecords until we create a dedicated page */}
             <Route path="*" element={<NotFound />} />
           </Routes>
         </main>
