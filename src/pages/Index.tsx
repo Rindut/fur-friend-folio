@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { cn } from '@/lib/utils';
@@ -9,43 +8,55 @@ import PetProfileCard, { PetData } from '@/components/ui/PetProfileCard';
 import AddPetButton from '@/components/ui/AddPetButton';
 import { useLanguage } from '@/context/LanguageContext';
 import { useAuth } from '@/context/AuthContext';
-
-// Sample data
-const samplePets: PetData[] = [
-  {
-    id: '1',
-    name: 'Luna',
-    species: 'dog',
-    breed: 'Golden Retriever',
-    age: '3 years',
-    imageUrl: 'https://images.unsplash.com/photo-1552053831-71594a27632d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8ZG9nfGVufDB8fDB8fA%3D%3D&auto=format&fit=crop&w=500&q=60',
-    upcomingCare: {
-      type: 'Vaccination',
-      date: 'Tomorrow'
-    }
-  },
-  {
-    id: '2',
-    name: 'Oliver',
-    species: 'cat',
-    breed: 'Siamese',
-    age: '2 years',
-    imageUrl: 'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8Y2F0fGVufDB8fDB8fA%3D%3D&auto=format&fit=crop&w=500&q=60',
-    upcomingCare: {
-      type: 'Grooming',
-      date: 'In 3 days'
-    }
-  }
-];
+import { supabase } from '@/integrations/supabase/client';
 
 const Index = () => {
   const [mounted, setMounted] = useState(false);
+  const [pets, setPets] = useState<PetData[]>([]);
+  const [loading, setLoading] = useState(false);
   const { language } = useLanguage();
   const { user } = useAuth();
 
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  useEffect(() => {
+    const fetchPets = async () => {
+      if (!user) return;
+      
+      setLoading(true);
+      try {
+        const { data, error } = await supabase
+          .from('pets')
+          .select('*')
+          .eq('user_id', user.id)
+          .eq('is_active', true)
+          .order('created_at', { ascending: false });
+          
+        if (error) throw error;
+        
+        if (data) {
+          const formattedPets: PetData[] = data.map(pet => ({
+            id: pet.id,
+            name: pet.name,
+            species: pet.species as 'dog' | 'cat' | 'bird' | 'rabbit' | 'fish' | 'other',
+            breed: pet.breed || undefined,
+            age: pet.age || undefined,
+            imageUrl: pet.image_url || undefined
+          }));
+          
+          setPets(formattedPets);
+        }
+      } catch (error) {
+        console.error('Error fetching pets:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchPets();
+  }, [user]);
 
   const translations = {
     en: {
@@ -196,7 +207,7 @@ const Index = () => {
               </div>
               
               <h1 className="text-5xl md:text-6xl font-bold mb-6 leading-tight">
-                {language === 'en' ? 'Keep your pets' : 'Jaga hewan peliharaan Anda agar'}
+                {language === 'en' ? 'Keep your pets' : 'Jaga kesayangan Anda agar'}
                 <span className="bg-clip-text text-transparent bg-gradient-to-r from-coral to-sage ml-2">
                   {t.heading}
                 </span>
@@ -227,7 +238,7 @@ const Index = () => {
                 <div className="absolute top-0 right-0 w-3/4 h-3/4 bg-lavender/30 rounded-full -z-10 animate-pulse-gentle" />
                 <div className="absolute bottom-0 left-0 w-2/3 h-2/3 bg-sage/30 rounded-full -z-10 animate-pulse-gentle [animation-delay:1s]" />
                 <img 
-                  src="https://images.unsplash.com/photo-1583337130417-3346a1be7dee?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MTB8fGRvZyUyMGFuZCUyMGNhdHxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=800&q=60" 
+                  src="https://images.unsplash.com/photo-1517451330947-7809dead78d5?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" 
                   alt="Cat and dog together" 
                   className="rounded-2xl shadow-xl object-cover w-full h-full"
                 />
@@ -313,10 +324,21 @@ const Index = () => {
             </div>
             
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {samplePets.map(pet => (
-                <PetProfileCard key={pet.id} pet={pet} />
-              ))}
-              <AddPetButton />
+              {loading ? (
+                <div className="col-span-full text-center py-8">Loading pets...</div>
+              ) : pets.length > 0 ? (
+                <>
+                  {pets.slice(0, 2).map(pet => (
+                    <PetProfileCard key={pet.id} pet={pet} />
+                  ))}
+                  <AddPetButton />
+                </>
+              ) : (
+                <div className="col-span-full flex flex-col items-center py-8">
+                  <p className="text-muted-foreground mb-4">No pets added yet. Add your first pet!</p>
+                  <AddPetButton />
+                </div>
+              )}
             </div>
           </div>
         </section>

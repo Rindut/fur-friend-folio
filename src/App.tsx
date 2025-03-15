@@ -20,6 +20,7 @@ import PageBreadcrumb from "./components/layout/PageBreadcrumb";
 import AddPet from "./pages/AddPet";
 import EditPet from "./pages/EditPet";
 import OwnerProfile from "./pages/OwnerProfile";
+import AddReminder from "./pages/AddReminder";
 
 const queryClient = new QueryClient();
 
@@ -83,6 +84,14 @@ const App = () => (
                   element={
                     <ProtectedRoute>
                       <Reminders />
+                    </ProtectedRoute>
+                  } 
+                />
+                <Route 
+                  path="/reminders/new" 
+                  element={
+                    <ProtectedRoute>
+                      <AddReminder />
                     </ProtectedRoute>
                   } 
                 />

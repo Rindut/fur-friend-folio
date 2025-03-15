@@ -1,7 +1,7 @@
 
 import { cn } from '@/lib/utils';
 import { Link } from 'react-router-dom';
-import { Heart, Calendar, Clock } from 'lucide-react';
+import { Heart, Calendar, Clock, CheckCircle2, XCircle } from 'lucide-react';
 import PetAvatar from './PetAvatar';
 
 export interface PetData {
@@ -15,6 +15,7 @@ export interface PetData {
     type: string;
     date: string;
   };
+  isActive?: boolean;
 }
 
 interface PetProfileCardProps {
@@ -30,6 +31,7 @@ const PetProfileCard = ({ pet, className }: PetProfileCardProps) => {
           'pet-card group glass-morphism',
           'p-5 flex flex-col gap-4 pet-card-hover',
           'border border-slate-200/50',
+          pet.isActive === false ? 'opacity-60' : '',
           className
         )}
       >
@@ -39,13 +41,26 @@ const PetProfileCard = ({ pet, className }: PetProfileCardProps) => {
             name={pet.name} 
             size="md" 
           />
-          <span className="chip chip-primary">
-            {pet.species === 'dog' ? '🐕' : 
-             pet.species === 'cat' ? '🐈' : 
-             pet.species === 'bird' ? '🦜' : 
-             pet.species === 'rabbit' ? '🐇' : 
-             pet.species === 'fish' ? '🐠' : '🐾'} {pet.species}
-          </span>
+          <div className="flex items-center gap-2">
+            {pet.isActive !== false ? (
+              <span className="flex items-center gap-1 text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full">
+                <CheckCircle2 className="w-3 h-3" />
+                Active
+              </span>
+            ) : (
+              <span className="flex items-center gap-1 text-xs bg-gray-100 text-gray-700 px-2 py-0.5 rounded-full">
+                <XCircle className="w-3 h-3" />
+                Inactive
+              </span>
+            )}
+            <span className="chip chip-primary">
+              {pet.species === 'dog' ? '🐕' : 
+               pet.species === 'cat' ? '🐈' : 
+               pet.species === 'bird' ? '🦜' : 
+               pet.species === 'rabbit' ? '🐇' : 
+               pet.species === 'fish' ? '🐠' : '🐾'} {pet.species}
+            </span>
+          </div>
         </div>
         
         <div>

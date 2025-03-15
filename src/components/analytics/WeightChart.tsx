@@ -1,139 +1,143 @@
 
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
-import {
-  Line,
-  LineChart,
-  CartesianGrid,
-  XAxis,
-  YAxis,
-  ResponsiveContainer,
-  Tooltip,
-  ReferenceLine
-} from "recharts";
-
-interface WeightDataPoint {
-  date: string;
-  value: number;
-}
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { Card, CardContent } from '@/components/ui/card';
 
 interface WeightChartProps {
-  data: WeightDataPoint[];
-  showDetails?: boolean;
+  language?: 'en' | 'id';
 }
 
-const WeightChart = ({ data, showDetails = false }: WeightChartProps) => {
-  // Calculate min and max for y-axis
-  const minWeight = Math.floor(Math.min(...data.map(d => d.value))) - 1;
-  const maxWeight = Math.ceil(Math.max(...data.map(d => d.value))) + 1;
+const WeightChart = ({ language = 'en' }: WeightChartProps) => {
+  const translations = {
+    en: {
+      weight: 'Weight',
+      date: 'Date',
+      kg: 'kg',
+      month: {
+        jan: 'Jan',
+        feb: 'Feb',
+        mar: 'Mar',
+        apr: 'Apr',
+        may: 'May',
+        jun: 'Jun',
+        jul: 'Jul',
+        aug: 'Aug',
+        sep: 'Sep',
+        oct: 'Oct',
+        nov: 'Nov',
+        dec: 'Dec'
+      }
+    },
+    id: {
+      weight: 'Berat',
+      date: 'Tanggal',
+      kg: 'kg',
+      month: {
+        jan: 'Jan',
+        feb: 'Feb',
+        mar: 'Mar',
+        apr: 'Apr',
+        may: 'Mei',
+        jun: 'Jun',
+        jul: 'Jul',
+        aug: 'Agt',
+        sep: 'Sep',
+        oct: 'Okt',
+        nov: 'Nov',
+        dec: 'Des'
+      }
+    }
+  };
+
+  const t = translations[language];
+
+  const data = [
+    {
+      name: t.month.jan,
+      Luna: 24,
+      Max: 12,
+    },
+    {
+      name: t.month.feb,
+      Luna: 24.5,
+      Max: 12.2,
+    },
+    {
+      name: t.month.mar,
+      Luna: 25,
+      Max: 12.5,
+    },
+    {
+      name: t.month.apr,
+      Luna: 25.2,
+      Max: 12.8,
+    },
+    {
+      name: t.month.may,
+      Luna: 25.8,
+      Max: 13,
+    },
+    {
+      name: t.month.jun,
+      Luna: 26,
+      Max: 13.2,
+    },
+  ];
+
+  const CustomTooltip = ({ active, payload, label }: any) => {
+    if (active && payload && payload.length) {
+      return (
+        <Card>
+          <CardContent className="p-2">
+            <p className="text-muted-foreground text-xs">{label}</p>
+            {payload.map((entry: any, index: number) => (
+              <p key={`item-${index}`} className="text-sm">
+                <span className="font-semibold" style={{ color: entry.color }}>
+                  {entry.name}:
+                </span>{' '}
+                {entry.value} {t.kg}
+              </p>
+            ))}
+          </CardContent>
+        </Card>
+      );
+    }
   
-  // Format the dates for display
-  const formattedData = data.map(point => ({
-    ...point,
-    formattedDate: new Date(point.date).toLocaleDateString('en-US', { 
-      month: 'short', 
-      day: 'numeric' 
-    })
-  }));
-  
-  // Calculate ideal weight range
-  const idealWeightMin = Math.round(data[0].value * 0.9);
-  const idealWeightMax = Math.round(data[0].value * 1.1);
-  
+    return null;
+  };
+
   return (
-    <div className="w-full h-full min-h-[200px]">
-      <ChartContainer
-        config={{
-          weight: {
-            label: "Weight",
-            color: "#FF7E67" // coral color
-          },
-          ideal: {
-            label: "Ideal Range",
-            color: "#A2D5AB" // sage color
-          }
-        }}
-      >
-        <ResponsiveContainer width="100%" height={showDetails ? 300 : 200}>
-          <LineChart
-            data={formattedData}
-            margin={{ top: 20, right: 20, left: 20, bottom: 20 }}
+    <div>
+      <div style={{ width: '100%', height: 300 }}>
+        <ResponsiveContainer>
+          <AreaChart
+            data={data}
+            margin={{
+              top: 10,
+              right: 30,
+              left: 0,
+              bottom: 0,
+            }}
           >
-            {showDetails && (
-              <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-            )}
-            
+            <CartesianGrid strokeDasharray="3 3" />
             <XAxis 
-              dataKey="formattedDate" 
-              tick={{ fontSize: 12 }}
-              tickLine={showDetails}
-              axisLine={showDetails}
+              dataKey="name" 
+              tick={{ fontSize: 12 }} 
             />
-            
             <YAxis 
-              domain={[minWeight, maxWeight]}
-              tick={{ fontSize: 12 }}
-              tickLine={showDetails}
-              axisLine={showDetails}
-              tickCount={5}
-              width={30}
+              tick={{ fontSize: 12 }} 
+              label={{ 
+                value: `${t.weight} (${t.kg})`, 
+                angle: -90, 
+                position: 'insideLeft',
+                style: { textAnchor: 'middle', fontSize: 12 }
+              }} 
             />
-            
-            {showDetails && (
-              <>
-                <ReferenceLine 
-                  y={idealWeightMin} 
-                  stroke="#A2D5AB" 
-                  strokeDasharray="3 3" 
-                  label={{ 
-                    value: 'Min Ideal', 
-                    position: 'insideLeft',
-                    fill: '#A2D5AB',
-                    fontSize: 10 
-                  }} 
-                />
-                <ReferenceLine 
-                  y={idealWeightMax} 
-                  stroke="#A2D5AB" 
-                  strokeDasharray="3 3" 
-                  label={{ 
-                    value: 'Max Ideal', 
-                    position: 'insideLeft',
-                    fill: '#A2D5AB',
-                    fontSize: 10 
-                  }} 
-                />
-              </>
-            )}
-            
-            <ChartTooltip
-              content={
-                <ChartTooltipContent
-                  indicator="dot"
-                  formatter={(value, name) => [
-                    `${value} lbs`,
-                    name === "value" ? "Weight" : name,
-                  ]}
-                />
-              }
-            />
-            
-            <Line
-              type="monotone"
-              dataKey="value"
-              stroke="var(--coral)"
-              strokeWidth={2}
-              dot={{
-                stroke: 'var(--coral)',
-                strokeWidth: 2,
-                r: 4,
-                fill: 'white'
-              }}
-              activeDot={{ r: 6, fill: 'var(--coral)' }}
-              name="weight"
-            />
-          </LineChart>
+            <Tooltip content={<CustomTooltip />} />
+            <Area type="monotone" dataKey="Luna" stroke="#8884d8" fill="#8884d8" fillOpacity={0.3} />
+            <Area type="monotone" dataKey="Max" stroke="#82ca9d" fill="#82ca9d" fillOpacity={0.3} />
+          </AreaChart>
         </ResponsiveContainer>
-      </ChartContainer>
+      </div>
     </div>
   );
 };
