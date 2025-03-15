@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
@@ -6,7 +5,6 @@ import {
   Home, 
   Calendar, 
   Heart, 
-  Bell, 
   PawPrint,
   Menu, 
   X,
@@ -51,7 +49,6 @@ const Navbar = () => {
       home: 'Home',
       dashboard: 'Dashboard',
       health: 'Health',
-      reminders: 'Reminders',
       services: 'Local Services',
       signIn: 'Sign In',
       signOut: 'Sign Out',
@@ -62,7 +59,6 @@ const Navbar = () => {
       home: 'Beranda',
       dashboard: 'Dasbor',
       health: 'Kesehatan',
-      reminders: 'Pengingat',
       services: 'Layanan Lokal',
       signIn: 'Masuk',
       signOut: 'Keluar',
@@ -75,21 +71,20 @@ const Navbar = () => {
 
   // Basic links for all users
   let navLinks = [
-    { name: t.home, path: '/', icon: <Home className="w-5 h-5" /> },
+    { name: t.home, path: '/', icon: <Home className="w-4 h-4" /> },
   ];
   
   // Add authenticated user links
   if (user) {
     navLinks = [
       ...navLinks,
-      { name: t.dashboard, path: '/dashboard', icon: <PawPrint className="w-5 h-5" /> },
-      { name: t.health, path: '/health', icon: <Heart className="w-5 h-5" /> },
-      { name: t.reminders, path: '/reminders', icon: <Bell className="w-5 h-5" /> },
+      { name: t.dashboard, path: '/dashboard', icon: <PawPrint className="w-4 h-4" /> },
+      { name: t.health, path: '/health', icon: <Heart className="w-4 h-4" /> },
     ];
   }
   
   // Add services link for all users
-  navLinks.push({ name: t.services, path: '/services', icon: <Map className="w-5 h-5" /> });
+  navLinks.push({ name: t.services, path: '/services', icon: <Map className="w-4 h-4" /> });
 
   const handleSignOut = async () => {
     await signOut();
@@ -104,29 +99,29 @@ const Navbar = () => {
     <header
       className={cn(
         'fixed top-0 left-0 right-0 z-50 transition-all duration-300 backdrop-blur',
-        scrolled ? 'py-3 shadow-md bg-white/80' : 'py-5 bg-transparent'
+        scrolled ? 'py-2 shadow-md bg-white/80' : 'py-3 bg-transparent'
       )}
     >
       <div className="container mx-auto px-4 md:px-6">
         <div className="flex items-center justify-between">
           <Link 
             to="/" 
-            className="flex items-center gap-2 text-xl font-display font-bold"
+            className="flex items-center gap-1 text-lg font-display font-bold"
             onClick={() => setIsOpen(false)}
           >
-            <PawPrint className="w-8 h-8 text-coral" />
+            <PawPrint className="w-6 h-6 text-coral" />
             <span className="bg-clip-text text-transparent bg-gradient-to-r from-coral to-sage">ANABULKU</span>
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center gap-4">
+          <div className="hidden md:flex items-center gap-3">
             <nav className="flex items-center gap-1">
               {navLinks.map((link) => (
                 <Link
                   key={link.path}
                   to={link.path}
                   className={cn(
-                    'px-4 py-2 rounded-full transition-all duration-200 flex items-center gap-2',
+                    'px-3 py-1.5 rounded-full transition-all duration-200 flex items-center gap-1.5 text-sm',
                     location.pathname === link.path
                       ? 'bg-coral/20 text-coral font-medium'
                       : 'hover:bg-muted/30 text-charcoal/80 hover:text-charcoal'
@@ -140,10 +135,10 @@ const Navbar = () => {
             
             <button 
               onClick={toggleLanguage}
-              className="p-2 rounded-full hover:bg-muted/30 text-charcoal/80"
+              className="p-1.5 rounded-full hover:bg-muted/30 text-charcoal/80"
               aria-label="Toggle language"
             >
-              <Globe className="w-5 h-5" />
+              <Globe className="w-4 h-4" />
               <span className="sr-only">
                 {language === 'en' ? 'Switch to Bahasa Indonesia' : 'Switch to English'}
               </span>
@@ -152,9 +147,9 @@ const Navbar = () => {
             {user ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="relative h-10 w-10 rounded-full">
-                    <Avatar className="h-10 w-10 border border-muted">
-                      <AvatarFallback className="bg-sage/20 text-sage">
+                  <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+                    <Avatar className="h-8 w-8 border border-muted">
+                      <AvatarFallback className="bg-sage/20 text-sage text-xs">
                         {getInitials(user.email)}
                       </AvatarFallback>
                     </Avatar>
@@ -176,8 +171,8 @@ const Navbar = () => {
               </DropdownMenu>
             ) : (
               <Link to="/auth">
-                <Button variant="default" className="flex items-center gap-2">
-                  <LogIn className="w-4 h-4" />
+                <Button variant="default" className="flex items-center gap-1.5 py-1.5 px-3 h-auto text-sm">
+                  <LogIn className="w-3.5 h-3.5" />
                   {t.signIn}
                 </Button>
               </Link>

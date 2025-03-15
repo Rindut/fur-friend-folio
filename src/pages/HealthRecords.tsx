@@ -9,7 +9,9 @@ import {
   Weight, 
   AlertCircle,
   Plus,
-  Calendar
+  Calendar,
+  ArrowRight,
+  Bell
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import PetAvatar from '@/components/ui/PetAvatar';
@@ -103,6 +105,24 @@ const sampleHealthRecords: HealthRecord[] = [
   }
 ];
 
+// Sample upcoming health tasks
+const upcomingTasks = [
+  {
+    id: '1',
+    title: 'Rabies Vaccination',
+    date: 'June 15, 2023',
+    petName: 'Luna',
+    petId: '1',
+  },
+  {
+    id: '2',
+    title: 'Annual Checkup',
+    date: 'June 20, 2023',
+    petName: 'Oliver',
+    petId: '2',
+  }
+];
+
 const HealthRecords = () => {
   const [selectedPet, setSelectedPet] = useState<string>(samplePets[0].id);
   const [activeTab, setActiveTab] = useState<string>('all');
@@ -110,24 +130,38 @@ const HealthRecords = () => {
   
   const translations = {
     en: {
-      pageTitle: 'Health Records',
+      pageTitle: 'Health',
+      healthRecords: 'Health Records',
+      healthRecordsDesc: 'Track your pet\'s complete medical history in one place. Store past veterinary visits, vaccinations, medications, surgeries, and health conditions.',
+      upcoming: 'Upcoming',
+      upcomingDesc: 'Never miss important pet care schedules with smart reminders for upcoming appointments.',
       all: 'All',
       vaccinations: 'Vaccinations',
       medications: 'Medications',
       visits: 'Vet Visits',
       addRecord: 'Add Record',
+      addReminder: 'Add Reminder',
       noRecords: 'No health records found. Add a new record to get started.',
-      details: 'Details'
+      noUpcoming: 'No upcoming health tasks.',
+      details: 'Details',
+      viewCalendar: 'View Calendar'
     },
     id: {
-      pageTitle: 'Catatan Kesehatan',
+      pageTitle: 'Kesehatan',
+      healthRecords: 'Catatan Kesehatan',
+      healthRecordsDesc: 'Lacak riwayat medis lengkap hewan peliharaan Anda dalam satu tempat. Simpan kunjungan dokter hewan, vaksinasi, pengobatan, operasi, dan kondisi kesehatan.',
+      upcoming: 'Mendatang',
+      upcomingDesc: 'Jangan pernah melewatkan jadwal perawatan hewan peliharaan penting dengan pengingat pintar untuk janji temu mendatang.',
       all: 'Semua',
       vaccinations: 'Vaksinasi',
       medications: 'Pengobatan',
       visits: 'Kunjungan Dokter',
       addRecord: 'Tambah Catatan',
+      addReminder: 'Tambah Pengingat',
       noRecords: 'Tidak ada catatan kesehatan. Tambahkan catatan baru untuk memulai.',
-      details: 'Detail'
+      noUpcoming: 'Tidak ada tugas kesehatan mendatang.',
+      details: 'Detail',
+      viewCalendar: 'Lihat Kalender'
     }
   };
   
@@ -170,37 +204,53 @@ const HealthRecords = () => {
         <div className="container px-4 mx-auto">
           <h1 className="text-3xl font-bold mb-8">{t.pageTitle}</h1>
           
-          {/* Pet Selector */}
-          <div className="flex flex-wrap gap-3 mb-8">
-            {samplePets.map(pet => (
-              <button
-                key={pet.id}
-                className={`px-4 py-2 rounded-full flex items-center gap-2 transition-all duration-200 ${
-                  selectedPet === pet.id 
-                    ? 'bg-lavender/30 text-charcoal' 
-                    : 'bg-white/70 text-muted-foreground hover:bg-lavender/10'
-                }`}
-                onClick={() => setSelectedPet(pet.id)}
-              >
-                <PetAvatar 
-                  src={pet.imageUrl} 
-                  name={pet.name} 
-                  size="sm" 
-                />
-                <span>{pet.name}</span>
-              </button>
-            ))}
-          </div>
-          
-          {/* Record Type Tabs */}
-          <Tabs 
-            defaultValue="all" 
-            value={activeTab}
-            onValueChange={setActiveTab}
-            className="w-full"
-          >
-            <div className="flex items-center justify-between mb-6">
-              <TabsList className="bg-white/70 p-1">
+          {/* Health Records Section */}
+          <div className="mb-12">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-semibold flex items-center gap-2">
+                <Heart className="text-coral w-5 h-5" /> {t.healthRecords}
+              </h2>
+              
+              <Button className="rounded-full bg-lavender hover:bg-lavender/90" asChild>
+                <Link to="/health/add">
+                  <Plus className="w-4 h-4 mr-2" />
+                  {t.addRecord}
+                </Link>
+              </Button>
+            </div>
+            
+            <p className="text-muted-foreground mb-6">{t.healthRecordsDesc}</p>
+            
+            {/* Pet Selector */}
+            <div className="flex flex-wrap gap-3 mb-6">
+              {samplePets.map(pet => (
+                <button
+                  key={pet.id}
+                  className={`px-4 py-2 rounded-full flex items-center gap-2 transition-all duration-200 ${
+                    selectedPet === pet.id 
+                      ? 'bg-lavender/30 text-charcoal' 
+                      : 'bg-white/70 text-muted-foreground hover:bg-lavender/10'
+                  }`}
+                  onClick={() => setSelectedPet(pet.id)}
+                >
+                  <PetAvatar 
+                    src={pet.imageUrl} 
+                    name={pet.name} 
+                    size="sm" 
+                  />
+                  <span>{pet.name}</span>
+                </button>
+              ))}
+            </div>
+            
+            {/* Record Type Tabs */}
+            <Tabs 
+              defaultValue="all" 
+              value={activeTab}
+              onValueChange={setActiveTab}
+              className="w-full"
+            >
+              <TabsList className="bg-white/70 p-1 mb-6">
                 <TabsTrigger 
                   value="all"
                   className="data-[state=active]:bg-lavender/30 data-[state=active]:text-charcoal rounded-lg"
@@ -231,51 +281,102 @@ const HealthRecords = () => {
                 </TabsTrigger>
               </TabsList>
               
-              <Button className="rounded-full bg-lavender hover:bg-lavender/90" asChild>
-                <Link to="/health/add">
-                  <Plus className="w-4 h-4 mr-2" />
-                  {t.addRecord}
-                </Link>
-              </Button>
+              <TabsContent value="all" className="mt-0">
+                <HealthRecordsList 
+                  records={currentPetRecords} 
+                  getRecordIcon={getRecordIcon} 
+                  getRecordTypeColor={getRecordTypeColor} 
+                  detailsText={t.details}
+                  noRecordsText={t.noRecords}
+                />
+              </TabsContent>
+              <TabsContent value="vaccination" className="mt-0">
+                <HealthRecordsList 
+                  records={currentPetRecords} 
+                  getRecordIcon={getRecordIcon} 
+                  getRecordTypeColor={getRecordTypeColor} 
+                  detailsText={t.details}
+                  noRecordsText={t.noRecords}
+                />
+              </TabsContent>
+              <TabsContent value="medication" className="mt-0">
+                <HealthRecordsList 
+                  records={currentPetRecords} 
+                  getRecordIcon={getRecordIcon} 
+                  getRecordTypeColor={getRecordTypeColor} 
+                  detailsText={t.details}
+                  noRecordsText={t.noRecords}
+                />
+              </TabsContent>
+              <TabsContent value="visit" className="mt-0">
+                <HealthRecordsList 
+                  records={currentPetRecords} 
+                  getRecordIcon={getRecordIcon} 
+                  getRecordTypeColor={getRecordTypeColor} 
+                  detailsText={t.details}
+                  noRecordsText={t.noRecords}
+                />
+              </TabsContent>
+            </Tabs>
+          </div>
+          
+          {/* Upcoming Section */}
+          <div>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-semibold flex items-center gap-2">
+                <Bell className="text-coral w-5 h-5" /> {t.upcoming}
+              </h2>
+              
+              <div className="flex gap-3">
+                <Button variant="outline" className="rounded-full" asChild>
+                  <Link to="/reminders">
+                    <Calendar className="w-4 h-4 mr-2" />
+                    {t.viewCalendar}
+                  </Link>
+                </Button>
+                <Button className="rounded-full bg-coral hover:bg-coral/90" asChild>
+                  <Link to="/reminders/new">
+                    <Plus className="w-4 h-4 mr-2" />
+                    {t.addReminder}
+                  </Link>
+                </Button>
+              </div>
             </div>
             
-            <TabsContent value="all" className="mt-0">
-              <HealthRecordsList 
-                records={currentPetRecords} 
-                getRecordIcon={getRecordIcon} 
-                getRecordTypeColor={getRecordTypeColor} 
-                detailsText={t.details}
-                noRecordsText={t.noRecords}
-              />
-            </TabsContent>
-            <TabsContent value="vaccination" className="mt-0">
-              <HealthRecordsList 
-                records={currentPetRecords} 
-                getRecordIcon={getRecordIcon} 
-                getRecordTypeColor={getRecordTypeColor} 
-                detailsText={t.details}
-                noRecordsText={t.noRecords}
-              />
-            </TabsContent>
-            <TabsContent value="medication" className="mt-0">
-              <HealthRecordsList 
-                records={currentPetRecords} 
-                getRecordIcon={getRecordIcon} 
-                getRecordTypeColor={getRecordTypeColor} 
-                detailsText={t.details}
-                noRecordsText={t.noRecords}
-              />
-            </TabsContent>
-            <TabsContent value="visit" className="mt-0">
-              <HealthRecordsList 
-                records={currentPetRecords} 
-                getRecordIcon={getRecordIcon} 
-                getRecordTypeColor={getRecordTypeColor} 
-                detailsText={t.details}
-                noRecordsText={t.noRecords}
-              />
-            </TabsContent>
-          </Tabs>
+            <p className="text-muted-foreground mb-6">{t.upcomingDesc}</p>
+            
+            {upcomingTasks.length > 0 ? (
+              <div className="space-y-4">
+                {upcomingTasks.map(task => (
+                  <div 
+                    key={task.id}
+                    className="glass-morphism rounded-xl p-5 hover:shadow-md transition-shadow flex items-center"
+                  >
+                    <div className="bg-coral/20 text-coral p-2 rounded-full mr-4">
+                      <Calendar className="w-4 h-4" />
+                    </div>
+                    
+                    <div className="flex-1">
+                      <h3 className="font-medium">{task.title}</h3>
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground mt-1">
+                        <span>{task.date}</span>
+                        <span>•</span>
+                        <span>{task.petName}</span>
+                      </div>
+                    </div>
+                    
+                    <Button variant="ghost" size="sm" className="text-muted-foreground">
+                      {t.details}
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="glass-morphism rounded-xl p-6 text-center">
+                <p className="text-muted-foreground">{t.noUpcoming}</p>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>

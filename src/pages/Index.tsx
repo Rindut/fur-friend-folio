@@ -1,8 +1,9 @@
+
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion';
-import { PawPrint, Heart, Calendar, Bell, ArrowRight, Map } from 'lucide-react';
+import { PawPrint, Heart, Calendar, Bell, ArrowRight, Map, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import PetProfileCard, { PetData } from '@/components/ui/PetProfileCard';
 import AddPetButton from '@/components/ui/AddPetButton';
@@ -71,18 +72,19 @@ const Index = () => {
       healthRecordsDesc: 'Store all health information in one place. Track vaccinations, medications, and vet visits.',
       smartReminders: 'Smart Reminders',
       smartRemindersDesc: 'Never miss important pet care tasks with customizable reminders for medications, vet visits, and more.',
-      careCalendar: 'Care Calendar',
-      careCalendarDesc: 'View all upcoming care tasks in a convenient calendar view for better planning.',
+      dashboard: 'Dashboard',
+      dashboardDesc: 'View all upcoming care tasks in a convenient dashboard view for better planning.',
       localServices: 'Local Pet Services',
       localServicesDesc: 'Find and review local pet services - vets, groomers, pet shops, and more in your area.',
       petFamily: 'Your Pet Family',
+      petParent: 'Pet Parent',
+      yourPets: 'Your Pets',
       viewAll: 'View All',
       ctaHeading: 'Ready to give your pets the care they deserve?',
       ctaDesc: 'Join thousands of pet owners who have simplified pet care with ANABULKU.',
       ctaButton: 'Get Started Now',
       signIn: 'Sign In',
       signUp: 'Sign Up',
-      dashboard: 'Go to Dashboard',
       findServices: 'Find Local Services'
     },
     id: {
@@ -97,18 +99,19 @@ const Index = () => {
       healthRecordsDesc: 'Simpan semua informasi kesehatan dalam satu tempat. Lacak vaksinasi, pengobatan, dan kunjungan dokter hewan.',
       smartReminders: 'Pengingat Pintar',
       smartRemindersDesc: 'Jangan lewatkan tugas perawatan hewan peliharaan penting dengan pengingat yang dapat disesuaikan untuk pengobatan, kunjungan dokter hewan, dan lainnya.',
-      careCalendar: 'Kalender Perawatan',
-      careCalendarDesc: 'Lihat semua tugas perawatan mendatang dalam tampilan kalender yang nyaman untuk perencanaan yang lebih baik.',
+      dashboard: 'Dasbor',
+      dashboardDesc: 'Lihat semua tugas perawatan mendatang dalam tampilan dasbor yang nyaman untuk perencanaan yang lebih baik.',
       localServices: 'Layanan Hewan Lokal',
       localServicesDesc: 'Temukan dan ulas layanan hewan peliharaan lokal - dokter hewan, salon, toko hewan, dan lainnya di area Anda.',
       petFamily: 'Keluarga Hewan Peliharaan Anda',
+      petParent: 'Pemilik Hewan',
+      yourPets: 'Hewan Peliharaan Anda',
       viewAll: 'Lihat Semua',
       ctaHeading: 'Siap memberikan hewan peliharaan Anda perawatan yang mereka layak?',
       ctaDesc: 'Bergabunglah dengan ribuan pemilik hewan peliharaan yang telah menyederhanakan perawatan hewan peliharaan dengan ANABULKU.',
       ctaButton: 'Mulai Sekarang',
       signIn: 'Masuk',
       signUp: 'Daftar',
-      dashboard: 'Ke Dasbor',
       findServices: 'Temukan Layanan Lokal'
     }
   };
@@ -270,6 +273,16 @@ const Index = () => {
             animate={mounted ? "visible" : "hidden"}
           >
             <motion.div variants={itemVariants} className="glass-morphism rounded-2xl p-6 text-center">
+              <div className="bg-sage/20 text-sage p-3 rounded-full w-14 h-14 flex items-center justify-center mx-auto mb-4">
+                <Calendar className="w-6 h-6" />
+              </div>
+              <h3 className="text-xl font-semibold mb-3">{t.dashboard}</h3>
+              <p className="text-muted-foreground">
+                {t.dashboardDesc}
+              </p>
+            </motion.div>
+            
+            <motion.div variants={itemVariants} className="glass-morphism rounded-2xl p-6 text-center">
               <div className="bg-lavender/20 text-lavender p-3 rounded-full w-14 h-14 flex items-center justify-center mx-auto mb-4">
                 <Heart className="w-6 h-6" />
               </div>
@@ -286,16 +299,6 @@ const Index = () => {
               <h3 className="text-xl font-semibold mb-3">{t.smartReminders}</h3>
               <p className="text-muted-foreground">
                 {t.smartRemindersDesc}
-              </p>
-            </motion.div>
-            
-            <motion.div variants={itemVariants} className="glass-morphism rounded-2xl p-6 text-center">
-              <div className="bg-sage/20 text-sage p-3 rounded-full w-14 h-14 flex items-center justify-center mx-auto mb-4">
-                <Calendar className="w-6 h-6" />
-              </div>
-              <h3 className="text-xl font-semibold mb-3">{t.careCalendar}</h3>
-              <p className="text-muted-foreground">
-                {t.careCalendarDesc}
               </p>
             </motion.div>
             
@@ -323,22 +326,52 @@ const Index = () => {
               </Link>
             </div>
             
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {loading ? (
-                <div className="col-span-full text-center py-8">Loading pets...</div>
-              ) : pets.length > 0 ? (
-                <>
-                  {pets.slice(0, 2).map(pet => (
-                    <PetProfileCard key={pet.id} pet={pet} />
-                  ))}
-                  <AddPetButton />
-                </>
-              ) : (
-                <div className="col-span-full flex flex-col items-center py-8">
-                  <p className="text-muted-foreground mb-4">No pets added yet. Add your first pet!</p>
-                  <AddPetButton />
+            {/* Pet Parent Section */}
+            <div className="mb-8">
+              <h3 className="text-lg font-medium mb-4 flex items-center gap-2">
+                <User className="w-5 h-5 text-sage" /> {t.petParent}
+              </h3>
+              <div className="glass-morphism rounded-xl p-5 flex items-center">
+                <Avatar className="h-12 w-12 mr-4 border border-sage/20">
+                  <AvatarFallback className="bg-sage/20 text-sage">
+                    {user ? user.email.substring(0, 2).toUpperCase() : 'U'}
+                  </AvatarFallback>
+                </Avatar>
+                <div>
+                  <h4 className="font-medium">{user.user_metadata?.username || 'Pet Parent'}</h4>
+                  <p className="text-sm text-muted-foreground">{user.email}</p>
                 </div>
-              )}
+                <Link to="/profile" className="ml-auto">
+                  <Button variant="outline" size="sm" className="rounded-full">
+                    <User className="w-4 h-4 mr-1" />
+                    <span>Profile</span>
+                  </Button>
+                </Link>
+              </div>
+            </div>
+            
+            {/* Pets Section */}
+            <div>
+              <h3 className="text-lg font-medium mb-4 flex items-center gap-2">
+                <PawPrint className="w-5 h-5 text-coral" /> {t.yourPets}
+              </h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {loading ? (
+                  <div className="col-span-full text-center py-8">Loading pets...</div>
+                ) : pets.length > 0 ? (
+                  <>
+                    {pets.slice(0, 2).map(pet => (
+                      <PetProfileCard key={pet.id} pet={pet} />
+                    ))}
+                    <AddPetButton />
+                  </>
+                ) : (
+                  <div className="col-span-full flex flex-col items-center py-8">
+                    <p className="text-muted-foreground mb-4">No pets added yet. Add your first pet!</p>
+                    <AddPetButton />
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </section>
