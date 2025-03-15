@@ -1,5 +1,6 @@
 
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { 
   Heart, 
@@ -12,6 +13,7 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import PetAvatar from '@/components/ui/PetAvatar';
+import { useLanguage } from '@/context/LanguageContext';
 
 interface HealthRecord {
   id: string;
@@ -104,6 +106,32 @@ const sampleHealthRecords: HealthRecord[] = [
 const HealthRecords = () => {
   const [selectedPet, setSelectedPet] = useState<string>(samplePets[0].id);
   const [activeTab, setActiveTab] = useState<string>('all');
+  const { language } = useLanguage();
+  
+  const translations = {
+    en: {
+      pageTitle: 'Health Records',
+      all: 'All',
+      vaccinations: 'Vaccinations',
+      medications: 'Medications',
+      visits: 'Vet Visits',
+      addRecord: 'Add Record',
+      noRecords: 'No health records found. Add a new record to get started.',
+      details: 'Details'
+    },
+    id: {
+      pageTitle: 'Catatan Kesehatan',
+      all: 'Semua',
+      vaccinations: 'Vaksinasi',
+      medications: 'Pengobatan',
+      visits: 'Kunjungan Dokter',
+      addRecord: 'Tambah Catatan',
+      noRecords: 'Tidak ada catatan kesehatan. Tambahkan catatan baru untuk memulai.',
+      details: 'Detail'
+    }
+  };
+  
+  const t = translations[language];
   
   const getRecordIcon = (type: HealthRecord['type']) => {
     switch (type) {
@@ -140,7 +168,7 @@ const HealthRecords = () => {
     <div className="min-h-screen pb-20">
       <div className="bg-gradient-to-b from-lavender/20 to-transparent pt-8 pb-12">
         <div className="container px-4 mx-auto">
-          <h1 className="text-3xl font-bold mb-8">Health Records</h1>
+          <h1 className="text-3xl font-bold mb-8">{t.pageTitle}</h1>
           
           {/* Pet Selector */}
           <div className="flex flex-wrap gap-3 mb-8">
@@ -178,48 +206,74 @@ const HealthRecords = () => {
                   className="data-[state=active]:bg-lavender/30 data-[state=active]:text-charcoal rounded-lg"
                 >
                   <Heart className="w-4 h-4 mr-2" />
-                  All
+                  {t.all}
                 </TabsTrigger>
                 <TabsTrigger 
                   value="vaccination"
                   className="data-[state=active]:bg-lavender/30 data-[state=active]:text-charcoal rounded-lg"
                 >
                   <Droplets className="w-4 h-4 mr-2" />
-                  Vaccinations
+                  {t.vaccinations}
                 </TabsTrigger>
                 <TabsTrigger 
                   value="medication"
                   className="data-[state=active]:bg-lavender/30 data-[state=active]:text-charcoal rounded-lg"
                 >
                   <Pill className="w-4 h-4 mr-2" />
-                  Medications
+                  {t.medications}
                 </TabsTrigger>
                 <TabsTrigger 
                   value="visit"
                   className="data-[state=active]:bg-lavender/30 data-[state=active]:text-charcoal rounded-lg"
                 >
                   <AlertCircle className="w-4 h-4 mr-2" />
-                  Vet Visits
+                  {t.visits}
                 </TabsTrigger>
               </TabsList>
               
-              <Button className="rounded-full bg-lavender hover:bg-lavender/90">
-                <Plus className="w-4 h-4 mr-2" />
-                Add Record
+              <Button className="rounded-full bg-lavender hover:bg-lavender/90" asChild>
+                <Link to="/health/add">
+                  <Plus className="w-4 h-4 mr-2" />
+                  {t.addRecord}
+                </Link>
               </Button>
             </div>
             
             <TabsContent value="all" className="mt-0">
-              <HealthRecordsList records={currentPetRecords} getRecordIcon={getRecordIcon} getRecordTypeColor={getRecordTypeColor} />
+              <HealthRecordsList 
+                records={currentPetRecords} 
+                getRecordIcon={getRecordIcon} 
+                getRecordTypeColor={getRecordTypeColor} 
+                detailsText={t.details}
+                noRecordsText={t.noRecords}
+              />
             </TabsContent>
             <TabsContent value="vaccination" className="mt-0">
-              <HealthRecordsList records={currentPetRecords} getRecordIcon={getRecordIcon} getRecordTypeColor={getRecordTypeColor} />
+              <HealthRecordsList 
+                records={currentPetRecords} 
+                getRecordIcon={getRecordIcon} 
+                getRecordTypeColor={getRecordTypeColor} 
+                detailsText={t.details}
+                noRecordsText={t.noRecords}
+              />
             </TabsContent>
             <TabsContent value="medication" className="mt-0">
-              <HealthRecordsList records={currentPetRecords} getRecordIcon={getRecordIcon} getRecordTypeColor={getRecordTypeColor} />
+              <HealthRecordsList 
+                records={currentPetRecords} 
+                getRecordIcon={getRecordIcon} 
+                getRecordTypeColor={getRecordTypeColor} 
+                detailsText={t.details}
+                noRecordsText={t.noRecords}
+              />
             </TabsContent>
             <TabsContent value="visit" className="mt-0">
-              <HealthRecordsList records={currentPetRecords} getRecordIcon={getRecordIcon} getRecordTypeColor={getRecordTypeColor} />
+              <HealthRecordsList 
+                records={currentPetRecords} 
+                getRecordIcon={getRecordIcon} 
+                getRecordTypeColor={getRecordTypeColor} 
+                detailsText={t.details}
+                noRecordsText={t.noRecords}
+              />
             </TabsContent>
           </Tabs>
         </div>
@@ -232,13 +286,21 @@ interface HealthRecordsListProps {
   records: HealthRecord[];
   getRecordIcon: (type: HealthRecord['type']) => JSX.Element;
   getRecordTypeColor: (type: HealthRecord['type']) => string;
+  detailsText: string;
+  noRecordsText: string;
 }
 
-const HealthRecordsList = ({ records, getRecordIcon, getRecordTypeColor }: HealthRecordsListProps) => {
+const HealthRecordsList = ({ 
+  records, 
+  getRecordIcon, 
+  getRecordTypeColor,
+  detailsText,
+  noRecordsText
+}: HealthRecordsListProps) => {
   if (records.length === 0) {
     return (
       <div className="glass-morphism rounded-xl p-6 text-center">
-        <p className="text-muted-foreground">No health records found. Add a new record to get started.</p>
+        <p className="text-muted-foreground">{noRecordsText}</p>
       </div>
     );
   }
@@ -266,7 +328,7 @@ const HealthRecordsList = ({ records, getRecordIcon, getRecordTypeColor }: Healt
                 </div>
                 
                 <Button variant="ghost" size="sm" className="text-muted-foreground">
-                  Details
+                  {detailsText}
                 </Button>
               </div>
               
