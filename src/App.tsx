@@ -17,6 +17,9 @@ import LocalServices from "./pages/LocalServices";
 import NotFound from "./pages/NotFound";
 import Navbar from "./components/layout/Navbar";
 import PageBreadcrumb from "./components/layout/PageBreadcrumb";
+import AddPet from "./pages/AddPet";
+import EditPet from "./pages/EditPet";
+import OwnerProfile from "./pages/OwnerProfile";
 
 const queryClient = new QueryClient();
 
@@ -88,6 +91,30 @@ const App = () => (
                   element={
                     <ProtectedRoute>
                       <PetProfile />
+                    </ProtectedRoute>
+                  } 
+                />
+                <Route 
+                  path="/pets/new" 
+                  element={
+                    <ProtectedRoute>
+                      <AddPet />
+                    </ProtectedRoute>
+                  } 
+                />
+                <Route 
+                  path="/pets/:id/edit" 
+                  element={
+                    <ProtectedRoute>
+                      <EditPet />
+                    </ProtectedRoute>
+                  } 
+                />
+                <Route 
+                  path="/profile" 
+                  element={
+                    <ProtectedRoute>
+                      <OwnerProfile />
                     </ProtectedRoute>
                   } 
                 />

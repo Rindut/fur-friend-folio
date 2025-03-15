@@ -1,6 +1,6 @@
 
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Droplets, Pill, Weight, AlertCircle, Calendar } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -10,6 +10,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useToast } from '@/hooks/use-toast';
 import { useLanguage } from '@/context/LanguageContext';
 import PetAvatar from '@/components/ui/PetAvatar';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/context/AuthContext';
 
 interface Pet {
   id: string;
@@ -17,28 +19,21 @@ interface Pet {
   imageUrl?: string;
 }
 
-// Sample data
-const samplePets: Pet[] = [
-  {
-    id: '1',
-    name: 'Luna',
-    imageUrl: 'https://images.unsplash.com/photo-1552053831-71594a27632d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8ZG9nfGVufDB8fDB8fA%3D%3D&auto=format&fit=crop&w=500&q=60',
-  },
-  {
-    id: '2',
-    name: 'Oliver',
-    imageUrl: 'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8Y2F0fGVufDB8fDB8fA%3D%3D&auto=format&fit=crop&w=500&q=60',
-  }
-];
+type RecordType = 'vaccination' | 'medication' | 'weight' | 'visit';
 
 const AddHealthRecord = () => {
+  const [searchParams] = useSearchParams();
+  const petIdFromUrl = searchParams.get('pet');
   const navigate = useNavigate();
   const { toast } = useToast();
   const { language } = useLanguage();
+  const { user } = useAuth();
+  const [pets, setPets] = useState<Pet[]>([]);
+  const [loading, setLoading] = useState(true);
   
   const [formData, setFormData] = useState({
-    petId: '',
-    type: '',
+    petId: petIdFromUrl || '',
+    type: 'vaccination' as RecordType, // Fixed type initialization
     title: '',
     date: '',
     details: ''
@@ -63,7 +58,8 @@ const AddHealthRecord = () => {
         weight: 'Weight',
         visit: 'Vet Visit'
       },
-      success: 'Health record added successfully'
+      success: 'Health record added successfully',
+      loadingPets: 'Loading pets...'
     },
     id: {
       pageTitle: 'Tambah Catatan Kesehatan',
@@ -83,13 +79,58 @@ const AddHealthRecord = () => {
         weight: 'Berat',
         visit: 'Kunjungan Dokter Hewan'
       },
-      success: 'Catatan kesehatan berhasil ditambahkan'
+      success: 'Catatan kesehatan berhasil ditambahkan',
+      loadingPets: 'Memuat hewan peliharaan...'
     }
   };
   
   const t = translations[language];
   
-  const getTypeIcon = (type: string) => {
+  useEffect(() => {
+    const fetchPets = async () => {
+      if (!user) return;
+      
+      try {
+        const { data, error } = await supabase
+          .from('pets')
+          .select('id, name, image_url')
+          .eq('user_id', user.id)
+          .eq('is_active', true)
+          .order('created_at', { ascending: true });
+          
+        if (error) throw error;
+        
+        if (data) {
+          setPets(data.map(pet => ({
+            id: pet.id,
+            name: pet.name,
+            imageUrl: pet.image_url
+          })));
+          
+          // If a pet ID was provided in URL and it's valid, set it as selected
+          if (petIdFromUrl && data.some(pet => pet.id === petIdFromUrl)) {
+            setFormData(prev => ({ ...prev, petId: petIdFromUrl }));
+          } else if (data.length > 0 && !petIdFromUrl) {
+            // If no pet ID in URL but we have pets, select the first one
+            setFormData(prev => ({ ...prev, petId: data[0].id }));
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching pets:', error);
+        toast({
+          title: 'Error',
+          description: 'Failed to load pets',
+          variant: 'destructive'
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchPets();
+  }, [user, petIdFromUrl, toast]);
+  
+  const getTypeIcon = (type: RecordType) => {
     switch (type) {
       case 'vaccination':
         return <Droplets className="w-4 h-4" />;
@@ -104,25 +145,77 @@ const AddHealthRecord = () => {
     }
   };
   
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Here you would normally save the data to your backend
-    console.log('Saving health record:', formData);
+    if (!user) {
+      toast({
+        title: 'Not logged in',
+        description: 'You need to be logged in to add a health record',
+        variant: 'destructive',
+      });
+      return;
+    }
     
-    // Show success toast
-    toast({
-      title: t.success,
-      duration: 3000
-    });
+    if (!formData.petId || !formData.type || !formData.title || !formData.date) {
+      toast({
+        title: 'Missing information',
+        description: 'Please fill in all required fields',
+        variant: 'destructive',
+      });
+      return;
+    }
     
-    // Navigate back to health records
-    navigate('/health');
+    try {
+      // Insert health record into Supabase
+      const { error } = await supabase
+        .from('health_records')
+        .insert([
+          {
+            pet_id: formData.petId,
+            type: formData.type,
+            title: formData.title,
+            date: formData.date,
+            details: formData.details || null,
+            user_id: user.id
+          }
+        ]);
+        
+      if (error) throw error;
+      
+      // Show success toast
+      toast({
+        title: t.success,
+        duration: 3000
+      });
+      
+      // Navigate back to health records or pet profile
+      if (formData.petId) {
+        navigate(`/health?pet=${formData.petId}`);
+      } else {
+        navigate('/health');
+      }
+    } catch (error) {
+      console.error('Error adding health record:', error);
+      toast({
+        title: 'Error',
+        description: 'There was an error adding the health record',
+        variant: 'destructive',
+      });
+    }
   };
   
   const handleChange = (name: string, value: string) => {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
+  
+  if (loading) {
+    return (
+      <div className="container px-4 mx-auto py-12 flex items-center justify-center">
+        <div className="animate-pulse">{t.loadingPets}</div>
+      </div>
+    );
+  }
   
   return (
     <div className="min-h-screen pb-20">
@@ -139,7 +232,7 @@ const AddHealthRecord = () => {
                   <div className="space-y-2">
                     <label className="text-sm font-medium">{t.petLabel}</label>
                     <div className="flex flex-wrap gap-3">
-                      {samplePets.map(pet => (
+                      {pets.map(pet => (
                         <button
                           type="button"
                           key={pet.id}
@@ -165,7 +258,7 @@ const AddHealthRecord = () => {
                     <label className="text-sm font-medium">{t.typeLabel}</label>
                     <Select 
                       value={formData.type} 
-                      onValueChange={(value) => handleChange('type', value)}
+                      onValueChange={(value) => handleChange('type', value as RecordType)}
                     >
                       <SelectTrigger>
                         <SelectValue placeholder={t.typeLabel} />
