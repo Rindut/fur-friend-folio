@@ -1,10 +1,9 @@
-
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/context/AuthContext';
 import { useToast } from '@/components/ui/use-toast';
-import { Service, ServiceCategory, mapDbCategoryToServiceCategory, mapDbServiceToService } from '@/types/petServices';
+import { Service, ServiceCategory, ServiceSource, mapDbCategoryToServiceCategory, mapDbServiceToService } from '@/types/petServices';
 import { useLanguage } from '@/context/LanguageContext';
 import externalPlatformsService from '@/services/ExternalPlatformsService';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
