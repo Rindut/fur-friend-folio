@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -20,8 +19,9 @@ const petSchema = z.object({
   name: z.string().min(1, "Pet name is required"),
   species: z.string().min(1, "Species is required"),
   breed: z.string().optional(),
-  age: z.string().optional(),
-  weight: z.string().optional(),
+  ageYears: z.coerce.number().min(0).optional(),
+  ageMonths: z.coerce.number().min(0).max(11).optional(),
+  weight: z.coerce.number().min(0).optional(),
   birthday: z.string().optional(),
   notes: z.string().optional(),
   imageUrl: z.string().optional(),
@@ -47,9 +47,10 @@ const AddPet = () => {
       breedLabel: 'Breed',
       breedPlaceholder: 'Enter breed (optional)',
       ageLabel: 'Age',
-      agePlaceholder: 'E.g. 3 years',
-      weightLabel: 'Weight',
-      weightPlaceholder: 'E.g. 25 lbs',
+      ageYearsLabel: 'Years',
+      ageMonthsLabel: 'Months',
+      weightLabel: 'Weight (kg)',
+      weightPlaceholder: 'Enter weight in kilograms',
       birthdayLabel: 'Birthday',
       notesLabel: 'Notes',
       notesPlaceholder: 'Add any additional information about your pet',
@@ -77,9 +78,10 @@ const AddPet = () => {
       breedLabel: 'Ras',
       breedPlaceholder: 'Masukkan ras (opsional)',
       ageLabel: 'Umur',
-      agePlaceholder: 'Cth: 3 tahun',
-      weightLabel: 'Berat',
-      weightPlaceholder: 'Cth: 11 kg',
+      ageYearsLabel: 'Tahun',
+      ageMonthsLabel: 'Bulan',
+      weightLabel: 'Berat (kg)',
+      weightPlaceholder: 'Masukkan berat dalam kilogram',
       birthdayLabel: 'Tanggal Lahir',
       notesLabel: 'Catatan',
       notesPlaceholder: 'Tambahkan informasi lain tentang hewan peliharaan Anda',
@@ -108,8 +110,9 @@ const AddPet = () => {
       name: '',
       species: '',
       breed: '',
-      age: '',
-      weight: '',
+      ageYears: 0,
+      ageMonths: 0,
+      weight: undefined,
       birthday: '',
       notes: '',
       imageUrl: '',
@@ -166,6 +169,14 @@ const AddPet = () => {
     }
     
     try {
+      // Format age as a string
+      const ageString = data.ageYears || data.ageMonths ? 
+        `${data.ageYears || 0} years, ${data.ageMonths || 0} months` : 
+        null;
+      
+      // Format weight with unit
+      const weightString = data.weight ? `${data.weight} kg` : null;
+      
       // Insert pet data into Supabase
       const { data: pet, error } = await supabase
         .from('pets')
@@ -174,12 +185,15 @@ const AddPet = () => {
             name: data.name,
             species: data.species,
             breed: data.breed || null,
-            age: data.age || null,
-            weight: data.weight || null,
+            age: ageString,
+            weight: weightString,
             birthday: data.birthday || null,
             notes: data.notes || null,
             image_url: data.imageUrl || null,
-            user_id: user.id
+            user_id: user.id,
+            age_years: data.ageYears || 0,
+            age_months: data.ageMonths || 0,
+            weight_kg: data.weight || null
           }
         ])
         .select()
@@ -340,13 +354,14 @@ const AddPet = () => {
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <FormField
                           control={form.control}
-                          name="age"
+                          name="ageYears"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>{t.ageLabel}</FormLabel>
+                              <FormLabel>{t.ageLabel} ({t.ageYearsLabel})</FormLabel>
                               <FormControl>
                                 <Input
-                                  placeholder={t.agePlaceholder}
+                                  type="number"
+                                  min="0"
                                   {...field}
                                 />
                               </FormControl>
@@ -357,13 +372,15 @@ const AddPet = () => {
                         
                         <FormField
                           control={form.control}
-                          name="weight"
+                          name="ageMonths"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>{t.weightLabel}</FormLabel>
+                              <FormLabel>{t.ageLabel} ({t.ageMonthsLabel})</FormLabel>
                               <FormControl>
                                 <Input
-                                  placeholder={t.weightPlaceholder}
+                                  type="number"
+                                  min="0"
+                                  max="11"
                                   {...field}
                                 />
                               </FormControl>
@@ -372,6 +389,26 @@ const AddPet = () => {
                           )}
                         />
                       </div>
+                      
+                      <FormField
+                        control={form.control}
+                        name="weight"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>{t.weightLabel}</FormLabel>
+                            <FormControl>
+                              <Input
+                                type="number"
+                                min="0"
+                                step="0.1"
+                                placeholder={t.weightPlaceholder}
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
                       
                       <FormField
                         control={form.control}

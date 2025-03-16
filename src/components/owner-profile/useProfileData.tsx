@@ -27,6 +27,9 @@ export const useProfileData = (form: UseFormReturn<ProfileFormValues>, setAvatar
         if (profile) {
           form.reset({
             username: profile.username || '',
+            fullName: profile.full_name || '',
+            phoneNumber: profile.phone_number || '',
+            province: profile.province || '',
             avatarUrl: profile.avatar_url || '',
           });
           

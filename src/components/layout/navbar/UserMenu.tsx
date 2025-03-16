@@ -1,6 +1,6 @@
 
 import { Link } from 'react-router-dom';
-import { LogIn, LogOut } from 'lucide-react';
+import { LogIn, LogOut, User, Settings } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
@@ -19,6 +19,7 @@ interface UserMenuProps {
     signIn: string;
     signOut: string;
     loggedInAs: string;
+    profile: string;
   };
   onSignOut?: () => void;
   mobile?: boolean;
@@ -73,6 +74,12 @@ const UserMenu = ({ translations, onSignOut, mobile = false }: UserMenuProps) =>
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
+        <DropdownMenuItem asChild>
+          <Link to="/profile" className="flex cursor-pointer items-center">
+            <User className="mr-2 h-4 w-4" />
+            <span>{t.profile}</span>
+          </Link>
+        </DropdownMenuItem>
         <DropdownMenuItem onClick={handleSignOut}>
           <LogOut className="mr-2 h-4 w-4" />
           <span>{t.signOut}</span>

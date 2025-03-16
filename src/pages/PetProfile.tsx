@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { PawPrint, CalendarClock, Heart, Edit, ArrowLeft, AlertTriangle, Plus, Trash2 } from 'lucide-react';
@@ -27,7 +26,10 @@ interface PetDetails {
   species: string;
   breed?: string;
   age?: string;
+  ageYears?: number;
+  ageMonths?: number;
   weight?: string;
+  weightKg?: number;
   birthday?: string;
   imageUrl?: string;
   notes?: string;
@@ -60,6 +62,10 @@ const PetProfile = () => {
       species: 'Species',
       breed: 'Breed',
       age: 'Age',
+      year: 'year',
+      years: 'years',
+      month: 'month',
+      months: 'months',
       weight: 'Weight',
       birthday: 'Birthday',
       status: 'Status',
@@ -89,6 +95,10 @@ const PetProfile = () => {
       species: 'Jenis',
       breed: 'Ras',
       age: 'Umur',
+      year: 'tahun',
+      years: 'tahun',
+      month: 'bulan',
+      months: 'bulan',
       weight: 'Berat',
       birthday: 'Tanggal Lahir',
       status: 'Status',
@@ -152,7 +162,10 @@ const PetProfile = () => {
             species: petData.species,
             breed: petData.breed,
             age: petData.age,
+            ageYears: petData.age_years,
+            ageMonths: petData.age_months,
             weight: petData.weight,
+            weightKg: petData.weight_kg,
             birthday: petData.birthday,
             imageUrl: petData.image_url,
             notes: petData.notes,
@@ -326,14 +339,19 @@ const PetProfile = () => {
                   <span className="font-medium">{t.breed}:</span> {pet.breed}
                 </div>
               )}
-              {pet.age && (
+              {(pet.ageYears !== undefined || pet.ageMonths !== undefined) && (
                 <div className="flex items-center gap-2 text-muted-foreground">
-                  <span className="font-medium">{t.age}:</span> {pet.age}
+                  <span className="font-medium">{t.age}:</span> 
+                  {pet.ageYears !== undefined && pet.ageYears > 0 ? `${pet.ageYears} ${pet.ageYears === 1 ? t.year : t.years}` : ''}
+                  {pet.ageYears !== undefined && pet.ageYears > 0 && pet.ageMonths !== undefined && pet.ageMonths > 0 ? ', ' : ''}
+                  {pet.ageMonths !== undefined && pet.ageMonths > 0 ? `${pet.ageMonths} ${pet.ageMonths === 1 ? t.month : t.months}` : ''}
+                  {!pet.ageYears && !pet.ageMonths && pet.age ? pet.age : ''}
                 </div>
               )}
-              {pet.weight && (
+              {(pet.weightKg !== undefined || pet.weight) && (
                 <div className="flex items-center gap-2 text-muted-foreground">
-                  <span className="font-medium">{t.weight}:</span> {pet.weight}
+                  <span className="font-medium">{t.weight}:</span> 
+                  {pet.weightKg !== undefined ? `${pet.weightKg} kg` : pet.weight}
                 </div>
               )}
               {pet.birthday && (

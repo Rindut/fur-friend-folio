@@ -3,29 +3,29 @@ export const translations = {
   en: {
     home: 'Home',
     dashboard: 'Dashboard',
-    petFamily: 'Your Pet Family',
-    petProgress: 'Your Pet Progress',
+    petFamily: 'Pet Family',
+    petProgress: 'Pet Progress',
     health: 'Health',
     petCareHistory: 'Pet Care History',
     upcomingPetCare: 'Upcoming Pet Care',
     services: 'Local Services',
     signIn: 'Sign In',
     signOut: 'Sign Out',
-    profile: 'Profile',
-    loggedInAs: 'Logged in as'
+    loggedInAs: 'Logged in as',
+    profile: 'My Profile'
   },
   id: {
     home: 'Beranda',
     dashboard: 'Dasbor',
-    petFamily: 'Keluarga Hewan Anda',
-    petProgress: 'Perkembangan Hewan Anda',
+    petFamily: 'Keluarga Hewan',
+    petProgress: 'Perkembangan Hewan',
     health: 'Kesehatan',
-    petCareHistory: 'Riwayat Perawatan Hewan',
-    upcomingPetCare: 'Perawatan Hewan Mendatang',
+    petCareHistory: 'Riwayat Perawatan',
+    upcomingPetCare: 'Perawatan Mendatang',
     services: 'Layanan Lokal',
     signIn: 'Masuk',
     signOut: 'Keluar',
-    profile: 'Profil',
-    loggedInAs: 'Masuk sebagai'
+    loggedInAs: 'Masuk sebagai',
+    profile: 'Profil Saya'
   }
 };

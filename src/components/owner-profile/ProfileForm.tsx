@@ -1,9 +1,10 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { useLanguage } from '@/context/LanguageContext';
 import { supabase } from '@/integrations/supabase/client';
@@ -14,9 +15,13 @@ import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { AvatarUpload } from './AvatarUpload';
+import { indonesianProvinces } from './provinces';
 
 const profileSchema = z.object({
   username: z.string().min(1, "Username is required"),
+  fullName: z.string().optional(),
+  phoneNumber: z.string().optional(),
+  province: z.string().optional(),
   avatarUrl: z.string().optional(),
 });
 
@@ -28,12 +33,19 @@ interface ProfileFormProps {
     pageDescription: string;
     usernameLabel: string;
     usernamePlaceholder: string;
+    fullNameLabel: string;
+    fullNamePlaceholder: string;
+    phoneLabel: string;
+    phonePlaceholder: string;
+    provinceLabel: string;
+    provinceSelect: string;
     avatarLabel: string;
     uploadButton: string;
     changeButton: string;
     cancel: string;
     save: string;
     success: string;
+    emailLabel: string;
   };
 }
 
@@ -43,11 +55,15 @@ export const ProfileForm = ({ translations: t }: ProfileFormProps) => {
   const { user } = useAuth();
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
+  const { language } = useLanguage();
 
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileSchema),
     defaultValues: {
       username: '',
+      fullName: '',
+      phoneNumber: '',
+      province: '',
       avatarUrl: '',
     }
   });
@@ -108,6 +124,9 @@ export const ProfileForm = ({ translations: t }: ProfileFormProps) => {
         .upsert({
           id: user.id,
           username: data.username,
+          full_name: data.fullName || null,
+          phone_number: data.phoneNumber || null,
+          province: data.province || null,
           avatar_url: data.avatarUrl || null,
           updated_at: new Date().toISOString()
         });
@@ -153,6 +172,19 @@ export const ProfileForm = ({ translations: t }: ProfileFormProps) => {
                 }}
               />
 
+              {user && (
+                <FormItem>
+                  <FormLabel>{t.emailLabel}</FormLabel>
+                  <FormControl>
+                    <Input
+                      value={user.email}
+                      disabled
+                      className="bg-gray-100"
+                    />
+                  </FormControl>
+                </FormItem>
+              )}
+
               <FormField
                 control={form.control}
                 name="username"
@@ -165,6 +197,69 @@ export const ProfileForm = ({ translations: t }: ProfileFormProps) => {
                         {...field}
                       />
                     </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="fullName"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t.fullNameLabel}</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder={t.fullNamePlaceholder}
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="phoneNumber"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t.phoneLabel}</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder={t.phonePlaceholder}
+                        type="tel"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="province"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t.provinceLabel}</FormLabel>
+                    <Select 
+                      onValueChange={field.onChange} 
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder={t.provinceSelect} />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {indonesianProvinces.map((province) => (
+                          <SelectItem key={province.code} value={province.code}>
+                            {language === 'id' ? province.name : province.name_en}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                     <FormMessage />
                   </FormItem>
                 )}

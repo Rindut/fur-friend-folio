@@ -7,7 +7,6 @@ import {
   NavigationMenu,
   NavigationMenuContent,
   NavigationMenuItem,
-  NavigationMenuLink,
   NavigationMenuList,
   NavigationMenuTrigger,
   navigationMenuTriggerStyle,
@@ -133,5 +132,8 @@ const DesktopNavigation = ({ translations }: DesktopNavigationProps) => {
     </NavigationMenu>
   );
 };
+
+// Fix the missing NavigationMenuLink component
+const NavigationMenuLink = NavigationMenu.Link;
 
 export default DesktopNavigation;
