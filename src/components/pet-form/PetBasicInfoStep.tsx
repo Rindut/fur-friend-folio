@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { usePetForm } from './PetFormContext';
 import { Input } from '@/components/ui/input';
@@ -134,7 +135,7 @@ export const PetBasicInfoStep: React.FC = () => {
                     variant="outline"
                     onClick={() => document.getElementById('pet-image-upload')?.click()}
                     disabled={uploading}
-                    className="flex gap-2 text-sm"
+                    className="flex gap-2 text-sm font-medium"
                   >
                     <Upload className="w-4 h-4" />
                     {imageUrl ? t.changeButton : t.uploadButton}
@@ -145,7 +146,7 @@ export const PetBasicInfoStep: React.FC = () => {
                   />
                 </div>
               </FormControl>
-              <FormMessage />
+              <FormMessage className="text-sm" />
             </FormItem>
           )}
         />
@@ -161,7 +162,7 @@ export const PetBasicInfoStep: React.FC = () => {
               <Input
                 placeholder={t.namePlaceholder}
                 {...field}
-                className="text-base"
+                className="text-base py-2"
               />
             </FormControl>
             <FormMessage className="text-sm" />
@@ -177,7 +178,7 @@ export const PetBasicInfoStep: React.FC = () => {
             <FormLabel className="text-base font-medium">{t.speciesLabel}</FormLabel>
             <Select onValueChange={field.onChange} defaultValue={field.value}>
               <FormControl>
-                <SelectTrigger className="text-base">
+                <SelectTrigger className="text-base py-2">
                   <SelectValue placeholder={t.speciesLabel} />
                 </SelectTrigger>
               </FormControl>
@@ -207,7 +208,7 @@ export const PetBasicInfoStep: React.FC = () => {
                 <Input
                   placeholder={t.otherSpeciesPlaceholder}
                   {...field}
-                  className="text-base"
+                  className="text-base py-2"
                 />
               </FormControl>
               <FormMessage className="text-sm" />
@@ -226,7 +227,7 @@ export const PetBasicInfoStep: React.FC = () => {
               <Input
                 placeholder={t.breedPlaceholder}
                 {...field}
-                className="text-base"
+                className="text-base py-2"
               />
             </FormControl>
             <FormMessage className="text-sm" />
@@ -250,7 +251,7 @@ export const PetBasicInfoStep: React.FC = () => {
                   <FormControl>
                     <RadioGroupItem value="male" />
                   </FormControl>
-                  <FormLabel className="font-normal cursor-pointer">
+                  <FormLabel className="font-normal cursor-pointer text-base">
                     {t.male}
                   </FormLabel>
                 </FormItem>
@@ -258,7 +259,7 @@ export const PetBasicInfoStep: React.FC = () => {
                   <FormControl>
                     <RadioGroupItem value="female" />
                   </FormControl>
-                  <FormLabel className="font-normal cursor-pointer">
+                  <FormLabel className="font-normal cursor-pointer text-base">
                     {t.female}
                   </FormLabel>
                 </FormItem>
@@ -279,7 +280,7 @@ export const PetBasicInfoStep: React.FC = () => {
               <Input
                 placeholder={t.colorPlaceholder}
                 {...field}
-                className="text-base"
+                className="text-base py-2"
               />
             </FormControl>
             <FormMessage className="text-sm" />
@@ -299,7 +300,7 @@ export const PetBasicInfoStep: React.FC = () => {
                   <FormControl>
                     <Button
                       variant={"outline"}
-                      className={`w-full justify-start text-left font-normal ${
+                      className={`w-full justify-start text-left font-normal text-base py-2 ${
                         !field.value && "text-muted-foreground"
                       }`}
                       disabled={watchIsEstimatedAge}
@@ -348,7 +349,7 @@ export const PetBasicInfoStep: React.FC = () => {
                 />
               </FormControl>
               <div className="space-y-1 leading-none">
-                <FormLabel className="cursor-pointer">
+                <FormLabel className="cursor-pointer text-base">
                   {t.estimatedAgeLabel}
                 </FormLabel>
               </div>
@@ -369,7 +370,7 @@ export const PetBasicInfoStep: React.FC = () => {
                       type="number"
                       min="0"
                       {...field}
-                      className="text-base"
+                      className="text-base py-2"
                     />
                   </FormControl>
                   <FormMessage className="text-sm" />
@@ -389,7 +390,7 @@ export const PetBasicInfoStep: React.FC = () => {
                       min="0"
                       max="11"
                       {...field}
-                      className="text-base"
+                      className="text-base py-2"
                     />
                   </FormControl>
                   <FormMessage className="text-sm" />
@@ -413,7 +414,7 @@ export const PetBasicInfoStep: React.FC = () => {
                 step="0.1"
                 placeholder={t.weightPlaceholder}
                 {...field}
-                className="text-base"
+                className="text-base py-2"
               />
             </FormControl>
             <FormMessage className="text-sm" />
@@ -432,7 +433,7 @@ export const PetBasicInfoStep: React.FC = () => {
                 placeholder={t.notesPlaceholder}
                 rows={4}
                 {...field}
-                className="text-base"
+                className="text-base py-2"
               />
             </FormControl>
             <FormMessage className="text-sm" />

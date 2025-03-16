@@ -151,7 +151,7 @@ export const PetVaccinationStep: React.FC = () => {
                           <Input 
                             placeholder={t.otherVaccinationPlaceholder} 
                             {...field} 
-                            className="text-base"
+                            className="text-base py-2"
                           />
                         </FormControl>
                         <FormMessage className="text-sm" />
@@ -181,7 +181,7 @@ export const PetVaccinationStep: React.FC = () => {
                         <FormControl>
                           <Button
                             variant="outline"
-                            className={`w-full justify-start text-base font-normal ${
+                            className={`w-full justify-start text-left font-normal text-base py-2 ${
                               !field.value && "text-muted-foreground"
                             }`}
                           >
@@ -218,7 +218,7 @@ export const PetVaccinationStep: React.FC = () => {
                       <Input 
                         placeholder={t.clinicPlaceholder} 
                         {...field} 
-                        className="text-base"
+                        className="text-base py-2"
                       />
                     </FormControl>
                     <FormMessage className="text-sm" />
@@ -233,7 +233,7 @@ export const PetVaccinationStep: React.FC = () => {
           type="button" 
           variant="outline" 
           onClick={addCustomVaccination}
-          className="mt-4 text-sm"
+          className="mt-4 text-base font-medium"
         >
           {t.addVaccinationButton}
         </Button>

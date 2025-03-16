@@ -179,6 +179,8 @@ export const PetFormProvider: React.FC<{ children: ReactNode }> = ({ children })
     }
     
     try {
+      console.log("Submitting form data:", data);
+      
       // Format vaccination data
       const formattedVaccinations = data.vaccinations?.map(vax => {
         return {
@@ -211,7 +213,10 @@ export const PetFormProvider: React.FC<{ children: ReactNode }> = ({ children })
         .select()
         .single();
         
-      if (error) throw error;
+      if (error) {
+        console.error("Supabase error:", error);
+        throw error;
+      }
       
       const translations = {
         en: { success: 'Pet profile created successfully' },

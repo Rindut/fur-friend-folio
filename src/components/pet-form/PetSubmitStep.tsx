@@ -3,6 +3,7 @@ import React from 'react';
 import { usePetForm } from './PetFormContext';
 import { PawPrint } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
+import { Button } from '@/components/ui/button';
 
 export const PetSubmitStep: React.FC = () => {
   const { form, onSubmit } = usePetForm();
@@ -36,6 +37,14 @@ export const PetSubmitStep: React.FC = () => {
         <p className="text-sm text-muted-foreground">
           {t.reviewInfo}
         </p>
+      </div>
+      <div className="mt-8 flex justify-center">
+        <Button 
+          type="submit" 
+          className="bg-lavender hover:bg-lavender/90 text-base py-2 px-6"
+        >
+          {t.submitButton}
+        </Button>
       </div>
     </form>
   );
