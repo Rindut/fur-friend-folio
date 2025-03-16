@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+
+import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { 
@@ -9,162 +10,38 @@ import {
   AlertCircle,
   Plus,
   Calendar,
-  ArrowRight,
   Bell
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useAuth } from '@/context/AuthContext';
-import PetAvatar from '@/components/ui/PetAvatar';
 import { useLanguage } from '@/context/LanguageContext';
-import AddReminderButton from '@/components/reminders/AddReminderButton';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { supabase } from '@/integrations/supabase/client';
-
-interface HealthRecord {
-  id: string;
-  type: 'vaccination' | 'medication' | 'weight' | 'visit';
-  title: string;
-  date: string;
-  details?: string;
-  petId: string;
-}
-
-interface Pet {
-  id: string;
-  name: string;
-  imageUrl?: string;
-}
-
-// Sample data
-const sampleHealthRecords: HealthRecord[] = [
-  {
-    id: '1',
-    type: 'vaccination',
-    title: 'Rabies Vaccination',
-    date: 'May 15, 2023',
-    details: 'Three-year vaccination.',
-    petId: '1'
-  },
-  {
-    id: '2',
-    type: 'vaccination',
-    title: 'DHPP Booster',
-    date: 'May 15, 2023',
-    details: 'Annual booster shot.',
-    petId: '1'
-  },
-  {
-    id: '3',
-    type: 'medication',
-    title: 'Heart Medication',
-    date: 'Started: January 10, 2023',
-    details: '10mg daily with food.',
-    petId: '1'
-  },
-  {
-    id: '4',
-    type: 'visit',
-    title: 'Annual Checkup',
-    date: 'May 15, 2023',
-    details: 'All vitals normal. Slight tartar buildup on teeth.',
-    petId: '1'
-  },
-  {
-    id: '5',
-    type: 'weight',
-    title: 'Weight Check',
-    date: 'May 15, 2023',
-    details: '65 lbs - Healthy weight range.',
-    petId: '1'
-  },
-  {
-    id: '6',
-    type: 'vaccination',
-    title: 'FVRCP Vaccination',
-    date: 'April 3, 2023',
-    details: 'Annual vaccination.',
-    petId: '2'
-  },
-  {
-    id: '7',
-    type: 'medication',
-    title: 'Flea Treatment',
-    date: 'Started: April 3, 2023',
-    details: 'Monthly application.',
-    petId: '2'
-  }
-];
-
-// Sample upcoming health tasks
-const upcomingTasks = [
-  {
-    id: '1',
-    title: 'Rabies Vaccination',
-    date: 'June 15, 2023',
-    petName: 'Luna',
-    petId: '1',
-  },
-  {
-    id: '2',
-    title: 'Annual Checkup',
-    date: 'June 20, 2023',
-    petName: 'Oliver',
-    petId: '2',
-  }
-];
+import PetSelector from '@/components/health/PetSelector';
+import HealthRecordsList from '@/components/health/HealthRecordsList';
+import UpcomingCareList from '@/components/health/UpcomingCareList';
+import { useHealthRecords } from '@/components/health/useHealthRecords';
 
 const HealthRecords = () => {
-  const [pets, setPets] = useState<Pet[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [selectedPet, setSelectedPet] = useState<string>('');
-  const [activeTab, setActiveTab] = useState<string>('all');
   const location = useLocation();
-  const { user } = useAuth();
   const { language } = useLanguage();
-  
-  useEffect(() => {
-    const fetchPets = async () => {
-      if (!user) return;
-      
-      try {
-        const { data, error } = await supabase
-          .from('pets')
-          .select('id, name, image_url')
-          .eq('user_id', user.id)
-          .eq('is_active', true)
-          .order('created_at', { ascending: false });
-          
-        if (error) throw error;
-        
-        if (data && data.length > 0) {
-          setPets(data.map(pet => ({
-            id: pet.id,
-            name: pet.name,
-            imageUrl: pet.image_url
-          })));
-          
-          // Set the first pet as selected by default
-          setSelectedPet(data[0].id);
-        }
-      } catch (error) {
-        console.error('Error fetching pets:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    
-    fetchPets();
-  }, [user]);
+  const {
+    pets,
+    loading,
+    selectedPet,
+    setSelectedPet,
+    activeTab,
+    setActiveTab,
+    healthRecords,
+    upcomingTasks
+  } = useHealthRecords();
   
   // Check if we should scroll to a specific section based on URL hash
-  useEffect(() => {
+  useState(() => {
     if (location.hash) {
       const element = document.getElementById(location.hash.substring(1));
       if (element) {
         element.scrollIntoView({ behavior: 'smooth' });
       }
     }
-  }, [location.hash]);
+  });
   
   const translations = {
     en: {
@@ -215,7 +92,7 @@ const HealthRecords = () => {
   
   const t = translations[language];
   
-  const getRecordIcon = (type: HealthRecord['type']) => {
+  const getRecordIcon = (type: 'vaccination' | 'medication' | 'weight' | 'visit') => {
     switch (type) {
       case 'vaccination':
         return <Droplets className="w-4 h-4" />;
@@ -228,7 +105,7 @@ const HealthRecords = () => {
     }
   };
   
-  const getRecordTypeColor = (type: HealthRecord['type']) => {
+  const getRecordTypeColor = (type: 'vaccination' | 'medication' | 'weight' | 'visit') => {
     switch (type) {
       case 'vaccination':
         return 'bg-lavender/20 text-lavender';
@@ -241,23 +118,6 @@ const HealthRecords = () => {
     }
   };
   
-  // Filter health records and upcoming tasks based on selected pet
-  const currentPetRecords = selectedPet 
-    ? sampleHealthRecords.filter(record => 
-        record.petId === selectedPet && 
-        (activeTab === 'all' || record.type === activeTab)
-      )
-    : [];
-  
-  const currentPetUpcomingTasks = selectedPet
-    ? upcomingTasks.filter(task => task.petId === selectedPet)
-    : [];
-  
-  // Handle pet selection
-  const handlePetChange = (petId: string) => {
-    setSelectedPet(petId);
-  };
-  
   return (
     <div className="min-h-screen pb-20">
       <div className="bg-gradient-to-b from-lavender/20 to-transparent pt-8 pb-12">
@@ -265,53 +125,18 @@ const HealthRecords = () => {
           <h1 className="text-3xl font-bold mb-4">{t.pageTitle}</h1>
           <p className="text-xl text-muted-foreground mb-8">{t.greeting}</p>
           
-          {/* Pet Selector - Moved above the sections */}
+          {/* Pet Selector */}
           {loading ? (
             <div className="mb-8 text-center">{t.loading}</div>
           ) : pets.length > 0 ? (
-            <div className="mb-8">
-              <div className="flex flex-col md:flex-row md:items-center gap-2 mb-4">
-                <p className="font-medium">{t.selectPet}:</p>
-                <div className="md:w-64">
-                  <Select value={selectedPet} onValueChange={handlePetChange}>
-                    <SelectTrigger>
-                      <SelectValue placeholder={t.selectPet} />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {pets.map(pet => (
-                        <SelectItem key={pet.id} value={pet.id} className="flex items-center gap-2">
-                          <div className="flex items-center gap-2">
-                            <PetAvatar src={pet.imageUrl} name={pet.name} size="sm" />
-                            <span>{pet.name}</span>
-                          </div>
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-              
-              <div className="flex flex-wrap gap-3">
-                {pets.map(pet => (
-                  <button
-                    key={pet.id}
-                    className={`px-4 py-2 rounded-full flex items-center gap-2 transition-all duration-200 ${
-                      selectedPet === pet.id 
-                        ? 'bg-lavender/30 text-charcoal' 
-                        : 'bg-white/70 text-muted-foreground hover:bg-lavender/10'
-                    }`}
-                    onClick={() => setSelectedPet(pet.id)}
-                  >
-                    <PetAvatar 
-                      src={pet.imageUrl} 
-                      name={pet.name} 
-                      size="sm" 
-                    />
-                    <span>{pet.name}</span>
-                  </button>
-                ))}
-              </div>
-            </div>
+            <PetSelector
+              pets={pets}
+              selectedPet={selectedPet}
+              onPetChange={setSelectedPet}
+              selectPetLabel={t.selectPet}
+              loading={loading}
+              loadingText={t.loading}
+            />
           ) : (
             <div className="mb-8 text-center">
               <p className="text-muted-foreground mb-4">{t.noPets}</p>
@@ -324,7 +149,7 @@ const HealthRecords = () => {
             </div>
           )}
           
-          {/* Pet Care History Section with clear section header */}
+          {/* Pet Care History Section */}
           <section id="pet-care-history" className="mb-12">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-semibold flex items-center gap-2">
@@ -332,7 +157,7 @@ const HealthRecords = () => {
               </h2>
               
               <Button className="rounded-full bg-lavender hover:bg-lavender/90" asChild>
-                <Link to="/health/add">
+                <Link to={`/health/add${selectedPet ? `?pet=${selectedPet}` : ''}`}>
                   <Plus className="w-4 h-4 mr-2" />
                   {t.addRecord}
                 </Link>
@@ -381,7 +206,7 @@ const HealthRecords = () => {
               
               <TabsContent value="all" className="mt-0">
                 <HealthRecordsList 
-                  records={currentPetRecords} 
+                  records={healthRecords} 
                   getRecordIcon={getRecordIcon} 
                   getRecordTypeColor={getRecordTypeColor} 
                   detailsText={t.details}
@@ -390,7 +215,7 @@ const HealthRecords = () => {
               </TabsContent>
               <TabsContent value="vaccination" className="mt-0">
                 <HealthRecordsList 
-                  records={currentPetRecords} 
+                  records={healthRecords} 
                   getRecordIcon={getRecordIcon} 
                   getRecordTypeColor={getRecordTypeColor} 
                   detailsText={t.details}
@@ -399,7 +224,7 @@ const HealthRecords = () => {
               </TabsContent>
               <TabsContent value="medication" className="mt-0">
                 <HealthRecordsList 
-                  records={currentPetRecords} 
+                  records={healthRecords} 
                   getRecordIcon={getRecordIcon} 
                   getRecordTypeColor={getRecordTypeColor} 
                   detailsText={t.details}
@@ -408,7 +233,7 @@ const HealthRecords = () => {
               </TabsContent>
               <TabsContent value="visit" className="mt-0">
                 <HealthRecordsList 
-                  records={currentPetRecords} 
+                  records={healthRecords} 
                   getRecordIcon={getRecordIcon} 
                   getRecordTypeColor={getRecordTypeColor} 
                   detailsText={t.details}
@@ -418,7 +243,7 @@ const HealthRecords = () => {
             </Tabs>
           </section>
           
-          {/* Upcoming Pet Care Section with clear section header */}
+          {/* Upcoming Pet Care Section */}
           <section id="upcoming-pet-care">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-semibold flex items-center gap-2">
@@ -443,113 +268,14 @@ const HealthRecords = () => {
             
             <p className="text-muted-foreground mb-6">{t.upcomingPetCareDesc}</p>
             
-            {currentPetUpcomingTasks.length > 0 ? (
-              <div className="space-y-4">
-                {currentPetUpcomingTasks.map(task => (
-                  <div 
-                    key={task.id}
-                    className="glass-morphism rounded-xl p-5 hover:shadow-md transition-shadow flex items-center"
-                  >
-                    <div className="bg-coral/20 text-coral p-2 rounded-full mr-4">
-                      <Calendar className="w-4 h-4" />
-                    </div>
-                    
-                    <div className="flex-1">
-                      <h3 className="font-medium">{task.title}</h3>
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground mt-1">
-                        <span>{task.date}</span>
-                        <span>•</span>
-                        <span>{task.petName}</span>
-                      </div>
-                    </div>
-                    
-                    <div className="flex items-center gap-2">
-                      <AddReminderButton 
-                        petId={task.petId}
-                        healthRecordId={task.id}
-                        variant="ghost"
-                        size="sm"
-                        showLabel={false}
-                        className="text-coral hover:bg-coral/10 p-2 rounded-full"
-                      />
-                      <Button variant="ghost" size="sm" className="text-muted-foreground">
-                        {t.details}
-                      </Button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="glass-morphism rounded-xl p-6 text-center">
-                <p className="text-muted-foreground">{t.noUpcoming}</p>
-              </div>
-            )}
+            <UpcomingCareList
+              tasks={upcomingTasks}
+              detailsText={t.details}
+              noUpcomingText={t.noUpcoming}
+            />
           </section>
         </div>
       </div>
-    </div>
-  );
-};
-
-interface HealthRecordsListProps {
-  records: HealthRecord[];
-  getRecordIcon: (type: HealthRecord['type']) => JSX.Element;
-  getRecordTypeColor: (type: HealthRecord['type']) => string;
-  detailsText: string;
-  noRecordsText: string;
-}
-
-const HealthRecordsList = ({ 
-  records, 
-  getRecordIcon, 
-  getRecordTypeColor,
-  detailsText,
-  noRecordsText
-}: HealthRecordsListProps) => {
-  if (records.length === 0) {
-    return (
-      <div className="glass-morphism rounded-xl p-6 text-center">
-        <p className="text-muted-foreground">{noRecordsText}</p>
-      </div>
-    );
-  }
-  
-  return (
-    <div className="space-y-4">
-      {records.map(record => (
-        <div 
-          key={record.id}
-          className="glass-morphism rounded-xl p-5 hover:shadow-md transition-shadow"
-        >
-          <div className="flex items-start">
-            <div className={`p-2 rounded-full mr-4 ${getRecordTypeColor(record.type)}`}>
-              {getRecordIcon(record.type)}
-            </div>
-            
-            <div className="flex-1">
-              <div className="flex items-start justify-between">
-                <div>
-                  <h3 className="font-medium">{record.title}</h3>
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground mt-1">
-                    <Calendar className="w-3 h-3" />
-                    <span>{record.date}</span>
-                  </div>
-                </div>
-                
-                <Button variant="ghost" size="sm" className="text-muted-foreground">
-                  {detailsText}
-                </Button>
-              </div>
-              
-              {record.details && (
-                <p className="text-sm text-muted-foreground mt-3">
-                  {record.details}
-                </p>
-              )}
-            </div>
-          </div>
-        </div>
-      ))}
     </div>
   );
 };

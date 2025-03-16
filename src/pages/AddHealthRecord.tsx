@@ -12,6 +12,7 @@ import { useLanguage } from '@/context/LanguageContext';
 import PetAvatar from '@/components/ui/PetAvatar';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/context/AuthContext';
+import { compareAsc, parseISO } from 'date-fns';
 
 interface Pet {
   id: string;
@@ -33,7 +34,7 @@ const AddHealthRecord = () => {
   
   const [formData, setFormData] = useState({
     petId: petIdFromUrl || '',
-    type: 'vaccination' as RecordType, // Fixed type initialization
+    type: 'vaccination' as RecordType,
     title: '',
     date: '',
     details: ''
@@ -168,7 +169,7 @@ const AddHealthRecord = () => {
     
     try {
       // Insert health record into Supabase
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from('health_records')
         .insert([
           {
@@ -179,9 +180,12 @@ const AddHealthRecord = () => {
             details: formData.details || null,
             user_id: user.id
           }
-        ]);
+        ])
+        .select();
         
       if (error) throw error;
+
+      console.log('Health record saved successfully:', data);
       
       // Show success toast
       toast({
@@ -189,9 +193,13 @@ const AddHealthRecord = () => {
         duration: 3000
       });
       
-      // Navigate back to health records or pet profile
+      // Determine which section to navigate to based on date
+      const isUpcoming = compareAsc(parseISO(formData.date), new Date()) > 0;
+      
+      // Navigate back to health records or pet profile with the appropriate hash
       if (formData.petId) {
-        navigate(`/health?pet=${formData.petId}`);
+        const sectionHash = isUpcoming ? '#upcoming-pet-care' : '#pet-care-history';
+        navigate(`/health?pet=${formData.petId}${sectionHash}`);
       } else {
         navigate('/health');
       }
