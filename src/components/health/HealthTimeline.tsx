@@ -1,0 +1,226 @@
+
+import React, { useState, useRef, useEffect } from 'react';
+import { addDays, subDays, format, isAfter, isBefore, isToday, parseISO } from 'date-fns';
+import { Slider } from '@/components/ui/slider';
+import { ZoomIn, ZoomOut, ChevronLeft, ChevronRight, Calendar } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
+import HealthTimelineEvent, { TimelineEvent, getEventTypeColor } from './HealthTimelineEvent';
+
+interface HealthTimelineProps {
+  events: TimelineEvent[];
+  language?: 'en' | 'id';
+}
+
+const HealthTimeline: React.FC<HealthTimelineProps> = ({ 
+  events = [], 
+  language = 'en' 
+}) => {
+  const [zoomLevel, setZoomLevel] = useState(1);
+  const [centerPosition, setCenterPosition] = useState(50); // 50% by default
+  const [sortedEvents, setSortedEvents] = useState<TimelineEvent[]>([]);
+  const timelineRef = useRef<HTMLDivElement>(null);
+  
+  // Sort and process events
+  useEffect(() => {
+    const processedEvents = events.map(event => ({
+      ...event,
+      date: typeof event.date === 'string' ? parseISO(event.date) : event.date,
+    }));
+    
+    const sorted = [...processedEvents].sort((a, b) => {
+      const dateA = a.date instanceof Date ? a.date : parseISO(a.date as string);
+      const dateB = b.date instanceof Date ? b.date : parseISO(b.date as string);
+      return dateA.getTime() - dateB.getTime();
+    });
+    
+    setSortedEvents(sorted);
+  }, [events]);
+  
+  const translations = {
+    en: {
+      today: 'Today',
+      zoomIn: 'Zoom in',
+      zoomOut: 'Zoom out',
+      noEvents: 'No health events to display',
+      past: 'Past',
+      upcoming: 'Upcoming',
+    },
+    id: {
+      today: 'Hari ini',
+      zoomIn: 'Perbesar',
+      zoomOut: 'Perkecil',
+      noEvents: 'Tidak ada peristiwa kesehatan untuk ditampilkan',
+      past: 'Sebelumnya',
+      upcoming: 'Mendatang',
+    }
+  };
+  
+  const t = translations[language];
+  
+  // Determine the date range to display
+  const today = new Date();
+  const timelineWidth = zoomLevel * 90; // increase width as zoom increases
+  const pastDays = Math.round(30 * zoomLevel);
+  const futureDays = Math.round(30 * zoomLevel);
+  const startDate = subDays(today, pastDays);
+  const endDate = addDays(today, futureDays);
+  
+  // Handle zoom controls
+  const handleZoomIn = () => {
+    setZoomLevel(prev => Math.min(prev + 0.5, 4));
+  };
+  
+  const handleZoomOut = () => {
+    setZoomLevel(prev => Math.max(prev - 0.5, 0.5));
+  };
+  
+  // Handle scroll position
+  const handleSliderChange = (value: number[]) => {
+    setCenterPosition(value[0]);
+    if (timelineRef.current) {
+      const maxScroll = timelineRef.current.scrollWidth - timelineRef.current.clientWidth;
+      timelineRef.current.scrollLeft = maxScroll * (value[0] / 100);
+    }
+  };
+  
+  // Position events on timeline
+  const getEventPosition = (eventDate: Date) => {
+    const totalDays = pastDays + futureDays;
+    const daysPassed = Math.max(0, (eventDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
+    return (daysPassed / totalDays) * 100;
+  };
+  
+  // Scroll to today initially
+  useEffect(() => {
+    if (timelineRef.current) {
+      const todayPos = getEventPosition(today);
+      const scrollPos = (timelineRef.current.scrollWidth * todayPos / 100) - (timelineRef.current.clientWidth / 2);
+      timelineRef.current.scrollLeft = scrollPos;
+    }
+  }, [zoomLevel, sortedEvents]);
+  
+  // Split events into past and future
+  const pastEvents = sortedEvents.filter(event => {
+    const eventDate = event.date instanceof Date ? event.date : parseISO(event.date as string);
+    return isBefore(eventDate, today) || isToday(eventDate);
+  });
+  
+  const futureEvents = sortedEvents.filter(event => {
+    const eventDate = event.date instanceof Date ? event.date : parseISO(event.date as string);
+    return isAfter(eventDate, today) && !isToday(eventDate);
+  });
+  
+  return (
+    <div className="mt-4">
+      {/* Timeline Controls */}
+      <div className="flex justify-between items-center mb-4">
+        <div className="flex items-center space-x-2">
+          <Button 
+            variant="outline" 
+            size="icon"
+            onClick={handleZoomOut}
+            disabled={zoomLevel <= 0.5}
+          >
+            <ZoomOut className="h-4 w-4" />
+          </Button>
+          <Slider
+            value={[centerPosition]}
+            min={0}
+            max={100}
+            step={1}
+            onValueChange={handleSliderChange}
+            className="w-40"
+          />
+          <Button 
+            variant="outline" 
+            size="icon"
+            onClick={handleZoomIn}
+            disabled={zoomLevel >= 4}
+          >
+            <ZoomIn className="h-4 w-4" />
+          </Button>
+        </div>
+        
+        <div className="flex items-center text-sm">
+          <span className="text-green-500 mr-2">●</span>
+          <span className="mr-4">{t.past}</span>
+          <span className="text-amber-500 mr-2">●</span>
+          <span>{t.upcoming}</span>
+        </div>
+      </div>
+      
+      {/* Timeline */}
+      <div className="relative overflow-hidden mt-2">
+        {sortedEvents.length === 0 ? (
+          <div className="text-center py-10 text-muted-foreground">
+            {t.noEvents}
+          </div>
+        ) : (
+          <div 
+            ref={timelineRef}
+            className="relative overflow-x-auto pb-4"
+            style={{ 
+              minHeight: '180px',
+            }}
+          >
+            <div 
+              className="relative"
+              style={{ 
+                width: `${timelineWidth}%`,
+                minWidth: '100%'
+              }}
+            >
+              {/* Timeline Bar */}
+              <div className="relative h-0.5 bg-gray-200 mt-5 mb-16">
+                {/* Today Marker */}
+                <div className="absolute top-1/2 -translate-y-1/2" style={{ left: `${getEventPosition(today)}%` }}>
+                  <div className="relative flex flex-col items-center">
+                    <div className="h-12 w-0.5 bg-coral -mb-0.5"></div>
+                    <div className="w-4 h-4 rounded-full bg-coral"></div>
+                    <div className="h-12 w-0.5 bg-coral -mt-0.5"></div>
+                    <div className="absolute top-full mt-1 whitespace-nowrap text-xs font-medium bg-coral text-white px-2 py-0.5 rounded">
+                      {t.today}
+                    </div>
+                  </div>
+                </div>
+              
+                {/* Past Events */}
+                {pastEvents.map(event => (
+                  <div 
+                    key={event.id} 
+                    className="absolute bottom-4"
+                    style={{ 
+                      left: `${getEventPosition(
+                        event.date instanceof Date ? event.date : parseISO(event.date as string)
+                      )}%` 
+                    }}
+                  >
+                    <HealthTimelineEvent event={event} language={language} />
+                  </div>
+                ))}
+                
+                {/* Future Events */}
+                {futureEvents.map(event => (
+                  <div 
+                    key={event.id} 
+                    className="absolute top-4"
+                    style={{ 
+                      left: `${getEventPosition(
+                        event.date instanceof Date ? event.date : parseISO(event.date as string)
+                      )}%` 
+                    }}
+                  >
+                    <HealthTimelineEvent event={event} language={language} />
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default HealthTimeline;
