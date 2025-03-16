@@ -39,6 +39,20 @@ import {
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 
+// Define proper types for navigation links with optional submenu
+interface SubMenuItem {
+  name: string;
+  path: string;
+  icon: JSX.Element;
+}
+
+interface NavLink {
+  name: string;
+  path: string;
+  icon: JSX.Element;
+  submenu?: SubMenuItem[];
+}
+
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -89,7 +103,7 @@ const Navbar = () => {
   const t = translations[language];
 
   // Basic links for all users
-  let navLinks = [
+  let navLinks: NavLink[] = [
     { name: t.home, path: '/', icon: <Home className="w-4 h-4" /> },
   ];
   
