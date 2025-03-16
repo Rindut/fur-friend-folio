@@ -2,7 +2,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { addDays, subDays, format, isAfter, isBefore, isToday, parseISO } from 'date-fns';
 import { Slider } from '@/components/ui/slider';
-import { ZoomIn, ZoomOut, ChevronLeft, ChevronRight, Calendar, LayoutHorizontal, LayoutVertical } from 'lucide-react';
+import { ZoomIn, ZoomOut, ChevronLeft, ChevronRight, Calendar, Rows, Columns } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { Toggle } from '@/components/ui/toggle';
@@ -156,7 +156,7 @@ const HealthTimeline: React.FC<HealthTimelineProps> = ({
               <Tooltip>
                 <TooltipTrigger asChild>
                   <ToggleGroupItem value="horizontal" aria-label={t.horizontal}>
-                    <LayoutHorizontal className="h-4 w-4" />
+                    <Rows className="h-4 w-4" />
                   </ToggleGroupItem>
                 </TooltipTrigger>
                 <TooltipContent side="bottom">
@@ -167,7 +167,7 @@ const HealthTimeline: React.FC<HealthTimelineProps> = ({
               <Tooltip>
                 <TooltipTrigger asChild>
                   <ToggleGroupItem value="vertical" aria-label={t.vertical}>
-                    <LayoutVertical className="h-4 w-4" />
+                    <Columns className="h-4 w-4" />
                   </ToggleGroupItem>
                 </TooltipTrigger>
                 <TooltipContent side="bottom">
