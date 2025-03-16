@@ -31,7 +31,7 @@ file_size_limit = "50MiB"
 [auth]
 enabled = true
 site_url = "http://localhost:3000"
-additional_redirect_urls = ["https://localhost:3000"]
+additional_redirect_urls = ["https://localhost:3000", "http://localhost:5173", "https://localhost:5173"]
 jwt_expiry = 3600
 enable_refresh_token_rotation = true
 refresh_token_reuse_interval = 10
@@ -50,11 +50,11 @@ redirect_uri = ""
 url = ""
 
 [auth.external.google]
-enabled = false
+enabled = true
 client_id = ""
 secret = ""
-redirect_uri = ""
-url = ""
+redirect_uri = "http://localhost:3000/auth/callback"
+url = "https://accounts.google.com"
 
 [analytics]
 enabled = false

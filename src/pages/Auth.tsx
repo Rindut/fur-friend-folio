@@ -11,6 +11,7 @@ import { PawPrint, Mail, Lock, User } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
 import { Separator } from '@/components/ui/separator';
 import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/components/ui/use-toast';
 
 const Auth = () => {
   const { signIn, signUp, user } = useAuth();
@@ -18,6 +19,7 @@ const Auth = () => {
   const [activeTab, setActiveTab] = useState('login');
   const navigate = useNavigate();
   const { language } = useLanguage();
+  const { toast } = useToast();
 
   // Form states
   const [loginEmail, setLoginEmail] = useState('');
@@ -68,6 +70,36 @@ const Auth = () => {
 
   const t = translations[language];
 
+  // Check for auth hash in URL (Google OAuth callback)
+  useEffect(() => {
+    const handleAuthCallback = async () => {
+      const hashParams = new URLSearchParams(window.location.hash.substring(1));
+      const accessToken = hashParams.get('access_token');
+      
+      if (accessToken) {
+        try {
+          setIsLoading(true);
+          const { data, error } = await supabase.auth.getUser();
+          if (error) throw error;
+          if (data?.user) {
+            navigate('/dashboard');
+          }
+        } catch (error) {
+          console.error('Error handling auth callback:', error);
+          toast({
+            title: "Authentication Error",
+            description: "There was a problem with the authentication process",
+            variant: "destructive"
+          });
+        } finally {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    handleAuthCallback();
+  }, [navigate, toast]);
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
@@ -108,16 +140,23 @@ const Auth = () => {
 
   const handleGoogleSignIn = async () => {
     setIsLoading(true);
+    setErrorMessage('');
     try {
-      const { error } = await supabase.auth.signInWithOAuth({
+      const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: window.location.origin + '/dashboard'
+          redirectTo: `${window.location.origin}/auth`
         }
       });
       
       if (error) {
+        console.error('Google sign-in error:', error);
         setErrorMessage(error.message);
+        toast({
+          title: "Sign in failed",
+          description: error.message,
+          variant: "destructive",
+        });
       }
     } catch (error) {
       console.error('Google sign-in error:', error);
