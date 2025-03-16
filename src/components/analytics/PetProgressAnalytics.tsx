@@ -1,8 +1,8 @@
+
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import WeightChart from './WeightChart';
-import MilestoneTracker from './MilestoneTracker';
 import HealthTimeline from '@/components/health/HealthTimeline';
 import { TimelineEvent } from '@/components/health/HealthTimelineEvent';
 import { useLanguage } from '@/context/LanguageContext';
@@ -16,13 +16,10 @@ const PetProgressAnalytics = () => {
     en: {
       title: 'Pet Progress & Analytics',
       weight: 'Weight Tracking',
-      health: 'Health Milestones',
       timeline: 'Health Timeline',
       petWeight: 'Pet Weight',
-      upcomingPetCare: 'Upcoming Pet Care',
       healthTimeline: 'Health Timeline',
       petWeightDesc: 'Track your pet\'s weight over time to monitor their health and ensure they maintain a healthy weight.',
-      upcomingPetCareDesc: 'Never miss important pet care schedules with smart reminders for upcoming appointments.',
       healthTimelineDesc: 'View your pet\'s health history and upcoming appointments on an interactive timeline.',
       lastEntry: 'Last entry',
       weightGoal: 'Weight goal',
@@ -34,13 +31,10 @@ const PetProgressAnalytics = () => {
     id: {
       title: 'Perkembangan & Analitik Hewan',
       weight: 'Pelacakan Berat',
-      health: 'Tonggak Kesehatan',
       timeline: 'Linimasa Kesehatan',
       petWeight: 'Berat Hewan',
-      upcomingPetCare: 'Perawatan Hewan Mendatang',
       healthTimeline: 'Linimasa Kesehatan',
       petWeightDesc: 'Lacak berat hewan peliharaan Anda dari waktu ke waktu untuk memantau kesehatan mereka dan memastikan mereka mempertahankan berat yang sehat.',
-      upcomingPetCareDesc: 'Jangan lewatkan jadwal perawatan hewan penting dengan pengingat pintar untuk janji temu mendatang.',
       healthTimelineDesc: 'Lihat riwayat kesehatan hewan peliharaan Anda dan janji temu mendatang pada linimasa interaktif.',
       lastEntry: 'Entri terakhir',
       weightGoal: 'Target berat',
@@ -143,12 +137,10 @@ const PetProgressAnalytics = () => {
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
               <CardTitle>
                 {activeTab === 'weight' && t.petWeight}
-                {activeTab === 'health' && t.upcomingPetCare}
                 {activeTab === 'timeline' && t.healthTimeline}
               </CardTitle>
               <TabsList>
                 <TabsTrigger value="weight">{t.weight}</TabsTrigger>
-                <TabsTrigger value="health">{t.health}</TabsTrigger>
                 <TabsTrigger value="timeline">{t.timeline}</TabsTrigger>
               </TabsList>
             </div>
@@ -157,10 +149,6 @@ const PetProgressAnalytics = () => {
             <TabsContent value="weight" className="mt-0">
               <p className="text-muted-foreground mb-6">{t.petWeightDesc}</p>
               <WeightChart />
-            </TabsContent>
-            <TabsContent value="health" className="mt-0">
-              <p className="text-muted-foreground mb-6">{t.upcomingPetCareDesc}</p>
-              <MilestoneTracker language={language} />
             </TabsContent>
             <TabsContent value="timeline" className="mt-0">
               <p className="text-muted-foreground mb-6">{t.healthTimelineDesc}</p>

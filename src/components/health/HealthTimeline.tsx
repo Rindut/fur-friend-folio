@@ -2,9 +2,12 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { addDays, subDays, format, isAfter, isBefore, isToday, parseISO } from 'date-fns';
 import { Slider } from '@/components/ui/slider';
-import { ZoomIn, ZoomOut, ChevronLeft, ChevronRight, Calendar } from 'lucide-react';
+import { ZoomIn, ZoomOut, ChevronLeft, ChevronRight, Calendar, LayoutHorizontal, LayoutVertical } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { Toggle } from '@/components/ui/toggle';
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import HealthTimelineEvent, { TimelineEvent, getEventTypeColor } from './HealthTimelineEvent';
 
 interface HealthTimelineProps {
@@ -19,6 +22,7 @@ const HealthTimeline: React.FC<HealthTimelineProps> = ({
   const [zoomLevel, setZoomLevel] = useState(1);
   const [centerPosition, setCenterPosition] = useState(50); // 50% by default
   const [sortedEvents, setSortedEvents] = useState<TimelineEvent[]>([]);
+  const [viewMode, setViewMode] = useState<'horizontal' | 'vertical'>('horizontal');
   const timelineRef = useRef<HTMLDivElement>(null);
   
   // Sort and process events
@@ -45,6 +49,8 @@ const HealthTimeline: React.FC<HealthTimelineProps> = ({
       noEvents: 'No health events to display',
       past: 'Past',
       upcoming: 'Upcoming',
+      horizontal: 'Horizontal View',
+      vertical: 'Vertical View',
     },
     id: {
       today: 'Hari ini',
@@ -53,6 +59,8 @@ const HealthTimeline: React.FC<HealthTimelineProps> = ({
       noEvents: 'Tidak ada peristiwa kesehatan untuk ditampilkan',
       past: 'Sebelumnya',
       upcoming: 'Mendatang',
+      horizontal: 'Tampilan Horizontal',
+      vertical: 'Tampilan Vertikal',
     }
   };
   
@@ -93,12 +101,12 @@ const HealthTimeline: React.FC<HealthTimelineProps> = ({
   
   // Scroll to today initially
   useEffect(() => {
-    if (timelineRef.current) {
+    if (timelineRef.current && viewMode === 'horizontal') {
       const todayPos = getEventPosition(today);
       const scrollPos = (timelineRef.current.scrollWidth * todayPos / 100) - (timelineRef.current.clientWidth / 2);
       timelineRef.current.scrollLeft = scrollPos;
     }
-  }, [zoomLevel, sortedEvents]);
+  }, [zoomLevel, sortedEvents, viewMode]);
   
   // Split events into past and future
   const pastEvents = sortedEvents.filter(event => {
@@ -142,11 +150,39 @@ const HealthTimeline: React.FC<HealthTimelineProps> = ({
           </Button>
         </div>
         
-        <div className="flex items-center text-sm">
-          <span className="text-green-500 mr-2">●</span>
-          <span className="mr-4">{t.past}</span>
-          <span className="text-amber-500 mr-2">●</span>
-          <span>{t.upcoming}</span>
+        <div className="flex items-center gap-4">
+          <TooltipProvider>
+            <ToggleGroup type="single" value={viewMode} onValueChange={(value) => value && setViewMode(value as 'horizontal' | 'vertical')}>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <ToggleGroupItem value="horizontal" aria-label={t.horizontal}>
+                    <LayoutHorizontal className="h-4 w-4" />
+                  </ToggleGroupItem>
+                </TooltipTrigger>
+                <TooltipContent side="bottom">
+                  <p>{t.horizontal}</p>
+                </TooltipContent>
+              </Tooltip>
+              
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <ToggleGroupItem value="vertical" aria-label={t.vertical}>
+                    <LayoutVertical className="h-4 w-4" />
+                  </ToggleGroupItem>
+                </TooltipTrigger>
+                <TooltipContent side="bottom">
+                  <p>{t.vertical}</p>
+                </TooltipContent>
+              </Tooltip>
+            </ToggleGroup>
+          </TooltipProvider>
+          
+          <div className="flex items-center text-sm">
+            <span className="text-green-500 mr-2">●</span>
+            <span className="mr-4">{t.past}</span>
+            <span className="text-amber-500 mr-2">●</span>
+            <span>{t.upcoming}</span>
+          </div>
         </div>
       </div>
       
@@ -156,7 +192,7 @@ const HealthTimeline: React.FC<HealthTimelineProps> = ({
           <div className="text-center py-10 text-muted-foreground">
             {t.noEvents}
           </div>
-        ) : (
+        ) : viewMode === 'horizontal' ? (
           <div 
             ref={timelineRef}
             className="relative overflow-x-auto pb-4"
@@ -212,6 +248,71 @@ const HealthTimeline: React.FC<HealthTimelineProps> = ({
                     }}
                   >
                     <HealthTimelineEvent event={event} language={language} />
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div className="relative py-4 pl-4">
+            {/* Vertical Timeline */}
+            <div className="relative border-l-2 border-gray-200 ml-4 pl-8">
+              {/* Today Marker */}
+              <div className="absolute left-0 transform -translate-x-1/2">
+                <div className="flex items-center">
+                  <div className="w-4 h-4 rounded-full bg-coral"></div>
+                  <div className="ml-2 whitespace-nowrap text-xs font-medium bg-coral text-white px-2 py-0.5 rounded">
+                    {t.today}
+                  </div>
+                </div>
+              </div>
+              
+              {/* Past Events */}
+              <div className="space-y-6 mb-8">
+                {pastEvents.map(event => (
+                  <div key={event.id} className="relative">
+                    <div className="absolute left-[-42px] w-4 h-4 rounded-full bg-green-500"></div>
+                    <div className="mb-1">
+                      <span className="text-sm font-medium">
+                        {format(event.date instanceof Date ? event.date : parseISO(event.date as string), 'MMM dd, yyyy')}
+                      </span>
+                    </div>
+                    <div className="p-3 bg-background border rounded-md shadow-sm">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <h4 className="font-medium">{event.title}</h4>
+                          {event.details && <p className="text-sm text-muted-foreground mt-1">{event.details}</p>}
+                        </div>
+                        <div className={`text-xs px-2 py-1 rounded-full ${event.completed ? 'bg-green-100 text-green-800' : 'bg-amber-100 text-amber-800'}`}>
+                          {event.completed ? 'Completed' : 'Upcoming'}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              
+              {/* Future Events */}
+              <div className="space-y-6">
+                {futureEvents.map(event => (
+                  <div key={event.id} className="relative">
+                    <div className="absolute left-[-42px] w-4 h-4 rounded-full bg-amber-500"></div>
+                    <div className="mb-1">
+                      <span className="text-sm font-medium">
+                        {format(event.date instanceof Date ? event.date : parseISO(event.date as string), 'MMM dd, yyyy')}
+                      </span>
+                    </div>
+                    <div className="p-3 bg-background border rounded-md shadow-sm">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <h4 className="font-medium">{event.title}</h4>
+                          {event.details && <p className="text-sm text-muted-foreground mt-1">{event.details}</p>}
+                        </div>
+                        <div className={`text-xs px-2 py-1 rounded-full ${event.completed ? 'bg-green-100 text-green-800' : 'bg-amber-100 text-amber-800'}`}>
+                          {event.completed ? 'Completed' : 'Upcoming'}
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 ))}
               </div>
