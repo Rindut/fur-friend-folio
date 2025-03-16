@@ -1,91 +1,36 @@
+
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { PawPrint, BarChart, User } from 'lucide-react';
+import { PawPrint, BarChart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import PetProfileCard, { PetData } from '@/components/ui/PetProfileCard';
-import AddPetButton from '@/components/ui/AddPetButton';
-import PetProgressAnalytics from '@/components/analytics/PetProgressAnalytics';
-import { supabase } from '@/integrations/supabase/client';
+import HeaderWithDate from '@/components/common/HeaderWithDate';
 import { useAuth } from '@/context/AuthContext';
 import { useLanguage } from '@/context/LanguageContext';
-import HeaderWithDate from '@/components/common/HeaderWithDate';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import PetProgressAnalytics from '@/components/analytics/PetProgressAnalytics';
 
 const Dashboard = () => {
-  const [pets, setPets] = useState<PetData[]>([]);
-  const [loading, setLoading] = useState(true);
   const { user } = useAuth();
   const { language } = useLanguage();
 
   const translations = {
     en: {
-      loading: 'Loading pets...',
-      noPets: 'No pets added yet. Add your first pet!',
       hello: 'Hello, Pet Parent!',
-      petParent: 'Pet Parent',
-      yourPets: 'Your Pets',
-      yourPetFamily: 'Your Pet Family',
       yourPetProgress: 'Your Pet Progress',
-      viewAll: 'View All',
-      profile: 'Profile',
-      addPet: 'Add a Pet'
+      viewPetFamily: 'View Pet Family',
     },
     id: {
-      loading: 'Memuat hewan peliharaan...',
-      noPets: 'Belum ada hewan peliharaan. Tambahkan hewan pertama Anda!',
       hello: 'Halo, Pemilik Hewan!',
-      petParent: 'Pemilik Hewan',
-      yourPets: 'Hewan Peliharaan Anda',
-      yourPetFamily: 'Keluarga Hewan Peliharaan Anda',
       yourPetProgress: 'Perkembangan Hewan Peliharaan Anda',
-      viewAll: 'Lihat Semua',
-      profile: 'Profil',
-      addPet: 'Tambah Hewan'
+      viewPetFamily: 'Lihat Keluarga Hewan',
     }
   };
 
   const t = translations[language];
 
-  useEffect(() => {
-    const fetchPets = async () => {
-      if (!user) return;
-      
-      try {
-        const { data, error } = await supabase
-          .from('pets')
-          .select('*')
-          .eq('user_id', user.id)
-          .order('created_at', { ascending: false });
-          
-        if (error) throw error;
-        
-        if (data) {
-          const formattedPets: PetData[] = data.map(pet => ({
-            id: pet.id,
-            name: pet.name,
-            species: pet.species as 'dog' | 'cat' | 'bird' | 'rabbit' | 'fish' | 'other',
-            breed: pet.breed || undefined,
-            age: pet.age || undefined,
-            imageUrl: pet.image_url || undefined,
-            isActive: pet.is_active
-          }));
-          
-          setPets(formattedPets);
-        }
-      } catch (error) {
-        console.error('Error fetching pets:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    
-    fetchPets();
-  }, [user]);
-
-  const addPetButton = (
+  const viewPetFamilyButton = (
     <Button className="rounded-full bg-coral hover:bg-coral/90" asChild>
-      <Link to="/pets/new" className="flex items-center gap-2">
-        <PawPrint className="w-4 h-4" /> {t.addPet}
+      <Link to="/pet-family" className="flex items-center gap-2">
+        <PawPrint className="w-4 h-4" /> {t.viewPetFamily}
       </Link>
     </Button>
   );
@@ -96,65 +41,8 @@ const Dashboard = () => {
         <div className="container px-4 mx-auto">
           <HeaderWithDate 
             title={t.hello}
-            actions={addPetButton}
+            actions={viewPetFamilyButton}
           />
-          
-          {/* Pet Family Section with colorful header */}
-          <section className="mb-12">
-            <div className="bg-soft-peach py-4 px-6 rounded-lg mb-6 flex items-center">
-              <User className="text-sage w-5 h-5 mr-2" />
-              <h2 className="text-xl font-semibold">{t.yourPetFamily}</h2>
-            </div>
-            
-            {/* Pet Parent subsection */}
-            <div className="mb-6">
-              <h3 className="text-lg font-medium mb-4">{t.petParent}</h3>
-              <div className="glass-morphism rounded-xl p-5 flex items-center mb-6">
-                <Avatar className="h-12 w-12 mr-4 border border-sage/20">
-                  {user?.user_metadata?.avatar_url ? (
-                    <AvatarImage src={user.user_metadata.avatar_url} alt="Profile" />
-                  ) : (
-                    <AvatarFallback className="bg-sage/20 text-sage">
-                      {user ? user.email.substring(0, 2).toUpperCase() : 'U'}
-                    </AvatarFallback>
-                  )}
-                </Avatar>
-                <div>
-                  <h4 className="font-medium">{user?.user_metadata?.username || 'Pet Parent'}</h4>
-                  <p className="text-sm text-muted-foreground">{user?.email}</p>
-                </div>
-                <Link to="/profile" className="ml-auto">
-                  <Button variant="outline" size="sm" className="rounded-full">
-                    <User className="w-4 h-4 mr-1" />
-                    <span>{t.profile}</span>
-                  </Button>
-                </Link>
-              </div>
-            </div>
-            
-            {/* Pets subsection */}
-            <div>
-              <h3 className="text-lg font-medium mb-4">{t.yourPets}</h3>
-              
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                {loading ? (
-                  <div className="col-span-full text-center py-8">{t.loading}</div>
-                ) : pets.length > 0 ? (
-                  <>
-                    {pets.map(pet => (
-                      <PetProfileCard key={pet.id} pet={pet} />
-                    ))}
-                    <AddPetButton variant="outline" className="h-full min-h-[200px]" />
-                  </>
-                ) : (
-                  <div className="col-span-full flex flex-col items-center py-8">
-                    <p className="text-muted-foreground mb-4">{t.noPets}</p>
-                    <AddPetButton variant="outline" />
-                  </div>
-                )}
-              </div>
-            </div>
-          </section>
         </div>
       </div>
       

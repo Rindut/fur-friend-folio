@@ -24,6 +24,7 @@ const PageBreadcrumb = () => {
   
   const pathMap: BreadcrumbMap = {
     'dashboard': { en: 'Dashboard', id: 'Dasbor' },
+    'pet-family': { en: 'Pet Family', id: 'Keluarga Hewan' },
     'health': { en: 'Health Records', id: 'Catatan Kesehatan' },
     'reminders': { en: 'Reminders', id: 'Pengingat' },
     'pets': { en: 'Pet Profile', id: 'Profil Hewan' },

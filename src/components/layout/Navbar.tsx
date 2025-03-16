@@ -7,7 +7,8 @@ import {
   PawPrint,
   Menu, 
   X,
-  Map
+  Map,
+  Users
 } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
 import { useAuth } from '@/context/AuthContext';
@@ -46,6 +47,7 @@ const Navbar = () => {
     navLinks = [
       ...navLinks,
       { name: t.dashboard, path: '/dashboard', icon: <PawPrint className="w-4 h-4" /> },
+      { name: t.petFamily, path: '/pet-family', icon: <Users className="w-4 h-4" /> },
       { name: t.health, path: '/health', icon: <Heart className="w-4 h-4" /> },
     ];
   }

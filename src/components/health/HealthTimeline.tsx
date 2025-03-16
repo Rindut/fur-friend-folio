@@ -2,7 +2,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { addDays, subDays, format, isAfter, isBefore, isToday, parseISO } from 'date-fns';
 import { Slider } from '@/components/ui/slider';
-import { ZoomIn, ZoomOut, ChevronLeft, ChevronRight, Calendar, Rows, Columns } from 'lucide-react';
+import { ZoomIn, ZoomOut, ChevronLeft, ChevronRight, Calendar, Rows, Columns, ChevronDown, ChevronUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { Toggle } from '@/components/ui/toggle';
@@ -23,6 +23,8 @@ const HealthTimeline: React.FC<HealthTimelineProps> = ({
   const [centerPosition, setCenterPosition] = useState(50); // 50% by default
   const [sortedEvents, setSortedEvents] = useState<TimelineEvent[]>([]);
   const [viewMode, setViewMode] = useState<'horizontal' | 'vertical'>('horizontal');
+  const [showAllPast, setShowAllPast] = useState(false);
+  const [showAllUpcoming, setShowAllUpcoming] = useState(false);
   const timelineRef = useRef<HTMLDivElement>(null);
   
   // Sort and process events
@@ -51,6 +53,9 @@ const HealthTimeline: React.FC<HealthTimelineProps> = ({
       upcoming: 'Upcoming',
       horizontal: 'Horizontal View',
       vertical: 'Vertical View',
+      showMore: 'Show More',
+      showLess: 'Show Less',
+      completed: 'Completed',
     },
     id: {
       today: 'Hari ini',
@@ -61,6 +66,9 @@ const HealthTimeline: React.FC<HealthTimelineProps> = ({
       upcoming: 'Mendatang',
       horizontal: 'Tampilan Horizontal',
       vertical: 'Tampilan Vertikal',
+      showMore: 'Tampilkan Lebih',
+      showLess: 'Tampilkan Kurang',
+      completed: 'Selesai',
     }
   };
   
@@ -118,6 +126,10 @@ const HealthTimeline: React.FC<HealthTimelineProps> = ({
     const eventDate = event.date instanceof Date ? event.date : parseISO(event.date as string);
     return isAfter(eventDate, today) && !isToday(eventDate);
   });
+
+  // Limit displayed events in vertical view
+  const displayedPastEvents = showAllPast ? pastEvents : pastEvents.slice(0, 3);
+  const displayedFutureEvents = showAllUpcoming ? futureEvents : futureEvents.slice(0, 3);
   
   return (
     <div className="mt-4">
@@ -258,18 +270,26 @@ const HealthTimeline: React.FC<HealthTimelineProps> = ({
             {/* Vertical Timeline */}
             <div className="relative border-l-2 border-gray-200 ml-4 pl-8">
               {/* Today Marker */}
-              <div className="absolute left-0 transform -translate-x-1/2">
-                <div className="flex items-center">
-                  <div className="w-4 h-4 rounded-full bg-coral"></div>
-                  <div className="ml-2 whitespace-nowrap text-xs font-medium bg-coral text-white px-2 py-0.5 rounded">
-                    {t.today}
-                  </div>
+              <div className="absolute left-0 transform -translate-x-1/2 flex items-center z-10 bg-white py-1">
+                <div className="w-6 h-6 rounded-full bg-coral flex items-center justify-center">
+                  <span className="text-white text-xs font-bold">T</span>
                 </div>
+                <div className="ml-2 whitespace-nowrap text-xs font-medium bg-coral text-white px-2 py-0.5 rounded">
+                  {t.today}
+                </div>
+              </div>
+              
+              {/* Past Events Title */}
+              <div className="mb-4 mt-10">
+                <h3 className="text-lg font-medium flex items-center">
+                  <span className="text-green-500 mr-2">●</span> 
+                  {t.past} <span className="text-muted-foreground text-sm ml-2">({pastEvents.length})</span>
+                </h3>
               </div>
               
               {/* Past Events */}
               <div className="space-y-6 mb-8">
-                {pastEvents.map(event => (
+                {displayedPastEvents.map((event, index) => (
                   <div key={event.id} className="relative">
                     <div className="absolute left-[-42px] w-4 h-4 rounded-full bg-green-500"></div>
                     <div className="mb-1">
@@ -283,18 +303,43 @@ const HealthTimeline: React.FC<HealthTimelineProps> = ({
                           <h4 className="font-medium">{event.title}</h4>
                           {event.details && <p className="text-sm text-muted-foreground mt-1">{event.details}</p>}
                         </div>
-                        <div className={`text-xs px-2 py-1 rounded-full ${event.completed ? 'bg-green-100 text-green-800' : 'bg-amber-100 text-amber-800'}`}>
-                          {event.completed ? 'Completed' : 'Upcoming'}
+                        <div className={`text-xs px-2 py-1 rounded-full bg-green-100 text-green-800`}>
+                          {t.completed}
                         </div>
                       </div>
                     </div>
                   </div>
                 ))}
+                
+                {/* Show More/Less Button for Past Events */}
+                {pastEvents.length > 3 && (
+                  <div className="text-center">
+                    <Button 
+                      variant="ghost" 
+                      onClick={() => setShowAllPast(!showAllPast)}
+                      className="text-muted-foreground hover:text-foreground"
+                    >
+                      {showAllPast ? (
+                        <><ChevronUp className="h-4 w-4 mr-1" /> {t.showLess}</>
+                      ) : (
+                        <><ChevronDown className="h-4 w-4 mr-1" /> {t.showMore} ({pastEvents.length - 3})</>
+                      )}
+                    </Button>
+                  </div>
+                )}
+              </div>
+              
+              {/* Upcoming Events Title */}
+              <div className="mb-4">
+                <h3 className="text-lg font-medium flex items-center">
+                  <span className="text-amber-500 mr-2">●</span> 
+                  {t.upcoming} <span className="text-muted-foreground text-sm ml-2">({futureEvents.length})</span>
+                </h3>
               </div>
               
               {/* Future Events */}
               <div className="space-y-6">
-                {futureEvents.map(event => (
+                {displayedFutureEvents.map(event => (
                   <div key={event.id} className="relative">
                     <div className="absolute left-[-42px] w-4 h-4 rounded-full bg-amber-500"></div>
                     <div className="mb-1">
@@ -308,13 +353,30 @@ const HealthTimeline: React.FC<HealthTimelineProps> = ({
                           <h4 className="font-medium">{event.title}</h4>
                           {event.details && <p className="text-sm text-muted-foreground mt-1">{event.details}</p>}
                         </div>
-                        <div className={`text-xs px-2 py-1 rounded-full ${event.completed ? 'bg-green-100 text-green-800' : 'bg-amber-100 text-amber-800'}`}>
-                          {event.completed ? 'Completed' : 'Upcoming'}
+                        <div className="text-xs px-2 py-1 rounded-full bg-amber-100 text-amber-800">
+                          {t.upcoming}
                         </div>
                       </div>
                     </div>
                   </div>
                 ))}
+                
+                {/* Show More/Less Button for Future Events */}
+                {futureEvents.length > 3 && (
+                  <div className="text-center">
+                    <Button 
+                      variant="ghost" 
+                      onClick={() => setShowAllUpcoming(!showAllUpcoming)}
+                      className="text-muted-foreground hover:text-foreground"
+                    >
+                      {showAllUpcoming ? (
+                        <><ChevronUp className="h-4 w-4 mr-1" /> {t.showLess}</>
+                      ) : (
+                        <><ChevronDown className="h-4 w-4 mr-1" /> {t.showMore} ({futureEvents.length - 3})</>
+                      )}
+                    </Button>
+                  </div>
+                )}
               </div>
             </div>
           </div>

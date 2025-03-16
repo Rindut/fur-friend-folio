@@ -2,7 +2,7 @@
 import { useLocation } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import { cn } from '@/lib/utils';
-import { Home, PawPrint, Heart, Map } from 'lucide-react';
+import { Home, PawPrint, Heart, Map, Users } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import {
   NavigationMenu,
@@ -57,6 +57,19 @@ const DesktopNavigation = ({ translations }: DesktopNavigationProps) => {
               >
                 <PawPrint className="w-4 h-4 mr-2" />
                 {t.dashboard}
+              </Link>
+            </NavigationMenuItem>
+            
+            <NavigationMenuItem>
+              <Link 
+                to="/pet-family" 
+                className={cn(
+                  navigationMenuTriggerStyle(),
+                  location.pathname === '/pet-family' ? 'bg-coral/20 text-coral font-medium' : ''
+                )}
+              >
+                <Users className="w-4 h-4 mr-2" />
+                {t.petFamily}
               </Link>
             </NavigationMenuItem>
             

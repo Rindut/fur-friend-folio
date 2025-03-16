@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -21,6 +20,7 @@ import AddPet from "./pages/AddPet";
 import EditPet from "./pages/EditPet";
 import OwnerProfile from "./pages/OwnerProfile";
 import AddReminder from "./pages/AddReminder";
+import PetFamily from "./pages/PetFamily";
 
 const queryClient = new QueryClient();
 
@@ -60,6 +60,14 @@ const App = () => (
                   element={
                     <ProtectedRoute>
                       <Dashboard />
+                    </ProtectedRoute>
+                  } 
+                />
+                <Route 
+                  path="/pet-family" 
+                  element={
+                    <ProtectedRoute>
+                      <PetFamily />
                     </ProtectedRoute>
                   } 
                 />
