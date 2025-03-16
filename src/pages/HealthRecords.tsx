@@ -1,6 +1,6 @@
 
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { 
   Heart, 
@@ -14,8 +14,10 @@ import {
   Bell
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useAuth } from '@/context/AuthContext';
 import PetAvatar from '@/components/ui/PetAvatar';
 import { useLanguage } from '@/context/LanguageContext';
+import AddReminderButton from '@/components/reminders/AddReminderButton';
 
 interface HealthRecord {
   id: string;
@@ -126,15 +128,28 @@ const upcomingTasks = [
 const HealthRecords = () => {
   const [selectedPet, setSelectedPet] = useState<string>(samplePets[0].id);
   const [activeTab, setActiveTab] = useState<string>('all');
+  const location = useLocation();
+  const { user } = useAuth();
   const { language } = useLanguage();
+  
+  // Check if we should scroll to a specific section based on URL hash
+  useEffect(() => {
+    if (location.hash) {
+      const element = document.getElementById(location.hash.substring(1));
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+  }, [location.hash]);
   
   const translations = {
     en: {
       pageTitle: 'Health',
-      healthRecords: 'Health Records',
-      healthRecordsDesc: 'Track your pet\'s complete medical history in one place. Store past veterinary visits, vaccinations, medications, surgeries, and health conditions.',
-      upcoming: 'Upcoming',
-      upcomingDesc: 'Never miss important pet care schedules with smart reminders for upcoming appointments.',
+      greeting: 'Hello, Pet Parent!',
+      petCareHistory: 'Pet Care History',
+      petCareHistoryDesc: 'Track your pet\'s complete medical history in one place. Store past veterinary visits, vaccinations, medications, surgeries, and health conditions.',
+      upcomingPetCare: 'Upcoming Pet Care',
+      upcomingPetCareDesc: 'Never miss important pet care schedules with smart reminders for upcoming appointments.',
       all: 'All',
       vaccinations: 'Vaccinations',
       medications: 'Medications',
@@ -144,14 +159,16 @@ const HealthRecords = () => {
       noRecords: 'No health records found. Add a new record to get started.',
       noUpcoming: 'No upcoming health tasks.',
       details: 'Details',
-      viewCalendar: 'View Calendar'
+      viewCalendar: 'View Calendar',
+      selectPet: 'Select Pet'
     },
     id: {
       pageTitle: 'Kesehatan',
-      healthRecords: 'Catatan Kesehatan',
-      healthRecordsDesc: 'Lacak riwayat medis lengkap hewan peliharaan Anda dalam satu tempat. Simpan kunjungan dokter hewan, vaksinasi, pengobatan, operasi, dan kondisi kesehatan.',
-      upcoming: 'Mendatang',
-      upcomingDesc: 'Jangan pernah melewatkan jadwal perawatan hewan peliharaan penting dengan pengingat pintar untuk janji temu mendatang.',
+      greeting: 'Halo, Pemilik Hewan!',
+      petCareHistory: 'Riwayat Perawatan Hewan',
+      petCareHistoryDesc: 'Lacak riwayat medis lengkap hewan peliharaan Anda dalam satu tempat. Simpan kunjungan dokter hewan, vaksinasi, pengobatan, operasi, dan kondisi kesehatan.',
+      upcomingPetCare: 'Perawatan Hewan Mendatang',
+      upcomingPetCareDesc: 'Jangan pernah melewatkan jadwal perawatan hewan peliharaan penting dengan pengingat pintar untuk janji temu mendatang.',
       all: 'Semua',
       vaccinations: 'Vaksinasi',
       medications: 'Pengobatan',
@@ -161,7 +178,8 @@ const HealthRecords = () => {
       noRecords: 'Tidak ada catatan kesehatan. Tambahkan catatan baru untuk memulai.',
       noUpcoming: 'Tidak ada tugas kesehatan mendatang.',
       details: 'Detail',
-      viewCalendar: 'Lihat Kalender'
+      viewCalendar: 'Lihat Kalender',
+      selectPet: 'Pilih Hewan'
     }
   };
   
@@ -198,17 +216,45 @@ const HealthRecords = () => {
     (activeTab === 'all' || record.type === activeTab)
   );
   
+  const currentPetUpcomingTasks = upcomingTasks.filter(task =>
+    task.petId === selectedPet
+  );
+  
   return (
     <div className="min-h-screen pb-20">
       <div className="bg-gradient-to-b from-lavender/20 to-transparent pt-8 pb-12">
         <div className="container px-4 mx-auto">
-          <h1 className="text-3xl font-bold mb-8">{t.pageTitle}</h1>
+          <h1 className="text-3xl font-bold mb-4">{t.pageTitle}</h1>
+          <p className="text-xl text-muted-foreground mb-8">{t.greeting}</p>
           
-          {/* Health Records Section */}
-          <div className="mb-12">
+          {/* Pet Selector - Moved above the sections */}
+          <div className="flex flex-wrap gap-3 mb-8">
+            <p className="flex items-center mr-2 font-medium">{t.selectPet}:</p>
+            {samplePets.map(pet => (
+              <button
+                key={pet.id}
+                className={`px-4 py-2 rounded-full flex items-center gap-2 transition-all duration-200 ${
+                  selectedPet === pet.id 
+                    ? 'bg-lavender/30 text-charcoal' 
+                    : 'bg-white/70 text-muted-foreground hover:bg-lavender/10'
+                }`}
+                onClick={() => setSelectedPet(pet.id)}
+              >
+                <PetAvatar 
+                  src={pet.imageUrl} 
+                  name={pet.name} 
+                  size="sm" 
+                />
+                <span>{pet.name}</span>
+              </button>
+            ))}
+          </div>
+          
+          {/* Pet Care History Section */}
+          <section id="pet-care-history" className="mb-12">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-semibold flex items-center gap-2">
-                <Heart className="text-coral w-5 h-5" /> {t.healthRecords}
+                <Heart className="text-coral w-5 h-5" /> {t.petCareHistory}
               </h2>
               
               <Button className="rounded-full bg-lavender hover:bg-lavender/90" asChild>
@@ -219,29 +265,7 @@ const HealthRecords = () => {
               </Button>
             </div>
             
-            <p className="text-muted-foreground mb-6">{t.healthRecordsDesc}</p>
-            
-            {/* Pet Selector */}
-            <div className="flex flex-wrap gap-3 mb-6">
-              {samplePets.map(pet => (
-                <button
-                  key={pet.id}
-                  className={`px-4 py-2 rounded-full flex items-center gap-2 transition-all duration-200 ${
-                    selectedPet === pet.id 
-                      ? 'bg-lavender/30 text-charcoal' 
-                      : 'bg-white/70 text-muted-foreground hover:bg-lavender/10'
-                  }`}
-                  onClick={() => setSelectedPet(pet.id)}
-                >
-                  <PetAvatar 
-                    src={pet.imageUrl} 
-                    name={pet.name} 
-                    size="sm" 
-                  />
-                  <span>{pet.name}</span>
-                </button>
-              ))}
-            </div>
+            <p className="text-muted-foreground mb-6">{t.petCareHistoryDesc}</p>
             
             {/* Record Type Tabs */}
             <Tabs 
@@ -318,13 +342,13 @@ const HealthRecords = () => {
                 />
               </TabsContent>
             </Tabs>
-          </div>
+          </section>
           
-          {/* Upcoming Section */}
-          <div>
+          {/* Upcoming Pet Care Section */}
+          <section id="upcoming-pet-care">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-semibold flex items-center gap-2">
-                <Bell className="text-coral w-5 h-5" /> {t.upcoming}
+                <Bell className="text-coral w-5 h-5" /> {t.upcomingPetCare}
               </h2>
               
               <div className="flex gap-3">
@@ -343,11 +367,11 @@ const HealthRecords = () => {
               </div>
             </div>
             
-            <p className="text-muted-foreground mb-6">{t.upcomingDesc}</p>
+            <p className="text-muted-foreground mb-6">{t.upcomingPetCareDesc}</p>
             
-            {upcomingTasks.length > 0 ? (
+            {currentPetUpcomingTasks.length > 0 ? (
               <div className="space-y-4">
-                {upcomingTasks.map(task => (
+                {currentPetUpcomingTasks.map(task => (
                   <div 
                     key={task.id}
                     className="glass-morphism rounded-xl p-5 hover:shadow-md transition-shadow flex items-center"
@@ -365,9 +389,19 @@ const HealthRecords = () => {
                       </div>
                     </div>
                     
-                    <Button variant="ghost" size="sm" className="text-muted-foreground">
-                      {t.details}
-                    </Button>
+                    <div className="flex items-center gap-2">
+                      <AddReminderButton 
+                        petId={task.petId}
+                        healthRecordId={task.id}
+                        variant="ghost"
+                        size="sm"
+                        showLabel={false}
+                        className="text-coral hover:bg-coral/10 p-2 rounded-full"
+                      />
+                      <Button variant="ghost" size="sm" className="text-muted-foreground">
+                        {t.details}
+                      </Button>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -376,7 +410,7 @@ const HealthRecords = () => {
                 <p className="text-muted-foreground">{t.noUpcoming}</p>
               </div>
             )}
-          </div>
+          </section>
         </div>
       </div>
     </div>

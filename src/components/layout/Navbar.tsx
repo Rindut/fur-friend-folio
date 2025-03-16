@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
@@ -13,7 +14,8 @@ import {
   LogOut,
   User,
   Map,
-  ChevronDown
+  ChevronDown,
+  Bell
 } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
 import { useAuth } from '@/context/AuthContext';
@@ -25,6 +27,15 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  NavigationMenu,
+  NavigationMenuContent,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  NavigationMenuTrigger,
+  navigationMenuTriggerStyle,
+} from "@/components/ui/navigation-menu";
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 
@@ -48,7 +59,11 @@ const Navbar = () => {
     en: {
       home: 'Home',
       dashboard: 'Dashboard',
+      petFamily: 'Your Pet Family',
+      petProgress: 'Your Pet Progress',
       health: 'Health',
+      petCareHistory: 'Pet Care History',
+      upcomingPetCare: 'Upcoming Pet Care',
       services: 'Local Services',
       signIn: 'Sign In',
       signOut: 'Sign Out',
@@ -58,7 +73,11 @@ const Navbar = () => {
     id: {
       home: 'Beranda',
       dashboard: 'Dasbor',
+      petFamily: 'Keluarga Hewan Anda',
+      petProgress: 'Perkembangan Hewan Anda',
       health: 'Kesehatan',
+      petCareHistory: 'Riwayat Perawatan Hewan',
+      upcomingPetCare: 'Perawatan Hewan Mendatang',
       services: 'Layanan Lokal',
       signIn: 'Masuk',
       signOut: 'Keluar',
@@ -78,8 +97,24 @@ const Navbar = () => {
   if (user) {
     navLinks = [
       ...navLinks,
-      { name: t.dashboard, path: '/dashboard', icon: <PawPrint className="w-4 h-4" /> },
-      { name: t.health, path: '/health', icon: <Heart className="w-4 h-4" /> },
+      { 
+        name: t.dashboard, 
+        path: '/dashboard', 
+        icon: <PawPrint className="w-4 h-4" />,
+        submenu: [
+          { name: t.petFamily, path: '/dashboard#pet-family', icon: <User className="w-4 h-4" /> },
+          { name: t.petProgress, path: '/dashboard#pet-progress', icon: <Calendar className="w-4 h-4" /> }
+        ]
+      },
+      { 
+        name: t.health, 
+        path: '/health', 
+        icon: <Heart className="w-4 h-4" />,
+        submenu: [
+          { name: t.petCareHistory, path: '/health#pet-care-history', icon: <Heart className="w-4 h-4" /> },
+          { name: t.upcomingPetCare, path: '/health#upcoming-pet-care', icon: <Bell className="w-4 h-4" /> }
+        ]
+      },
     ];
   }
   
@@ -113,25 +148,107 @@ const Navbar = () => {
             <span className="bg-clip-text text-transparent bg-gradient-to-r from-coral to-sage">ANABULKU</span>
           </Link>
 
-          {/* Desktop Navigation */}
+          {/* Desktop Navigation with Submenus */}
           <div className="hidden md:flex items-center gap-3">
-            <nav className="flex items-center gap-1">
-              {navLinks.map((link) => (
-                <Link
-                  key={link.path}
-                  to={link.path}
-                  className={cn(
-                    'px-3 py-1.5 rounded-full transition-all duration-200 flex items-center gap-1.5 text-sm',
-                    location.pathname === link.path
-                      ? 'bg-coral/20 text-coral font-medium'
-                      : 'hover:bg-muted/30 text-charcoal/80 hover:text-charcoal'
-                  )}
-                >
-                  {link.icon}
-                  <span>{link.name}</span>
-                </Link>
-              ))}
-            </nav>
+            <NavigationMenu>
+              <NavigationMenuList>
+                <NavigationMenuItem>
+                  <Link 
+                    to="/" 
+                    className={cn(
+                      navigationMenuTriggerStyle(),
+                      location.pathname === '/' ? 'bg-coral/20 text-coral font-medium' : ''
+                    )}
+                  >
+                    <Home className="w-4 h-4 mr-2" />
+                    {t.home}
+                  </Link>
+                </NavigationMenuItem>
+                
+                {user && (
+                  <>
+                    <NavigationMenuItem>
+                      <NavigationMenuTrigger className={location.pathname === '/dashboard' ? 'bg-coral/20 text-coral font-medium' : ''}>
+                        <PawPrint className="w-4 h-4 mr-2" />
+                        {t.dashboard}
+                      </NavigationMenuTrigger>
+                      <NavigationMenuContent>
+                        <ul className="grid w-[220px] gap-3 p-4">
+                          <li className="row-span-1">
+                            <NavigationMenuLink asChild>
+                              <Link
+                                to="/dashboard#pet-family"
+                                className="flex items-center gap-2 p-2 rounded-md hover:bg-muted hover:text-coral"
+                              >
+                                <User className="w-4 h-4" />
+                                <span>{t.petFamily}</span>
+                              </Link>
+                            </NavigationMenuLink>
+                          </li>
+                          <li className="row-span-1">
+                            <NavigationMenuLink asChild>
+                              <Link
+                                to="/dashboard#pet-progress"
+                                className="flex items-center gap-2 p-2 rounded-md hover:bg-muted hover:text-coral"
+                              >
+                                <Calendar className="w-4 h-4" />
+                                <span>{t.petProgress}</span>
+                              </Link>
+                            </NavigationMenuLink>
+                          </li>
+                        </ul>
+                      </NavigationMenuContent>
+                    </NavigationMenuItem>
+                    
+                    <NavigationMenuItem>
+                      <NavigationMenuTrigger className={location.pathname === '/health' ? 'bg-coral/20 text-coral font-medium' : ''}>
+                        <Heart className="w-4 h-4 mr-2" />
+                        {t.health}
+                      </NavigationMenuTrigger>
+                      <NavigationMenuContent>
+                        <ul className="grid w-[220px] gap-3 p-4">
+                          <li className="row-span-1">
+                            <NavigationMenuLink asChild>
+                              <Link
+                                to="/health#pet-care-history"
+                                className="flex items-center gap-2 p-2 rounded-md hover:bg-muted hover:text-coral"
+                              >
+                                <Heart className="w-4 h-4" />
+                                <span>{t.petCareHistory}</span>
+                              </Link>
+                            </NavigationMenuLink>
+                          </li>
+                          <li className="row-span-1">
+                            <NavigationMenuLink asChild>
+                              <Link
+                                to="/health#upcoming-pet-care"
+                                className="flex items-center gap-2 p-2 rounded-md hover:bg-muted hover:text-coral"
+                              >
+                                <Bell className="w-4 h-4" />
+                                <span>{t.upcomingPetCare}</span>
+                              </Link>
+                            </NavigationMenuLink>
+                          </li>
+                        </ul>
+                      </NavigationMenuContent>
+                    </NavigationMenuItem>
+                  </>
+                )}
+                
+                <NavigationMenuItem>
+                  <Link 
+                    to="/services" 
+                    className={cn(
+                      navigationMenuTriggerStyle(),
+                      location.pathname === '/services' ? 'bg-coral/20 text-coral font-medium' : ''
+                    )}
+                  >
+                    <Map className="w-4 h-4 mr-2" />
+                    {t.services}
+                  </Link>
+                </NavigationMenuItem>
+              </NavigationMenuList>
+            </NavigationMenu>
             
             <button 
               onClick={toggleLanguage}
@@ -231,20 +348,37 @@ const Navbar = () => {
         <div className="fixed inset-0 z-40 bg-white pt-20 md:hidden animate-fade-in">
           <nav className="container mx-auto px-4 py-8 flex flex-col gap-4">
             {navLinks.map((link) => (
-              <Link
-                key={link.path}
-                to={link.path}
-                onClick={() => setIsOpen(false)}
-                className={cn(
-                  'px-4 py-3 rounded-xl transition-all duration-200 flex items-center gap-3',
-                  location.pathname === link.path
-                    ? 'bg-coral/20 text-coral font-medium'
-                    : 'hover:bg-muted/30 text-charcoal/80 hover:text-charcoal'
+              <div key={link.path} className="flex flex-col">
+                <Link
+                  to={link.path}
+                  onClick={() => setIsOpen(false)}
+                  className={cn(
+                    'px-4 py-3 rounded-xl transition-all duration-200 flex items-center gap-3',
+                    location.pathname === link.path
+                      ? 'bg-coral/20 text-coral font-medium'
+                      : 'hover:bg-muted/30 text-charcoal/80 hover:text-charcoal'
+                  )}
+                >
+                  {link.icon}
+                  <span className="text-lg">{link.name}</span>
+                </Link>
+                
+                {link.submenu && (
+                  <div className="pl-10 space-y-2 mt-2">
+                    {link.submenu.map((subitem) => (
+                      <Link
+                        key={subitem.path}
+                        to={subitem.path}
+                        onClick={() => setIsOpen(false)}
+                        className="px-4 py-2 rounded-lg transition-all duration-200 flex items-center gap-3 hover:bg-muted/30"
+                      >
+                        {subitem.icon}
+                        <span>{subitem.name}</span>
+                      </Link>
+                    ))}
+                  </div>
                 )}
-              >
-                {link.icon}
-                <span className="text-lg">{link.name}</span>
-              </Link>
+              </div>
             ))}
             
             {user ? (
