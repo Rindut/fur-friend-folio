@@ -1,7 +1,6 @@
-
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { PawPrint, ArrowRight, User, BarChart } from 'lucide-react';
+import { PawPrint, BarChart, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import PetProfileCard, { PetData } from '@/components/ui/PetProfileCard';
 import AddPetButton from '@/components/ui/AddPetButton';
@@ -9,6 +8,7 @@ import PetProgressAnalytics from '@/components/analytics/PetProgressAnalytics';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/context/AuthContext';
 import { useLanguage } from '@/context/LanguageContext';
+import HeaderWithDate from '@/components/common/HeaderWithDate';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 const Dashboard = () => {
@@ -82,27 +82,22 @@ const Dashboard = () => {
     fetchPets();
   }, [user]);
 
-  // Get current date
-  const today = new Date();
-  const options: Intl.DateTimeFormatOptions = { weekday: 'long', month: 'long', day: 'numeric' };
-  const formattedDate = today.toLocaleDateString(language === 'id' ? 'id-ID' : 'en-US', options);
+  const addPetButton = (
+    <Button className="rounded-full bg-coral hover:bg-coral/90" asChild>
+      <Link to="/pets/new" className="flex items-center gap-2">
+        <PawPrint className="w-4 h-4" /> {t.addPet}
+      </Link>
+    </Button>
+  );
 
   return (
     <div className="min-h-screen pb-20">
       <div className="bg-gradient-to-b from-lavender/20 to-transparent pt-8 pb-12">
         <div className="container px-4 mx-auto">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
-            <div>
-              <p className="text-muted-foreground text-sm">{formattedDate}</p>
-              <h1 className="text-3xl font-bold">{t.hello}</h1>
-            </div>
-            
-            <Button className="rounded-full bg-coral hover:bg-coral/90 md:self-end" asChild>
-              <Link to="/pets/new" className="flex items-center gap-2">
-                <PawPrint className="w-4 h-4" /> {t.addPet}
-              </Link>
-            </Button>
-          </div>
+          <HeaderWithDate 
+            title={t.hello}
+            actions={addPetButton}
+          />
           
           {/* Pet Family Section with colorful header */}
           <section className="mb-12">
