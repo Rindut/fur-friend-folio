@@ -106,7 +106,7 @@ const Dashboard = () => {
           
           {/* Pet Family Section with colorful header */}
           <section className="mb-12">
-            <div className="bg-soft-blue py-4 px-6 rounded-lg mb-6 flex items-center">
+            <div className="bg-soft-peach py-4 px-6 rounded-lg mb-6 flex items-center">
               <User className="text-sage w-5 h-5 mr-2" />
               <h2 className="text-xl font-semibold">{t.yourPetFamily}</h2>
             </div>

@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { 
@@ -92,6 +92,11 @@ const HealthRecords = () => {
   
   const t = translations[language];
   
+  // Get current date - added to match Dashboard
+  const today = new Date();
+  const options: Intl.DateTimeFormatOptions = { weekday: 'long', month: 'long', day: 'numeric' };
+  const formattedDate = today.toLocaleDateString(language === 'id' ? 'id-ID' : 'en-US', options);
+  
   const getRecordIcon = (type: 'vaccination' | 'medication' | 'weight' | 'visit') => {
     switch (type) {
       case 'vaccination':
@@ -122,8 +127,13 @@ const HealthRecords = () => {
     <div className="min-h-screen pb-20">
       <div className="bg-gradient-to-b from-lavender/20 to-transparent pt-8 pb-12">
         <div className="container px-4 mx-auto">
-          <h1 className="text-3xl font-bold mb-4">{t.pageTitle}</h1>
-          <p className="text-xl text-muted-foreground mb-8">{t.greeting}</p>
+          {/* Added greeting and date to match Dashboard */}
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
+            <div>
+              <p className="text-muted-foreground text-sm">{formattedDate}</p>
+              <h1 className="text-3xl font-bold">{t.greeting}</h1>
+            </div>
+          </div>
           
           {/* Pet Selector */}
           {loading ? (
@@ -149,9 +159,9 @@ const HealthRecords = () => {
             </div>
           )}
           
-          {/* Pet Care History Section */}
+          {/* Pet Care History Section - updated to soft peach */}
           <section id="pet-care-history" className="mb-12">
-            <div className="bg-soft-green py-4 px-6 rounded-lg mb-6 flex items-center">
+            <div className="bg-soft-peach py-4 px-6 rounded-lg mb-6 flex items-center">
               <Heart className="text-coral w-5 h-5 mr-2" />
               <h2 className="text-xl font-semibold">{t.petCareHistory}</h2>
               
@@ -244,9 +254,9 @@ const HealthRecords = () => {
             </Tabs>
           </section>
           
-          {/* Upcoming Pet Care Section */}
+          {/* Upcoming Pet Care Section - updated to soft peach */}
           <section id="upcoming-pet-care">
-            <div className="bg-soft-purple py-4 px-6 rounded-lg mb-6 flex items-center">
+            <div className="bg-soft-peach py-4 px-6 rounded-lg mb-6 flex items-center">
               <Bell className="text-coral w-5 h-5 mr-2" />
               <h2 className="text-xl font-semibold">{t.upcomingPetCare}</h2>
               
