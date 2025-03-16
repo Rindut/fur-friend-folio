@@ -1,5 +1,5 @@
 
-import { ReactElement } from 'react';
+import React, { ReactElement } from 'react';
 import { Droplets, Pill, Weight, AlertCircle } from 'lucide-react';
 
 export type RecordType = 'vaccination' | 'medication' | 'weight' | 'visit';
@@ -8,13 +8,13 @@ export const useRecordUtils = () => {
   const getRecordIcon = (type: RecordType): ReactElement => {
     switch (type) {
       case 'vaccination':
-        return <Droplets className="w-4 h-4" />;
+        return React.createElement(Droplets, { className: "w-4 h-4" });
       case 'medication':
-        return <Pill className="w-4 h-4" />;
+        return React.createElement(Pill, { className: "w-4 h-4" });
       case 'weight':
-        return <Weight className="w-4 h-4" />;
+        return React.createElement(Weight, { className: "w-4 h-4" });
       case 'visit':
-        return <AlertCircle className="w-4 h-4" />;
+        return React.createElement(AlertCircle, { className: "w-4 h-4" });
     }
   };
   
