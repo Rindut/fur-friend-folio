@@ -29,7 +29,7 @@ export const WeightChart = () => {
           .from('pets')
           .select('id, name, weight, updated_at')
           .eq('user_id', user.id)
-          .is('weight', 'not.null')
+          .not('weight', 'is', null)  // This is the correct way to filter for non-null values
           .order('updated_at', { ascending: true });
 
         if (error) throw error;
