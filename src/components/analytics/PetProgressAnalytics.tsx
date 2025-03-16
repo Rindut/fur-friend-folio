@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -45,8 +46,10 @@ const PetProgressAnalytics = () => {
   const t = translations[language];
 
   return (
-    <div className="mt-12">
-      <h2 className="text-xl font-semibold mb-6">{t.title}</h2>
+    <div className="mt-8">
+      <div className="flex items-center mb-6">
+        <h2 className="text-xl font-semibold">{t.title}</h2>
+      </div>
 
       <Card>
         <Tabs defaultValue="weight" value={activeTab} onValueChange={setActiveTab}>
@@ -66,7 +69,7 @@ const PetProgressAnalytics = () => {
             </TabsContent>
             <TabsContent value="health" className="mt-0">
               <p className="text-muted-foreground mb-6">{t.upcomingPetCareDesc}</p>
-              <MilestoneTracker />
+              <MilestoneTracker language={language} />
             </TabsContent>
           </CardContent>
         </Tabs>

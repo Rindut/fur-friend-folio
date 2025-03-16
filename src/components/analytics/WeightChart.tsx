@@ -6,6 +6,7 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/context/AuthContext';
 import { formatDistanceToNow } from 'date-fns';
+import { useLanguage } from '@/context/LanguageContext';
 
 interface WeightData {
   id: string;
@@ -19,6 +20,26 @@ export const WeightChart = () => {
   const [weightData, setWeightData] = useState<WeightData[]>([]);
   const [loading, setLoading] = useState(true);
   const { user } = useAuth();
+  const { language } = useLanguage();
+
+  const translations = {
+    en: {
+      loading: 'Loading weight data...',
+      petWeightTracking: 'Pet Weight Tracking',
+      noWeightData: 'No weight data available yet. Add weight information to your pets to see it tracked here.',
+      petsTracked: 'Pets Tracked',
+      weightLabel: 'Weight (kg)'
+    },
+    id: {
+      loading: 'Memuat data berat...',
+      petWeightTracking: 'Pelacakan Berat Hewan',
+      noWeightData: 'Belum ada data berat yang tersedia. Tambahkan informasi berat ke hewan peliharaan Anda untuk melihatnya dilacak di sini.',
+      petsTracked: 'Hewan yang Dilacak',
+      weightLabel: 'Berat (kg)'
+    }
+  };
+
+  const t = translations[language];
 
   useEffect(() => {
     const fetchWeightData = async () => {
@@ -59,11 +80,11 @@ export const WeightChart = () => {
     return (
       <Card>
         <CardHeader>
-          <CardTitle>Pet Weight Tracking</CardTitle>
+          <CardTitle>{t.petWeightTracking}</CardTitle>
         </CardHeader>
         <CardContent className="flex flex-col items-center justify-center py-10">
           <p className="text-muted-foreground text-center">
-            No weight data available yet. Add weight information to your pets to see it tracked here.
+            {t.noWeightData}
           </p>
         </CardContent>
       </Card>
@@ -73,12 +94,12 @@ export const WeightChart = () => {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Pet Weight Tracking</CardTitle>
+        <CardTitle>{t.petWeightTracking}</CardTitle>
       </CardHeader>
       <CardContent>
         {loading ? (
           <div className="flex items-center justify-center h-60">
-            <p>Loading weight data...</p>
+            <p>{t.loading}</p>
           </div>
         ) : (
           <>
@@ -95,7 +116,7 @@ export const WeightChart = () => {
                   />
                   <YAxis 
                     label={{ 
-                      value: 'Weight (kg)', 
+                      value: t.weightLabel, 
                       angle: -90, 
                       position: 'insideLeft',
                       style: { textAnchor: 'middle' }
@@ -107,13 +128,13 @@ export const WeightChart = () => {
                     dataKey="weight" 
                     stroke="#FF7E5F" 
                     activeDot={{ r: 8 }} 
-                    name="Weight (kg)"
+                    name={t.weightLabel}
                   />
                 </LineChart>
               </ResponsiveContainer>
             </div>
             <div className="mt-4">
-              <Label>Pets Tracked</Label>
+              <Label>{t.petsTracked}</Label>
               <div className="flex flex-wrap gap-2 mt-2">
                 {Array.from(new Set(weightData.map(item => item.name))).map((name, idx) => (
                   <div key={idx} className="px-3 py-1 text-sm rounded-full bg-lavender/20 text-primary">

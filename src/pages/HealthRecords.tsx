@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
@@ -18,6 +17,8 @@ import { useAuth } from '@/context/AuthContext';
 import PetAvatar from '@/components/ui/PetAvatar';
 import { useLanguage } from '@/context/LanguageContext';
 import AddReminderButton from '@/components/reminders/AddReminderButton';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { supabase } from '@/integrations/supabase/client';
 
 interface HealthRecord {
   id: string;
@@ -35,19 +36,6 @@ interface Pet {
 }
 
 // Sample data
-const samplePets: Pet[] = [
-  {
-    id: '1',
-    name: 'Luna',
-    imageUrl: 'https://images.unsplash.com/photo-1552053831-71594a27632d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8ZG9nfGVufDB8fDB8fA%3D%3D&auto=format&fit=crop&w=500&q=60',
-  },
-  {
-    id: '2',
-    name: 'Oliver',
-    imageUrl: 'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8Y2F0fGVufDB8fDB8fA%3D%3D&auto=format&fit=crop&w=500&q=60',
-  }
-];
-
 const sampleHealthRecords: HealthRecord[] = [
   {
     id: '1',
@@ -126,11 +114,47 @@ const upcomingTasks = [
 ];
 
 const HealthRecords = () => {
-  const [selectedPet, setSelectedPet] = useState<string>(samplePets[0].id);
+  const [pets, setPets] = useState<Pet[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedPet, setSelectedPet] = useState<string>('');
   const [activeTab, setActiveTab] = useState<string>('all');
   const location = useLocation();
   const { user } = useAuth();
   const { language } = useLanguage();
+  
+  useEffect(() => {
+    const fetchPets = async () => {
+      if (!user) return;
+      
+      try {
+        const { data, error } = await supabase
+          .from('pets')
+          .select('id, name, image_url')
+          .eq('user_id', user.id)
+          .eq('is_active', true)
+          .order('created_at', { ascending: false });
+          
+        if (error) throw error;
+        
+        if (data && data.length > 0) {
+          setPets(data.map(pet => ({
+            id: pet.id,
+            name: pet.name,
+            imageUrl: pet.image_url
+          })));
+          
+          // Set the first pet as selected by default
+          setSelectedPet(data[0].id);
+        }
+      } catch (error) {
+        console.error('Error fetching pets:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchPets();
+  }, [user]);
   
   // Check if we should scroll to a specific section based on URL hash
   useEffect(() => {
@@ -160,7 +184,9 @@ const HealthRecords = () => {
       noUpcoming: 'No upcoming health tasks.',
       details: 'Details',
       viewCalendar: 'View Calendar',
-      selectPet: 'Select Pet'
+      selectPet: 'Select Pet',
+      noPets: 'No pets found. Add a pet first to track health records.',
+      loading: 'Loading...'
     },
     id: {
       pageTitle: 'Kesehatan',
@@ -179,7 +205,9 @@ const HealthRecords = () => {
       noUpcoming: 'Tidak ada tugas kesehatan mendatang.',
       details: 'Detail',
       viewCalendar: 'Lihat Kalender',
-      selectPet: 'Pilih Hewan'
+      selectPet: 'Pilih Hewan',
+      noPets: 'Tidak ada hewan ditemukan. Tambahkan hewan terlebih dahulu untuk melacak catatan kesehatan.',
+      loading: 'Memuat...'
     }
   };
   
@@ -211,14 +239,22 @@ const HealthRecords = () => {
     }
   };
   
-  const currentPetRecords = sampleHealthRecords.filter(record => 
-    record.petId === selectedPet && 
-    (activeTab === 'all' || record.type === activeTab)
-  );
+  // Filter health records and upcoming tasks based on selected pet
+  const currentPetRecords = selectedPet 
+    ? sampleHealthRecords.filter(record => 
+        record.petId === selectedPet && 
+        (activeTab === 'all' || record.type === activeTab)
+      )
+    : [];
   
-  const currentPetUpcomingTasks = upcomingTasks.filter(task =>
-    task.petId === selectedPet
-  );
+  const currentPetUpcomingTasks = selectedPet
+    ? upcomingTasks.filter(task => task.petId === selectedPet)
+    : [];
+  
+  // Handle pet selection
+  const handlePetChange = (petId: string) => {
+    setSelectedPet(petId);
+  };
   
   return (
     <div className="min-h-screen pb-20">
@@ -228,29 +264,65 @@ const HealthRecords = () => {
           <p className="text-xl text-muted-foreground mb-8">{t.greeting}</p>
           
           {/* Pet Selector - Moved above the sections */}
-          <div className="flex flex-wrap gap-3 mb-8">
-            <p className="flex items-center mr-2 font-medium">{t.selectPet}:</p>
-            {samplePets.map(pet => (
-              <button
-                key={pet.id}
-                className={`px-4 py-2 rounded-full flex items-center gap-2 transition-all duration-200 ${
-                  selectedPet === pet.id 
-                    ? 'bg-lavender/30 text-charcoal' 
-                    : 'bg-white/70 text-muted-foreground hover:bg-lavender/10'
-                }`}
-                onClick={() => setSelectedPet(pet.id)}
-              >
-                <PetAvatar 
-                  src={pet.imageUrl} 
-                  name={pet.name} 
-                  size="sm" 
-                />
-                <span>{pet.name}</span>
-              </button>
-            ))}
-          </div>
+          {loading ? (
+            <div className="mb-8 text-center">{t.loading}</div>
+          ) : pets.length > 0 ? (
+            <div className="mb-8">
+              <div className="flex flex-col md:flex-row md:items-center gap-2 mb-4">
+                <p className="font-medium">{t.selectPet}:</p>
+                <div className="md:w-64">
+                  <Select value={selectedPet} onValueChange={handlePetChange}>
+                    <SelectTrigger>
+                      <SelectValue placeholder={t.selectPet} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {pets.map(pet => (
+                        <SelectItem key={pet.id} value={pet.id} className="flex items-center gap-2">
+                          <div className="flex items-center gap-2">
+                            <PetAvatar src={pet.imageUrl} name={pet.name} size="sm" />
+                            <span>{pet.name}</span>
+                          </div>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              
+              <div className="flex flex-wrap gap-3">
+                {pets.map(pet => (
+                  <button
+                    key={pet.id}
+                    className={`px-4 py-2 rounded-full flex items-center gap-2 transition-all duration-200 ${
+                      selectedPet === pet.id 
+                        ? 'bg-lavender/30 text-charcoal' 
+                        : 'bg-white/70 text-muted-foreground hover:bg-lavender/10'
+                    }`}
+                    onClick={() => setSelectedPet(pet.id)}
+                  >
+                    <PetAvatar 
+                      src={pet.imageUrl} 
+                      name={pet.name} 
+                      size="sm" 
+                    />
+                    <span>{pet.name}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          ) : (
+            <div className="mb-8 text-center">
+              <p className="text-muted-foreground mb-4">{t.noPets}</p>
+              <Button className="rounded-full bg-lavender hover:bg-lavender/90" asChild>
+                <Link to="/pets/new">
+                  <Plus className="w-4 h-4 mr-2" />
+                  {t.addPet}
+                </Link>
+              </Button>
+            </div>
+          )}
           
-          {/* Pet Care History Section */}
+          {/* Pet Care History Section with clear section header */}
           <section id="pet-care-history" className="mb-12">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-semibold flex items-center gap-2">
@@ -344,7 +416,7 @@ const HealthRecords = () => {
             </Tabs>
           </section>
           
-          {/* Upcoming Pet Care Section */}
+          {/* Upcoming Pet Care Section with clear section header */}
           <section id="upcoming-pet-care">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-semibold flex items-center gap-2">

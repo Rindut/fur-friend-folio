@@ -1,8 +1,9 @@
 
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
-import { Plus } from 'lucide-react';
+import { Plus, Bell, Calendar } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 interface AddReminderButtonProps {
   petId?: string;
@@ -11,6 +12,8 @@ interface AddReminderButtonProps {
   size?: 'default' | 'sm' | 'lg';
   variant?: 'default' | 'outline' | 'ghost';
   showLabel?: boolean;
+  showTooltip?: boolean;
+  icon?: 'plus' | 'bell' | 'calendar';
 }
 
 const AddReminderButton = ({ 
@@ -19,16 +22,20 @@ const AddReminderButton = ({
   className, 
   size = 'sm',
   variant = 'outline',
-  showLabel = true
+  showLabel = true,
+  showTooltip = true,
+  icon = 'plus'
 }: AddReminderButtonProps) => {
   const { language } = useLanguage();
   
   const translations = {
     en: {
-      addReminder: 'Add Reminder'
+      addReminder: 'Add Reminder',
+      tooltipText: 'Create a reminder for this item'
     },
     id: {
-      addReminder: 'Tambah Pengingat'
+      addReminder: 'Tambah Pengingat',
+      tooltipText: 'Buat pengingat untuk item ini'
     }
   };
   
@@ -41,7 +48,19 @@ const AddReminderButton = ({
   
   const linkTo = `/reminders/new${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
   
-  return (
+  const getIcon = () => {
+    switch (icon) {
+      case 'bell':
+        return <Bell className="w-4 h-4" />;
+      case 'calendar':
+        return <Calendar className="w-4 h-4" />;
+      case 'plus':
+      default:
+        return <Plus className="w-4 h-4" />;
+    }
+  };
+
+  const button = (
     <Button 
       variant={variant} 
       size={size}
@@ -49,11 +68,28 @@ const AddReminderButton = ({
       asChild
     >
       <Link to={linkTo} className="flex items-center gap-1">
-        <Plus className="w-4 h-4" />
+        {getIcon()}
         {showLabel && t.addReminder}
       </Link>
     </Button>
   );
+  
+  if (showTooltip) {
+    return (
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            {button}
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>{t.tooltipText}</p>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
+    );
+  }
+  
+  return button;
 };
 
 export default AddReminderButton;
