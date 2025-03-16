@@ -1,5 +1,6 @@
 
-import { Link, useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { Home, PawPrint, Heart, Map } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';

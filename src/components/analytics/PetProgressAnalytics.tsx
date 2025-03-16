@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -63,11 +62,11 @@ const PetProgressAnalytics = () => {
           <CardContent className="pt-6">
             <TabsContent value="weight" className="mt-0">
               <p className="text-muted-foreground mb-6">{t.petWeightDesc}</p>
-              <WeightChart language={language} />
+              <WeightChart />
             </TabsContent>
             <TabsContent value="health" className="mt-0">
               <p className="text-muted-foreground mb-6">{t.upcomingPetCareDesc}</p>
-              <MilestoneTracker language={language} />
+              <MilestoneTracker />
             </TabsContent>
           </CardContent>
         </Tabs>

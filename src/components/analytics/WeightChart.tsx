@@ -27,9 +27,9 @@ export const WeightChart = () => {
       try {
         const { data, error } = await supabase
           .from('pets')
-          .select('id, name, weight_kg, updated_at')
+          .select('id, name, weight, updated_at')
           .eq('user_id', user.id)
-          .is('weight_kg', 'not.null')
+          .is('weight', 'not.null')
           .order('updated_at', { ascending: true });
 
         if (error) throw error;
@@ -38,7 +38,7 @@ export const WeightChart = () => {
         const formattedData = data.map(pet => ({
           id: pet.id,
           name: pet.name,
-          weight: parseFloat(pet.weight_kg) || 0,
+          weight: parseFloat(pet.weight) || 0,
           date: pet.updated_at,
           formattedDate: formatDistanceToNow(new Date(pet.updated_at), { addSuffix: true })
         }));
