@@ -3,13 +3,10 @@ import { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { 
   Home, 
-  Calendar, 
   Heart, 
   PawPrint,
   Menu, 
   X,
-  Bell,
-  User,
   Map
 } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
@@ -48,24 +45,8 @@ const Navbar = () => {
   if (user) {
     navLinks = [
       ...navLinks,
-      { 
-        name: t.dashboard, 
-        path: '/dashboard', 
-        icon: <PawPrint className="w-4 h-4" />,
-        submenu: [
-          { name: t.petFamily, path: '/dashboard#pet-family', icon: <User className="w-4 h-4" /> },
-          { name: t.petProgress, path: '/dashboard#pet-progress', icon: <Calendar className="w-4 h-4" /> }
-        ]
-      },
-      { 
-        name: t.health, 
-        path: '/health', 
-        icon: <Heart className="w-4 h-4" />,
-        submenu: [
-          { name: t.petCareHistory, path: '/health#pet-care-history', icon: <Heart className="w-4 h-4" /> },
-          { name: t.upcomingPetCare, path: '/health#upcoming-pet-care', icon: <Bell className="w-4 h-4" /> }
-        ]
-      },
+      { name: t.dashboard, path: '/dashboard', icon: <PawPrint className="w-4 h-4" /> },
+      { name: t.health, path: '/health', icon: <Heart className="w-4 h-4" /> },
     ];
   }
   
@@ -83,7 +64,7 @@ const Navbar = () => {
         <div className="flex items-center justify-between">
           <Logo onClick={() => setIsOpen(false)} />
 
-          {/* Desktop Navigation with Submenus */}
+          {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-3">
             <DesktopNavigation translations={t} />
             

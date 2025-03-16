@@ -52,22 +52,6 @@ const MobileNavigation = ({
               {link.icon}
               <span className="text-lg">{link.name}</span>
             </Link>
-            
-            {link.submenu && (
-              <div className="pl-10 space-y-2 mt-2">
-                {link.submenu.map((subitem) => (
-                  <Link
-                    key={subitem.path}
-                    to={subitem.path}
-                    onClick={onClose}
-                    className="px-4 py-2 rounded-lg transition-all duration-200 flex items-center gap-3 hover:bg-muted/30"
-                  >
-                    {subitem.icon}
-                    <span>{subitem.name}</span>
-                  </Link>
-                ))}
-              </div>
-            )}
           </div>
         ))}
         
