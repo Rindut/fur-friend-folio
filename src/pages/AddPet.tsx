@@ -247,8 +247,8 @@ const AddPet = () => {
                 <CardHeader>
                   <div className="flex justify-between items-center">
                     <div>
-                      <CardTitle>{t.pageTitle}</CardTitle>
-                      <CardDescription>{t.pageDescription}</CardDescription>
+                      <CardTitle className="text-2xl font-semibold">{t.pageTitle}</CardTitle>
+                      <CardDescription className="text-base mt-1">{t.pageDescription}</CardDescription>
                     </div>
                     <div className="text-sm font-medium">
                       {t[`step${step}`]} ({step}/{totalSteps})
@@ -269,7 +269,7 @@ const AddPet = () => {
                         type="button" 
                         variant="outline"
                         onClick={prevStep}
-                        className="flex items-center"
+                        className="flex items-center text-sm"
                       >
                         <ChevronLeft className="w-4 h-4 mr-1" />
                         {t.prevButton}
@@ -279,6 +279,7 @@ const AddPet = () => {
                         type="button" 
                         variant="outline"
                         onClick={() => navigate('/dashboard')}
+                        className="text-sm"
                       >
                         {t.cancelButton}
                       </Button>
@@ -290,7 +291,7 @@ const AddPet = () => {
                       <Button 
                         type="button"
                         onClick={nextStep}
-                        className="bg-lavender hover:bg-lavender/90 flex items-center"
+                        className="bg-lavender hover:bg-lavender/90 flex items-center text-sm"
                       >
                         {t.nextButton}
                         <ChevronRight className="w-4 h-4 ml-1" />
@@ -299,7 +300,7 @@ const AddPet = () => {
                       <Button 
                         form="pet-form"
                         type="submit"
-                        className="bg-lavender hover:bg-lavender/90"
+                        className="bg-lavender hover:bg-lavender/90 text-sm"
                       >
                         {t.saveButton}
                       </Button>

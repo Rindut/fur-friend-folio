@@ -118,7 +118,7 @@ export const PetVaccinationStep: React.FC = () => {
     if (species === 'fish') {
       return (
         <div className="mb-6 p-4 bg-muted/30 rounded-md">
-          <p className="text-muted-foreground">{t.noStandardVaccinations}</p>
+          <p className="text-base text-muted-foreground">{t.noStandardVaccinations}</p>
         </div>
       );
     }
@@ -146,21 +146,22 @@ export const PetVaccinationStep: React.FC = () => {
                     name={`vaccinations.${index}.customName`}
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>{t.otherVaccinationLabel}</FormLabel>
+                        <FormLabel className="text-base font-medium">{t.otherVaccinationLabel}</FormLabel>
                         <FormControl>
                           <Input 
                             placeholder={t.otherVaccinationPlaceholder} 
                             {...field} 
+                            className="text-base"
                           />
                         </FormControl>
-                        <FormMessage />
+                        <FormMessage className="text-sm" />
                       </FormItem>
                     )}
                   />
                 ) : (
                   <label 
                     htmlFor={`vax-${index}`} 
-                    className="font-medium cursor-pointer"
+                    className="text-base font-medium cursor-pointer"
                   >
                     {t.vaccinations[species][vaccination.type]}
                   </label>
@@ -174,13 +175,13 @@ export const PetVaccinationStep: React.FC = () => {
                 name={`vaccinations.${index}.date`}
                 render={({ field }) => (
                   <FormItem className="flex flex-col">
-                    <FormLabel>{t.vaccinationDateLabel}</FormLabel>
+                    <FormLabel className="text-base font-medium">{t.vaccinationDateLabel}</FormLabel>
                     <Popover>
                       <PopoverTrigger asChild>
                         <FormControl>
                           <Button
                             variant="outline"
-                            className={`w-full justify-start text-left font-normal ${
+                            className={`w-full justify-start text-base font-normal ${
                               !field.value && "text-muted-foreground"
                             }`}
                           >
@@ -202,7 +203,7 @@ export const PetVaccinationStep: React.FC = () => {
                         />
                       </PopoverContent>
                     </Popover>
-                    <FormMessage />
+                    <FormMessage className="text-sm" />
                   </FormItem>
                 )}
               />
@@ -212,14 +213,15 @@ export const PetVaccinationStep: React.FC = () => {
                 name={`vaccinations.${index}.clinic`}
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t.clinicLabel}</FormLabel>
+                    <FormLabel className="text-base font-medium">{t.clinicLabel}</FormLabel>
                     <FormControl>
                       <Input 
                         placeholder={t.clinicPlaceholder} 
                         {...field} 
+                        className="text-base"
                       />
                     </FormControl>
-                    <FormMessage />
+                    <FormMessage className="text-sm" />
                   </FormItem>
                 )}
               />
@@ -231,7 +233,7 @@ export const PetVaccinationStep: React.FC = () => {
           type="button" 
           variant="outline" 
           onClick={addCustomVaccination}
-          className="mt-4"
+          className="mt-4 text-sm"
         >
           {t.addVaccinationButton}
         </Button>
@@ -241,7 +243,7 @@ export const PetVaccinationStep: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      <h3 className="text-lg font-medium">{t.vaccinationsLabel}</h3>
+      <h3 className="text-xl font-medium mb-4">{t.vaccinationsLabel}</h3>
       {renderVaccinationOptions()}
     </div>
   );

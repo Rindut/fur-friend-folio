@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, ReactNode, useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -47,7 +48,7 @@ interface PetFormContextType {
 
 const PetFormContext = createContext<PetFormContextType | undefined>(undefined);
 
-export const PetFormProvider = ({ children }: { children: ReactNode }) => {
+export const PetFormProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { language } = useLanguage();

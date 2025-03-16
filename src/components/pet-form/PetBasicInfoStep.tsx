@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { usePetForm } from './PetFormContext';
 import { Input } from '@/components/ui/input';
@@ -119,7 +118,7 @@ export const PetBasicInfoStep: React.FC = () => {
           name="imageUrl"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>{t.imageLabel}</FormLabel>
+              <FormLabel className="text-base font-medium">{t.imageLabel}</FormLabel>
               <FormControl>
                 <div>
                   <Input
@@ -135,7 +134,7 @@ export const PetBasicInfoStep: React.FC = () => {
                     variant="outline"
                     onClick={() => document.getElementById('pet-image-upload')?.click()}
                     disabled={uploading}
-                    className="flex gap-2"
+                    className="flex gap-2 text-sm"
                   >
                     <Upload className="w-4 h-4" />
                     {imageUrl ? t.changeButton : t.uploadButton}
@@ -157,14 +156,15 @@ export const PetBasicInfoStep: React.FC = () => {
         name="name"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>{t.nameLabel}</FormLabel>
+            <FormLabel className="text-base font-medium">{t.nameLabel}</FormLabel>
             <FormControl>
               <Input
                 placeholder={t.namePlaceholder}
                 {...field}
+                className="text-base"
               />
             </FormControl>
-            <FormMessage />
+            <FormMessage className="text-sm" />
           </FormItem>
         )}
       />
@@ -174,24 +174,24 @@ export const PetBasicInfoStep: React.FC = () => {
         name="species"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>{t.speciesLabel}</FormLabel>
+            <FormLabel className="text-base font-medium">{t.speciesLabel}</FormLabel>
             <Select onValueChange={field.onChange} defaultValue={field.value}>
               <FormControl>
-                <SelectTrigger>
+                <SelectTrigger className="text-base">
                   <SelectValue placeholder={t.speciesLabel} />
                 </SelectTrigger>
               </FormControl>
               <SelectContent>
-                <SelectItem value="cat">{t.species.cat}</SelectItem>
-                <SelectItem value="dog">{t.species.dog}</SelectItem>
-                <SelectItem value="rabbit">{t.species.rabbit}</SelectItem>
-                <SelectItem value="hamster">{t.species.hamster}</SelectItem>
-                <SelectItem value="fish">{t.species.fish}</SelectItem>
-                <SelectItem value="bird">{t.species.bird}</SelectItem>
-                <SelectItem value="other">{t.species.other}</SelectItem>
+                <SelectItem value="cat" className="text-base">{t.species.cat}</SelectItem>
+                <SelectItem value="dog" className="text-base">{t.species.dog}</SelectItem>
+                <SelectItem value="rabbit" className="text-base">{t.species.rabbit}</SelectItem>
+                <SelectItem value="hamster" className="text-base">{t.species.hamster}</SelectItem>
+                <SelectItem value="fish" className="text-base">{t.species.fish}</SelectItem>
+                <SelectItem value="bird" className="text-base">{t.species.bird}</SelectItem>
+                <SelectItem value="other" className="text-base">{t.species.other}</SelectItem>
               </SelectContent>
             </Select>
-            <FormMessage />
+            <FormMessage className="text-sm" />
           </FormItem>
         )}
       />
@@ -202,14 +202,15 @@ export const PetBasicInfoStep: React.FC = () => {
           name="otherSpecies"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>{t.otherSpeciesLabel}</FormLabel>
+              <FormLabel className="text-base font-medium">{t.otherSpeciesLabel}</FormLabel>
               <FormControl>
                 <Input
                   placeholder={t.otherSpeciesPlaceholder}
                   {...field}
+                  className="text-base"
                 />
               </FormControl>
-              <FormMessage />
+              <FormMessage className="text-sm" />
             </FormItem>
           )}
         />
@@ -220,14 +221,15 @@ export const PetBasicInfoStep: React.FC = () => {
         name="breed"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>{t.breedLabel}</FormLabel>
+            <FormLabel className="text-base font-medium">{t.breedLabel}</FormLabel>
             <FormControl>
               <Input
                 placeholder={t.breedPlaceholder}
                 {...field}
+                className="text-base"
               />
             </FormControl>
-            <FormMessage />
+            <FormMessage className="text-sm" />
           </FormItem>
         )}
       />
@@ -237,7 +239,7 @@ export const PetBasicInfoStep: React.FC = () => {
         name="gender"
         render={({ field }) => (
           <FormItem className="space-y-3">
-            <FormLabel>{t.genderLabel}</FormLabel>
+            <FormLabel className="text-base font-medium">{t.genderLabel}</FormLabel>
             <FormControl>
               <RadioGroup
                 onValueChange={field.onChange}
@@ -262,7 +264,7 @@ export const PetBasicInfoStep: React.FC = () => {
                 </FormItem>
               </RadioGroup>
             </FormControl>
-            <FormMessage />
+            <FormMessage className="text-sm" />
           </FormItem>
         )}
       />
@@ -272,14 +274,15 @@ export const PetBasicInfoStep: React.FC = () => {
         name="fur_color"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>{t.colorLabel}</FormLabel>
+            <FormLabel className="text-base font-medium">{t.colorLabel}</FormLabel>
             <FormControl>
               <Input
                 placeholder={t.colorPlaceholder}
                 {...field}
+                className="text-base"
               />
             </FormControl>
-            <FormMessage />
+            <FormMessage className="text-sm" />
           </FormItem>
         )}
       />
@@ -290,7 +293,7 @@ export const PetBasicInfoStep: React.FC = () => {
           name="birthday"
           render={({ field }) => (
             <FormItem className="flex flex-col">
-              <FormLabel>{t.birthdayLabel}</FormLabel>
+              <FormLabel className="text-base font-medium">{t.birthdayLabel}</FormLabel>
               <Popover>
                 <PopoverTrigger asChild>
                   <FormControl>
@@ -320,7 +323,7 @@ export const PetBasicInfoStep: React.FC = () => {
                   />
                 </PopoverContent>
               </Popover>
-              <FormMessage />
+              <FormMessage className="text-sm" />
             </FormItem>
           )}
         />
@@ -360,15 +363,16 @@ export const PetBasicInfoStep: React.FC = () => {
               name="ageYears"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t.ageLabel} ({t.ageYearsLabel})</FormLabel>
+                  <FormLabel className="text-base font-medium">{t.ageLabel} ({t.ageYearsLabel})</FormLabel>
                   <FormControl>
                     <Input
                       type="number"
                       min="0"
                       {...field}
+                      className="text-base"
                     />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage className="text-sm" />
                 </FormItem>
               )}
             />
@@ -378,16 +382,17 @@ export const PetBasicInfoStep: React.FC = () => {
               name="ageMonths"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t.ageLabel} ({t.ageMonthsLabel})</FormLabel>
+                  <FormLabel className="text-base font-medium">{t.ageLabel} ({t.ageMonthsLabel})</FormLabel>
                   <FormControl>
                     <Input
                       type="number"
                       min="0"
                       max="11"
                       {...field}
+                      className="text-base"
                     />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage className="text-sm" />
                 </FormItem>
               )}
             />
@@ -400,7 +405,7 @@ export const PetBasicInfoStep: React.FC = () => {
         name="weight"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>{t.weightLabel}</FormLabel>
+            <FormLabel className="text-base font-medium">{t.weightLabel}</FormLabel>
             <FormControl>
               <Input
                 type="number"
@@ -408,9 +413,10 @@ export const PetBasicInfoStep: React.FC = () => {
                 step="0.1"
                 placeholder={t.weightPlaceholder}
                 {...field}
+                className="text-base"
               />
             </FormControl>
-            <FormMessage />
+            <FormMessage className="text-sm" />
           </FormItem>
         )}
       />
@@ -420,15 +426,16 @@ export const PetBasicInfoStep: React.FC = () => {
         name="notes"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>{t.notesLabel}</FormLabel>
+            <FormLabel className="text-base font-medium">{t.notesLabel}</FormLabel>
             <FormControl>
               <Textarea
                 placeholder={t.notesPlaceholder}
                 rows={4}
                 {...field}
+                className="text-base"
               />
             </FormControl>
-            <FormMessage />
+            <FormMessage className="text-sm" />
           </FormItem>
         )}
       />

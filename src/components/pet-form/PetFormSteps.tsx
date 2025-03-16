@@ -13,7 +13,7 @@ export const PetFormSteps: React.FC<PetFormStepsProps> = ({ step, totalSteps }) 
         {Array.from({ length: totalSteps }).map((_, i) => (
           <div key={i} className="flex flex-col items-center">
             <div 
-              className={`w-8 h-8 rounded-full flex items-center justify-center ${
+              className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
                 i + 1 === step 
                   ? 'bg-lavender text-white' 
                   : i + 1 < step 
