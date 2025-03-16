@@ -56,26 +56,22 @@ const DesktopNavigation = ({ translations }: DesktopNavigationProps) => {
               <NavigationMenuContent>
                 <ul className="grid w-[220px] gap-3 p-4">
                   <li className="row-span-1">
-                    <NavigationMenuLink asChild>
-                      <Link
-                        to="/dashboard#pet-family"
-                        className="flex items-center gap-2 p-2 rounded-md hover:bg-muted hover:text-coral"
-                      >
-                        <PawPrint className="w-4 h-4" />
-                        <span>{t.petFamily}</span>
-                      </Link>
-                    </NavigationMenuLink>
+                    <Link
+                      to="/dashboard#pet-family"
+                      className="flex items-center gap-2 p-2 rounded-md hover:bg-muted hover:text-coral"
+                    >
+                      <PawPrint className="w-4 h-4" />
+                      <span>{t.petFamily}</span>
+                    </Link>
                   </li>
                   <li className="row-span-1">
-                    <NavigationMenuLink asChild>
-                      <Link
-                        to="/dashboard#pet-progress"
-                        className="flex items-center gap-2 p-2 rounded-md hover:bg-muted hover:text-coral"
-                      >
-                        <PawPrint className="w-4 h-4" />
-                        <span>{t.petProgress}</span>
-                      </Link>
-                    </NavigationMenuLink>
+                    <Link
+                      to="/dashboard#pet-progress"
+                      className="flex items-center gap-2 p-2 rounded-md hover:bg-muted hover:text-coral"
+                    >
+                      <PawPrint className="w-4 h-4" />
+                      <span>{t.petProgress}</span>
+                    </Link>
                   </li>
                 </ul>
               </NavigationMenuContent>
@@ -89,26 +85,22 @@ const DesktopNavigation = ({ translations }: DesktopNavigationProps) => {
               <NavigationMenuContent>
                 <ul className="grid w-[220px] gap-3 p-4">
                   <li className="row-span-1">
-                    <NavigationMenuLink asChild>
-                      <Link
-                        to="/health#pet-care-history"
-                        className="flex items-center gap-2 p-2 rounded-md hover:bg-muted hover:text-coral"
-                      >
-                        <Heart className="w-4 h-4" />
-                        <span>{t.petCareHistory}</span>
-                      </Link>
-                    </NavigationMenuLink>
+                    <Link
+                      to="/health#pet-care-history"
+                      className="flex items-center gap-2 p-2 rounded-md hover:bg-muted hover:text-coral"
+                    >
+                      <Heart className="w-4 h-4" />
+                      <span>{t.petCareHistory}</span>
+                    </Link>
                   </li>
                   <li className="row-span-1">
-                    <NavigationMenuLink asChild>
-                      <Link
-                        to="/health#upcoming-pet-care"
-                        className="flex items-center gap-2 p-2 rounded-md hover:bg-muted hover:text-coral"
-                      >
-                        <Heart className="w-4 h-4" />
-                        <span>{t.upcomingPetCare}</span>
-                      </Link>
-                    </NavigationMenuLink>
+                    <Link
+                      to="/health#upcoming-pet-care"
+                      className="flex items-center gap-2 p-2 rounded-md hover:bg-muted hover:text-coral"
+                    >
+                      <Heart className="w-4 h-4" />
+                      <span>{t.upcomingPetCare}</span>
+                    </Link>
                   </li>
                 </ul>
               </NavigationMenuContent>
@@ -132,8 +124,5 @@ const DesktopNavigation = ({ translations }: DesktopNavigationProps) => {
     </NavigationMenu>
   );
 };
-
-// Fix the missing NavigationMenuLink component
-const NavigationMenuLink = NavigationMenu.Link;
 
 export default DesktopNavigation;

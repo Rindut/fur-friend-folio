@@ -33,7 +33,7 @@ const WeightChart = ({ language = 'en' }: WeightChartProps) => {
       try {
         const { data, error } = await supabase
           .from('pets')
-          .select('id, name, weight_kg, updated_at')
+          .select('id, name, weight, updated_at')
           .eq('user_id', user.id)
           .eq('is_active', true)
           .order('created_at', { ascending: true });
@@ -44,7 +44,7 @@ const WeightChart = ({ language = 'en' }: WeightChartProps) => {
         const weights = data?.map(pet => ({
           id: pet.id,
           name: pet.name,
-          weightKg: pet.weight_kg,
+          weightKg: pet.weight ? parseFloat(pet.weight) : null,
           updatedAt: pet.updated_at
         })) || [];
 
