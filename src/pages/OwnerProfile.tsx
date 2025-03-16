@@ -13,6 +13,9 @@ const OwnerProfile = () => {
   const form = useForm<ProfileFormValues>({
     defaultValues: {
       username: '',
+      fullName: '',
+      phoneNumber: '',
+      province: '',
       avatarUrl: '',
     }
   });

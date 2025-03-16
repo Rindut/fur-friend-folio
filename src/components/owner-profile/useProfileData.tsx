@@ -13,16 +13,25 @@ export const useProfileData = (form: UseFormReturn<ProfileFormValues>, setAvatar
   
   useEffect(() => {
     const fetchProfile = async () => {
-      if (!user) return;
+      if (!user) {
+        setLoading(false);
+        return;
+      }
       
       try {
+        console.log('Fetching profile for user:', user.id);
         const { data: profile, error } = await supabase
           .from('profiles')
           .select('*')
           .eq('id', user.id)
           .single();
           
-        if (error && error.code !== 'PGRST116') throw error;
+        if (error && error.code !== 'PGRST116') {
+          console.error('Error fetching profile:', error);
+          throw error;
+        }
+        
+        console.log('Profile data:', profile);
         
         if (profile) {
           // Reset form with available profile data

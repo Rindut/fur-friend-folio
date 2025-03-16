@@ -118,6 +118,7 @@ export const ProfileForm = ({ translations: t }: ProfileFormProps) => {
     }
     
     try {
+      console.log('Updating profile with data:', data);
       // Update profile data in Supabase
       const { error } = await supabase
         .from('profiles')
