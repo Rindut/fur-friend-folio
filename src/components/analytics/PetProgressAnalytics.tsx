@@ -1,10 +1,10 @@
-
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import WeightChart from './WeightChart';
 import MilestoneTracker from './MilestoneTracker';
 import HealthTimeline from '@/components/health/HealthTimeline';
+import { TimelineEvent } from '@/components/health/HealthTimelineEvent';
 import { useLanguage } from '@/context/LanguageContext';
 import { addDays, subDays } from 'date-fns';
 
@@ -53,9 +53,9 @@ const PetProgressAnalytics = () => {
 
   const t = translations[language];
   
-  // Sample timeline events for demonstration
+  // Sample timeline events with proper typing
   const today = new Date();
-  const sampleEvents = [
+  const sampleEvents: TimelineEvent[] = [
     {
       id: '1',
       date: subDays(today, 60),
