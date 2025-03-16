@@ -58,6 +58,7 @@ export type Database = {
           birthday: string | null
           breed: string | null
           created_at: string | null
+          fur_color: string | null
           id: string
           image_url: string | null
           is_active: boolean | null
@@ -76,6 +77,7 @@ export type Database = {
           birthday?: string | null
           breed?: string | null
           created_at?: string | null
+          fur_color?: string | null
           id?: string
           image_url?: string | null
           is_active?: boolean | null
@@ -94,6 +96,7 @@ export type Database = {
           birthday?: string | null
           breed?: string | null
           created_at?: string | null
+          fur_color?: string | null
           id?: string
           image_url?: string | null
           is_active?: boolean | null

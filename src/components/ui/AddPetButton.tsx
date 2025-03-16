@@ -2,6 +2,7 @@
 import { cn } from '@/lib/utils';
 import { Plus, PawPrint } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useLanguage } from '@/context/LanguageContext';
 
 interface AddPetButtonProps {
   className?: string;
@@ -9,6 +10,21 @@ interface AddPetButtonProps {
 }
 
 const AddPetButton = ({ className, variant = 'default' }: AddPetButtonProps) => {
+  const { language } = useLanguage();
+  
+  const translations = {
+    en: {
+      addPet: 'Add a Pet',
+      createProfile: 'Create a new pet profile'
+    },
+    id: {
+      addPet: 'Tambah Hewan',
+      createProfile: 'Buat profil hewan baru'
+    }
+  };
+  
+  const t = translations[language];
+  
   return (
     <Link
       to="/pets/new"
@@ -30,9 +46,9 @@ const AddPetButton = ({ className, variant = 'default' }: AddPetButtonProps) => 
         'font-medium text-center',
         variant === 'default' ? 'text-coral' : 'text-muted-foreground'
       )}>
-        Add a Pet
+        {t.addPet}
       </span>
-      <span className="text-xs text-muted-foreground text-center">Create a new pet profile</span>
+      <span className="text-xs text-muted-foreground text-center">{t.createProfile}</span>
     </Link>
   );
 };
