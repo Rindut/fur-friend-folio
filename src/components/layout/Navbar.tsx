@@ -4,7 +4,6 @@ import { cn } from '@/lib/utils';
 import { 
   Home, 
   Heart, 
-  PawPrint,
   Menu, 
   X,
   Map,
@@ -46,7 +45,7 @@ const Navbar = () => {
   if (user) {
     navLinks = [
       ...navLinks,
-      { name: t.dashboard, path: '/dashboard', icon: <PawPrint className="w-4 h-4" /> },
+      // Dashboard menu is hidden as requested
       { name: t.petFamily, path: '/pet-family', icon: <Users className="w-4 h-4" /> },
       { name: t.health, path: '/health', icon: <Heart className="w-4 h-4" /> },
     ];

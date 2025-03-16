@@ -1,6 +1,6 @@
 
 import { Link } from 'react-router-dom';
-import { Heart, Droplets, Pill, AlertCircle, Plus } from 'lucide-react';
+import { Heart, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import HealthRecordsList from '@/components/health/HealthRecordsList';
@@ -22,6 +22,7 @@ interface PetCareHistorySectionProps {
   selectedPet: string;
   getRecordIcon: (type: HealthRecord['type']) => JSX.Element;
   getRecordTypeColor: (type: HealthRecord['type']) => string;
+  showTabs?: boolean;
 }
 
 const PetCareHistorySection = ({
@@ -31,7 +32,8 @@ const PetCareHistorySection = ({
   setActiveTab,
   selectedPet,
   getRecordIcon,
-  getRecordTypeColor
+  getRecordTypeColor,
+  showTabs = true
 }: PetCareHistorySectionProps) => {
   return (
     <section id="pet-care-history" className="mb-12">
@@ -51,45 +53,59 @@ const PetCareHistorySection = ({
       
       <p className="text-muted-foreground mb-6">{t.petCareHistoryDesc}</p>
       
-      {/* Record Type Tabs */}
-      <Tabs 
-        defaultValue="all" 
-        value={activeTab}
-        onValueChange={setActiveTab}
-        className="w-full"
-      >
-        <TabsList className="bg-white/70 p-1 mb-6">
-          <TabsTrigger 
-            value="all"
-            className="data-[state=active]:bg-lavender/30 data-[state=active]:text-charcoal rounded-lg"
-          >
-            <Heart className="w-4 h-4 mr-2" />
-            {t.all}
-          </TabsTrigger>
-          <TabsTrigger 
-            value="vaccination"
-            className="data-[state=active]:bg-lavender/30 data-[state=active]:text-charcoal rounded-lg"
-          >
-            <Droplets className="w-4 h-4 mr-2" />
-            {t.vaccinations}
-          </TabsTrigger>
-          <TabsTrigger 
-            value="medication"
-            className="data-[state=active]:bg-lavender/30 data-[state=active]:text-charcoal rounded-lg"
-          >
-            <Pill className="w-4 h-4 mr-2" />
-            {t.medications}
-          </TabsTrigger>
-          <TabsTrigger 
-            value="visit"
-            className="data-[state=active]:bg-lavender/30 data-[state=active]:text-charcoal rounded-lg"
-          >
-            <AlertCircle className="w-4 h-4 mr-2" />
-            {t.visits}
-          </TabsTrigger>
-        </TabsList>
-        
-        <TabsContent value="all" className="mt-0">
+      {/* Record Type Tabs - Only show if showTabs is true */}
+      {showTabs ? (
+        <Tabs 
+          defaultValue="all" 
+          value={activeTab}
+          onValueChange={setActiveTab}
+          className="w-full"
+        >
+          {/* Tab triggers would be here but are now moved to the main page */}
+          <TabsList className="bg-white/70 p-1 mb-6">
+            {/* The tab triggers that have been moved to the parent component */}
+          </TabsList>
+          
+          <TabsContent value="all" className="mt-0">
+            <HealthRecordsList 
+              records={healthRecords} 
+              getRecordIcon={getRecordIcon} 
+              getRecordTypeColor={getRecordTypeColor} 
+              detailsText={t.details}
+              noRecordsText={t.noRecords}
+            />
+          </TabsContent>
+          <TabsContent value="vaccination" className="mt-0">
+            <HealthRecordsList 
+              records={healthRecords} 
+              getRecordIcon={getRecordIcon} 
+              getRecordTypeColor={getRecordTypeColor} 
+              detailsText={t.details}
+              noRecordsText={t.noRecords}
+            />
+          </TabsContent>
+          <TabsContent value="medication" className="mt-0">
+            <HealthRecordsList 
+              records={healthRecords} 
+              getRecordIcon={getRecordIcon} 
+              getRecordTypeColor={getRecordTypeColor} 
+              detailsText={t.details}
+              noRecordsText={t.noRecords}
+            />
+          </TabsContent>
+          <TabsContent value="visit" className="mt-0">
+            <HealthRecordsList 
+              records={healthRecords} 
+              getRecordIcon={getRecordIcon} 
+              getRecordTypeColor={getRecordTypeColor} 
+              detailsText={t.details}
+              noRecordsText={t.noRecords}
+            />
+          </TabsContent>
+        </Tabs>
+      ) : (
+        // If tabs are not shown, just display the records directly
+        <div className="mt-0">
           <HealthRecordsList 
             records={healthRecords} 
             getRecordIcon={getRecordIcon} 
@@ -97,35 +113,8 @@ const PetCareHistorySection = ({
             detailsText={t.details}
             noRecordsText={t.noRecords}
           />
-        </TabsContent>
-        <TabsContent value="vaccination" className="mt-0">
-          <HealthRecordsList 
-            records={healthRecords} 
-            getRecordIcon={getRecordIcon} 
-            getRecordTypeColor={getRecordTypeColor} 
-            detailsText={t.details}
-            noRecordsText={t.noRecords}
-          />
-        </TabsContent>
-        <TabsContent value="medication" className="mt-0">
-          <HealthRecordsList 
-            records={healthRecords} 
-            getRecordIcon={getRecordIcon} 
-            getRecordTypeColor={getRecordTypeColor} 
-            detailsText={t.details}
-            noRecordsText={t.noRecords}
-          />
-        </TabsContent>
-        <TabsContent value="visit" className="mt-0">
-          <HealthRecordsList 
-            records={healthRecords} 
-            getRecordIcon={getRecordIcon} 
-            getRecordTypeColor={getRecordTypeColor} 
-            detailsText={t.details}
-            noRecordsText={t.noRecords}
-          />
-        </TabsContent>
-      </Tabs>
+        </div>
+      )}
     </section>
   );
 };

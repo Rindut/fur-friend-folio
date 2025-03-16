@@ -47,18 +47,7 @@ const DesktopNavigation = ({ translations }: DesktopNavigationProps) => {
         
         {user && (
           <>
-            <NavigationMenuItem>
-              <Link 
-                to="/dashboard" 
-                className={cn(
-                  navigationMenuTriggerStyle(),
-                  location.pathname === '/dashboard' ? 'bg-coral/20 text-coral font-medium' : ''
-                )}
-              >
-                <PawPrint className="w-4 h-4 mr-2" />
-                {t.dashboard}
-              </Link>
-            </NavigationMenuItem>
+            {/* Dashboard is hidden as requested */}
             
             <NavigationMenuItem>
               <Link 
