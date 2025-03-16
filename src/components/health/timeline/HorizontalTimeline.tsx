@@ -1,13 +1,15 @@
 
 import React, { useRef, useEffect } from 'react';
 import { format, isAfter, isBefore, isToday, parseISO } from 'date-fns';
-import HealthTimelineEvent from '../HealthTimelineEvent';
+import HealthTimelineEvent, { TimelineEvent as HealthTimelineEventType } from '../HealthTimelineEvent';
+import { RecordType } from '../useRecordUtils';
 
+// Update the TimelineEvent interface to match the imported one
 interface TimelineEvent {
   id: string;
   title: string;
   date: Date | string;
-  type?: string;
+  type: RecordType | 'checkup' | 'grooming';
   details?: string;
   completed?: boolean;
 }
@@ -84,7 +86,10 @@ const HorizontalTimeline: React.FC<HorizontalTimelineProps> = ({
                 )}%` 
               }}
             >
-              <HealthTimelineEvent event={event} language={language} />
+              <HealthTimelineEvent 
+                event={event as HealthTimelineEventType} 
+                language={language} 
+              />
             </div>
           ))}
           
@@ -99,7 +104,10 @@ const HorizontalTimeline: React.FC<HorizontalTimelineProps> = ({
                 )}%` 
               }}
             >
-              <HealthTimelineEvent event={event} language={language} />
+              <HealthTimelineEvent 
+                event={event as HealthTimelineEventType} 
+                language={language} 
+              />
             </div>
           ))}
         </div>
