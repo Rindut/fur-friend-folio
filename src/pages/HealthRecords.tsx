@@ -151,17 +151,18 @@ const HealthRecords = () => {
           
           {/* Pet Care History Section */}
           <section id="pet-care-history" className="mb-12">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-semibold flex items-center gap-2">
-                <Heart className="text-coral w-5 h-5" /> {t.petCareHistory}
-              </h2>
+            <div className="bg-soft-green py-4 px-6 rounded-lg mb-6 flex items-center">
+              <Heart className="text-coral w-5 h-5 mr-2" />
+              <h2 className="text-xl font-semibold">{t.petCareHistory}</h2>
               
-              <Button className="rounded-full bg-lavender hover:bg-lavender/90" asChild>
-                <Link to={`/health/add${selectedPet ? `?pet=${selectedPet}` : ''}`}>
-                  <Plus className="w-4 h-4 mr-2" />
-                  {t.addRecord}
-                </Link>
-              </Button>
+              <div className="ml-auto">
+                <Button className="rounded-full bg-lavender hover:bg-lavender/90" asChild>
+                  <Link to={`/health/add${selectedPet ? `?pet=${selectedPet}` : ''}`}>
+                    <Plus className="w-4 h-4 mr-2" />
+                    {t.addRecord}
+                  </Link>
+                </Button>
+              </div>
             </div>
             
             <p className="text-muted-foreground mb-6">{t.petCareHistoryDesc}</p>
@@ -245,12 +246,11 @@ const HealthRecords = () => {
           
           {/* Upcoming Pet Care Section */}
           <section id="upcoming-pet-care">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-semibold flex items-center gap-2">
-                <Bell className="text-coral w-5 h-5" /> {t.upcomingPetCare}
-              </h2>
+            <div className="bg-soft-purple py-4 px-6 rounded-lg mb-6 flex items-center">
+              <Bell className="text-coral w-5 h-5 mr-2" />
+              <h2 className="text-xl font-semibold">{t.upcomingPetCare}</h2>
               
-              <div className="flex gap-3">
+              <div className="ml-auto flex gap-3">
                 <Button variant="outline" className="rounded-full" asChild>
                   <Link to="/reminders">
                     <Calendar className="w-4 h-4 mr-2" />

@@ -87,11 +87,11 @@ const DesktopNavigation = ({ translations }: DesktopNavigationProps) => {
                 <ul className="grid w-[220px] gap-3 p-4">
                   <li className="row-span-1">
                     <Link
-                      to="/health#pet-weight"
+                      to="/health#pet-care-history"
                       className="flex items-center gap-2 p-2 rounded-md hover:bg-muted hover:text-coral"
                     >
                       <Heart className="w-4 h-4" />
-                      <span>Pet Weight</span>
+                      <span>{t.petCareHistory}</span>
                     </Link>
                   </li>
                   <li className="row-span-1">

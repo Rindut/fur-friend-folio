@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { PawPrint, ArrowRight, User, HeartPulse, BarChart } from 'lucide-react';
+import { PawPrint, ArrowRight, User, BarChart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import PetProfileCard, { PetData } from '@/components/ui/PetProfileCard';
 import AddPetButton from '@/components/ui/AddPetButton';
@@ -104,10 +104,10 @@ const Dashboard = () => {
             </Button>
           </div>
           
-          {/* Pet Family Section with clear section header */}
+          {/* Pet Family Section with colorful header */}
           <section className="mb-12">
-            <div className="flex items-center gap-2 mb-6">
-              <User className="text-sage w-5 h-5" />
+            <div className="bg-soft-blue py-4 px-6 rounded-lg mb-6 flex items-center">
+              <User className="text-sage w-5 h-5 mr-2" />
               <h2 className="text-xl font-semibold">{t.yourPetFamily}</h2>
             </div>
             
@@ -163,13 +163,17 @@ const Dashboard = () => {
         </div>
       </div>
       
-      {/* Pet Progress & Analytics Section with clear section header */}
+      {/* Pet Progress Section with colorful header */}
       <div className="container px-4 mx-auto">
-        <div className="flex items-center gap-2 mb-6">
-          <BarChart className="text-coral w-5 h-5" />
+        <div className="bg-soft-peach py-4 px-6 rounded-lg mb-6 flex items-center">
+          <BarChart className="text-coral w-5 h-5 mr-2" />
           <h2 className="text-xl font-semibold">{t.yourPetProgress}</h2>
         </div>
-        <PetProgressAnalytics />
+        
+        {/* Analytics content without the title */}
+        <div className="mt-0">
+          <PetProgressAnalytics />
+        </div>
       </div>
     </div>
   );

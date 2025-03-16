@@ -46,11 +46,7 @@ const PetProgressAnalytics = () => {
   const t = translations[language];
 
   return (
-    <div className="mt-8">
-      <div className="flex items-center mb-6">
-        <h2 className="text-xl font-semibold">{t.title}</h2>
-      </div>
-
+    <div className="mt-0">
       <Card>
         <Tabs defaultValue="weight" value={activeTab} onValueChange={setActiveTab}>
           <CardHeader className="pb-0">
