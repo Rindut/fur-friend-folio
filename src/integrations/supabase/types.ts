@@ -53,6 +53,8 @@ export type Database = {
       pets: {
         Row: {
           age: string | null
+          age_months: number | null
+          age_years: number | null
           birthday: string | null
           breed: string | null
           created_at: string | null
@@ -65,9 +67,12 @@ export type Database = {
           updated_at: string | null
           user_id: string
           weight: string | null
+          weight_kg: number | null
         }
         Insert: {
           age?: string | null
+          age_months?: number | null
+          age_years?: number | null
           birthday?: string | null
           breed?: string | null
           created_at?: string | null
@@ -80,9 +85,12 @@ export type Database = {
           updated_at?: string | null
           user_id: string
           weight?: string | null
+          weight_kg?: number | null
         }
         Update: {
           age?: string | null
+          age_months?: number | null
+          age_years?: number | null
           birthday?: string | null
           breed?: string | null
           created_at?: string | null
@@ -95,25 +103,35 @@ export type Database = {
           updated_at?: string | null
           user_id?: string
           weight?: string | null
+          weight_kg?: number | null
         }
         Relationships: []
       }
       profiles: {
         Row: {
           avatar_url: string | null
+          full_name: string | null
           id: string
+          phone_number: string | null
+          province: string | null
           updated_at: string | null
           username: string | null
         }
         Insert: {
           avatar_url?: string | null
+          full_name?: string | null
           id: string
+          phone_number?: string | null
+          province?: string | null
           updated_at?: string | null
           username?: string | null
         }
         Update: {
           avatar_url?: string | null
+          full_name?: string | null
           id?: string
+          phone_number?: string | null
+          province?: string | null
           updated_at?: string | null
           username?: string | null
         }

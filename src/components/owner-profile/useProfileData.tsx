@@ -25,12 +25,12 @@ export const useProfileData = (form: UseFormReturn<ProfileFormValues>, setAvatar
         if (error && error.code !== 'PGRST116') throw error;
         
         if (profile) {
-          // Check if fields exist before accessing them
+          // Reset form with available profile data
           form.reset({
             username: profile.username || '',
-            fullName: '',  // Initialize with empty string as it's not in the DB yet
-            phoneNumber: '', // Initialize with empty string as it's not in the DB yet
-            province: '',    // Initialize with empty string as it's not in the DB yet
+            fullName: profile.full_name || '',
+            phoneNumber: profile.phone_number || '',
+            province: profile.province || '',
             avatarUrl: profile.avatar_url || '',
           });
           
