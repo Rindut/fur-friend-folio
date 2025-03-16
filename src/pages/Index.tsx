@@ -9,7 +9,7 @@ import AddPetButton from '@/components/ui/AddPetButton';
 import { useLanguage } from '@/context/LanguageContext';
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 const Index = () => {
   const [mounted, setMounted] = useState(false);
@@ -73,7 +73,7 @@ const Index = () => {
       smartReminders: 'Smart Reminders',
       smartRemindersDesc: 'Never miss important pet care tasks with customizable reminders for medications, vet visits, and more.',
       dashboard: 'Dashboard',
-      dashboardDesc: 'View all upcoming care tasks in a convenient dashboard view for better planning.',
+      dashboardDesc: 'Keep track of your pet\'s needs and activities in a convenient dashboard view for better planning.',
       localServices: 'Local Pet Services',
       localServicesDesc: 'Find and review local pet services - vets, groomers, pet shops, and more in your area.',
       petFamily: 'Your Pet Family',
@@ -100,7 +100,7 @@ const Index = () => {
       smartReminders: 'Pengingat Pintar',
       smartRemindersDesc: 'Jangan lewatkan tugas perawatan hewan peliharaan penting dengan pengingat yang dapat disesuaikan untuk pengobatan, kunjungan dokter hewan, dan lainnya.',
       dashboard: 'Dasbor',
-      dashboardDesc: 'Lihat semua tugas perawatan mendatang dalam tampilan dasbor yang nyaman untuk perencanaan yang lebih baik.',
+      dashboardDesc: 'Pantau kebutuhan dan aktivitas hewan peliharaan Anda dalam tampilan dasbor yang nyaman untuk perencanaan yang lebih baik.',
       localServices: 'Layanan Hewan Lokal',
       localServicesDesc: 'Temukan dan ulas layanan hewan peliharaan lokal - dokter hewan, salon, toko hewan, dan lainnya di area Anda.',
       petFamily: 'Keluarga Hewan Peliharaan Anda',

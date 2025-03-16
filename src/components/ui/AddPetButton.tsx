@@ -13,7 +13,7 @@ const AddPetButton = ({ className, variant = 'default' }: AddPetButtonProps) => 
     <Link
       to="/pets/new"
       className={cn(
-        'pet-card flex flex-col items-center justify-center gap-3 p-5 min-h-[180px] pet-card-hover group',
+        'pet-card flex flex-col items-center justify-center gap-3 p-5 min-h-[200px] pet-card-hover group h-full',
         variant === 'default' 
           ? 'bg-gradient-to-br from-coral/10 to-coral/20 hover:from-coral/20 hover:to-coral/30 border-dashed border-2 border-coral/30' 
           : 'glass-morphism border-dashed border-2 border-slate-200/70',

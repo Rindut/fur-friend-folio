@@ -25,11 +25,11 @@ interface PetProfileCardProps {
 
 const PetProfileCard = ({ pet, className }: PetProfileCardProps) => {
   return (
-    <Link to={`/pets/${pet.id}`} className="block outline-none">
+    <Link to={`/pets/${pet.id}`} className="block outline-none h-full">
       <div 
         className={cn(
           'pet-card group glass-morphism',
-          'p-5 flex flex-col gap-4 pet-card-hover',
+          'p-5 flex flex-col gap-4 pet-card-hover h-full',
           'border border-slate-200/50',
           pet.isActive === false ? 'opacity-60' : '',
           className

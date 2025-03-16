@@ -13,10 +13,10 @@ const AddReminder = () => {
 
   const translations = {
     en: {
-      back: 'Back to Reminders'
+      back: 'Back to Upcoming Pet Care'
     },
     id: {
-      back: 'Kembali ke Pengingat'
+      back: 'Kembali ke Perawatan Hewan Mendatang'
     }
   };
 
