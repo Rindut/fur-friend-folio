@@ -186,7 +186,8 @@ const HealthRecords = () => {
       viewCalendar: 'View Calendar',
       selectPet: 'Select Pet',
       noPets: 'No pets found. Add a pet first to track health records.',
-      loading: 'Loading...'
+      loading: 'Loading...',
+      addPet: 'Add Pet'
     },
     id: {
       pageTitle: 'Kesehatan',
@@ -207,7 +208,8 @@ const HealthRecords = () => {
       viewCalendar: 'Lihat Kalender',
       selectPet: 'Pilih Hewan',
       noPets: 'Tidak ada hewan ditemukan. Tambahkan hewan terlebih dahulu untuk melacak catatan kesehatan.',
-      loading: 'Memuat...'
+      loading: 'Memuat...',
+      addPet: 'Tambah Hewan'
     }
   };
   
