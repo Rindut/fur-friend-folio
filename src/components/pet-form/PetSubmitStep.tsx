@@ -26,8 +26,13 @@ export const PetSubmitStep: React.FC = () => {
   
   const t = translations[language];
 
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    form.handleSubmit(onSubmit)();
+  };
+
   return (
-    <form id="pet-form" onSubmit={form.handleSubmit(onSubmit)}>
+    <form id="pet-form" onSubmit={handleSubmit}>
       <div className="text-center py-8">
         <PawPrint className="mx-auto mb-4 h-12 w-12 text-lavender" />
         <h3 className="text-2xl font-semibold mb-3">{t.pageTitle}</h3>

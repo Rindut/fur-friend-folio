@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useNavigate, Navigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
@@ -108,9 +107,8 @@ const Auth = () => {
       const { error } = await signIn(loginEmail, loginPassword);
       if (error) {
         setErrorMessage(error.message);
-      } else {
-        navigate('/dashboard');
       }
+      // The navigate will happen in the AuthContext's onAuthStateChange handler
     } catch (error) {
       console.error('Login error:', error);
       setErrorMessage('An unexpected error occurred');
