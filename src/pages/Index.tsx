@@ -18,9 +18,6 @@ const Index = () => {
     setMounted(true);
   }, []);
 
-  // Add a console log to debug
-  console.log('Index page rendered with language:', language);
-
   return (
     <div className="min-h-screen">
       {/* Hero Section */}

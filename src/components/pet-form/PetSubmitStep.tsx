@@ -48,6 +48,7 @@ export const PetSubmitStep: React.FC = () => {
       <div className="mt-6 flex justify-center">
         <Button 
           type="submit" 
+          form="pet-form"
           onClick={handleSubmit}
           className="bg-lavender hover:bg-lavender/90 text-base py-2 px-6"
         >
