@@ -1,29 +1,25 @@
+
 import React from 'react';
 import { usePetForm } from './PetFormContext';
-import { useLanguage } from '@/context/LanguageContext';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Button } from '@/components/ui/button';
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Calendar } from '@/components/ui/calendar';
-import { Upload, Calendar as CalendarIcon } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Calendar } from '@/components/ui/calendar';
+import { PawPrint, Calendar as CalendarIcon, Upload } from 'lucide-react';
 import { format } from 'date-fns';
+import { useLanguage } from '@/context/LanguageContext';
 
 export const PetBasicInfoStep: React.FC = () => {
-  const { form, imageUrl, handleImageUpload, uploading } = usePetForm();
+  const { form, imageUrl, uploading, handleImageUpload } = usePetForm();
   const { language } = useLanguage();
   
   const translations = {
     en: {
-      pageTitle: 'Add New Pet',
-      pageDescription: 'Create a profile for your pet',
-      step1: 'Pet Information',
-      step2: 'Vaccination Information',
-      step3: 'Submit & Save',
       nameLabel: 'Pet Name',
       namePlaceholder: 'Enter your pet\'s name',
       speciesLabel: 'Species',
@@ -48,19 +44,6 @@ export const PetBasicInfoStep: React.FC = () => {
       imageLabel: 'Pet Photo',
       uploadButton: 'Upload Image',
       changeButton: 'Change Image',
-      prevButton: 'Previous',
-      nextButton: 'Next',
-      cancelButton: 'Cancel',
-      saveButton: 'Save Pet Profile',
-      vaccinationsLabel: 'Vaccinations',
-      vaccinationDateLabel: 'Vaccination Date',
-      clinicLabel: 'Veterinary Clinic',
-      clinicPlaceholder: 'Enter clinic name',
-      addVaccinationButton: 'Add Another Vaccination',
-      otherVaccinationLabel: 'Other Vaccination',
-      otherVaccinationPlaceholder: 'Specify vaccination name',
-      noStandardVaccinations: 'No standard vaccinations for this pet type',
-      success: 'Pet profile created successfully',
       species: {
         cat: 'Cat',
         dog: 'Dog',
@@ -70,48 +53,8 @@ export const PetBasicInfoStep: React.FC = () => {
         bird: 'Bird',
         other: 'Other'
       },
-      vaccinations: {
-        cat: {
-          tricat: 'Tricat',
-          tetracat: 'Tetracat',
-          rabies: 'Rabies',
-          fvrfe: 'FVR-Fe',
-          other: 'Other'
-        },
-        dog: {
-          dhpp: 'DHPP',
-          rabies: 'Rabies',
-          leptospirosis: 'Leptospirosis',
-          bordetella: 'Bordetella',
-          other: 'Other'
-        },
-        rabbit: {
-          myxomatosis: 'Myxomatosis',
-          vhd: 'VHD',
-          other: 'Other'
-        },
-        hamster: {
-          other: 'Other'
-        },
-        fish: {
-          other: 'Other'
-        },
-        bird: {
-          newcastle: 'Newcastle Disease',
-          pacheco: 'Pacheco\'s Disease',
-          other: 'Other'
-        },
-        other: {
-          other: 'Other'
-        }
-      }
     },
     id: {
-      pageTitle: 'Tambah Hewan Peliharaan',
-      pageDescription: 'Buat profil untuk hewan peliharaan Anda',
-      step1: 'Informasi Hewan',
-      step2: 'Informasi Vaksinasi',
-      step3: 'Simpan & Selesai',
       nameLabel: 'Nama Hewan',
       namePlaceholder: 'Masukkan nama hewan',
       speciesLabel: 'Jenis',
@@ -136,19 +79,6 @@ export const PetBasicInfoStep: React.FC = () => {
       imageLabel: 'Foto Hewan',
       uploadButton: 'Unggah Gambar',
       changeButton: 'Ganti Gambar',
-      prevButton: 'Sebelumnya',
-      nextButton: 'Selanjutnya',
-      cancelButton: 'Batal',
-      saveButton: 'Simpan Profil',
-      vaccinationsLabel: 'Vaksinasi',
-      vaccinationDateLabel: 'Tanggal Vaksinasi',
-      clinicLabel: 'Klinik Hewan',
-      clinicPlaceholder: 'Masukkan nama klinik',
-      addVaccinationButton: 'Tambah Vaksinasi Lain',
-      otherVaccinationLabel: 'Vaksinasi Lainnya',
-      otherVaccinationPlaceholder: 'Tentukan nama vaksinasi',
-      noStandardVaccinations: 'Tidak ada vaksinasi standar untuk jenis hewan ini',
-      success: 'Profil hewan berhasil dibuat',
       species: {
         cat: 'Kucing',
         dog: 'Anjing',
@@ -157,246 +87,277 @@ export const PetBasicInfoStep: React.FC = () => {
         fish: 'Ikan',
         bird: 'Burung',
         other: 'Lainnya'
-      },
-      vaccinations: {
-        cat: {
-          tricat: 'Tricat',
-          tetracat: 'Tetracat',
-          rabies: 'Rabies',
-          fvrfe: 'FVR-Fe',
-          other: 'Lainnya'
-        },
-        dog: {
-          dhpp: 'DHPP',
-          rabies: 'Rabies',
-          leptospirosis: 'Leptospirosis',
-          bordetella: 'Bordetella',
-          other: 'Lainnya'
-        },
-        rabbit: {
-          myxomatosis: 'Myxomatosis',
-          vhd: 'VHD',
-          other: 'Lainnya'
-        },
-        hamster: {
-          other: 'Lainnya'
-        },
-        fish: {
-          other: 'Lainnya'
-        },
-        bird: {
-          newcastle: 'Penyakit Newcastle',
-          pacheco: 'Penyakit Pacheco',
-          other: 'Lainnya'
-        },
-        other: {
-          other: 'Lainnya'
-        }
       }
     }
   };
   
   const t = translations[language];
   const watchSpecies = form.watch('species');
+  const watchIsEstimatedAge = form.watch('isEstimatedAge');
   
   return (
     <div className="space-y-6">
-      {/* Pet Basic Information Section */}
+      <div className="mb-8 flex flex-col items-center justify-center">
+        <div className="relative mb-4">
+          {imageUrl ? (
+            <div className="w-32 h-32 rounded-full overflow-hidden bg-muted">
+              <img 
+                src={imageUrl} 
+                alt="Pet preview" 
+                className="w-full h-full object-cover"
+              />
+            </div>
+          ) : (
+            <div className="w-32 h-32 rounded-full bg-muted flex items-center justify-center text-muted-foreground">
+              <PawPrint size={40} />
+            </div>
+          )}
+        </div>
+
+        <FormField
+          control={form.control}
+          name="imageUrl"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel className="text-base font-medium">{t.imageLabel}</FormLabel>
+              <FormControl>
+                <div>
+                  <Input
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    id="pet-image-upload"
+                    onChange={handleImageUpload}
+                    disabled={uploading}
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => document.getElementById('pet-image-upload')?.click()}
+                    disabled={uploading}
+                    className="flex gap-2 text-sm font-medium"
+                  >
+                    <Upload className="w-4 h-4" />
+                    {imageUrl ? t.changeButton : t.uploadButton}
+                  </Button>
+                  <input 
+                    {...field}
+                    type="hidden"
+                  />
+                </div>
+              </FormControl>
+              <FormMessage className="text-sm" />
+            </FormItem>
+          )}
+        />
+      </div>
+
+      <FormField
+        control={form.control}
+        name="name"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel className="text-base font-medium">{t.nameLabel}</FormLabel>
+            <FormControl>
+              <Input
+                placeholder={t.namePlaceholder}
+                {...field}
+                className="text-base py-2"
+              />
+            </FormControl>
+            <FormMessage className="text-sm" />
+          </FormItem>
+        )}
+      />
+      
+      <FormField
+        control={form.control}
+        name="species"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel className="text-base font-medium">{t.speciesLabel}</FormLabel>
+            <Select onValueChange={field.onChange} defaultValue={field.value}>
+              <FormControl>
+                <SelectTrigger className="text-base py-2">
+                  <SelectValue placeholder={t.speciesLabel} />
+                </SelectTrigger>
+              </FormControl>
+              <SelectContent>
+                <SelectItem value="cat" className="text-base">{t.species.cat}</SelectItem>
+                <SelectItem value="dog" className="text-base">{t.species.dog}</SelectItem>
+                <SelectItem value="rabbit" className="text-base">{t.species.rabbit}</SelectItem>
+                <SelectItem value="hamster" className="text-base">{t.species.hamster}</SelectItem>
+                <SelectItem value="fish" className="text-base">{t.species.fish}</SelectItem>
+                <SelectItem value="bird" className="text-base">{t.species.bird}</SelectItem>
+                <SelectItem value="other" className="text-base">{t.species.other}</SelectItem>
+              </SelectContent>
+            </Select>
+            <FormMessage className="text-sm" />
+          </FormItem>
+        )}
+      />
+      
+      {watchSpecies === 'other' && (
+        <FormField
+          control={form.control}
+          name="otherSpecies"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel className="text-base font-medium">{t.otherSpeciesLabel}</FormLabel>
+              <FormControl>
+                <Input
+                  placeholder={t.otherSpeciesPlaceholder}
+                  {...field}
+                  className="text-base py-2"
+                />
+              </FormControl>
+              <FormMessage className="text-sm" />
+            </FormItem>
+          )}
+        />
+      )}
+      
+      <FormField
+        control={form.control}
+        name="breed"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel className="text-base font-medium">{t.breedLabel}</FormLabel>
+            <FormControl>
+              <Input
+                placeholder={t.breedPlaceholder}
+                {...field}
+                className="text-base py-2"
+              />
+            </FormControl>
+            <FormMessage className="text-sm" />
+          </FormItem>
+        )}
+      />
+      
+      <FormField
+        control={form.control}
+        name="gender"
+        render={({ field }) => (
+          <FormItem className="space-y-3">
+            <FormLabel className="text-base font-medium">{t.genderLabel}</FormLabel>
+            <FormControl>
+              <RadioGroup
+                onValueChange={field.onChange}
+                defaultValue={field.value}
+                className="flex space-x-4"
+              >
+                <FormItem className="flex items-center space-x-2 space-y-0">
+                  <FormControl>
+                    <RadioGroupItem value="male" />
+                  </FormControl>
+                  <FormLabel className="font-normal cursor-pointer text-base">
+                    {t.male}
+                  </FormLabel>
+                </FormItem>
+                <FormItem className="flex items-center space-x-2 space-y-0">
+                  <FormControl>
+                    <RadioGroupItem value="female" />
+                  </FormControl>
+                  <FormLabel className="font-normal cursor-pointer text-base">
+                    {t.female}
+                  </FormLabel>
+                </FormItem>
+              </RadioGroup>
+            </FormControl>
+            <FormMessage className="text-sm" />
+          </FormItem>
+        )}
+      />
+      
+      <FormField
+        control={form.control}
+        name="fur_color"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel className="text-base font-medium">{t.colorLabel}</FormLabel>
+            <FormControl>
+              <Input
+                placeholder={t.colorPlaceholder}
+                {...field}
+                className="text-base py-2"
+              />
+            </FormControl>
+            <FormMessage className="text-sm" />
+          </FormItem>
+        )}
+      />
+      
       <div className="space-y-4">
         <FormField
           control={form.control}
-          name="name"
+          name="birthday"
           render={({ field }) => (
-            <FormItem>
-              <FormLabel className="text-base font-medium">{t.nameLabel}</FormLabel>
-              <FormControl>
-                <Input 
-                  placeholder={t.namePlaceholder} 
-                  className="text-base" 
-                  {...field} 
-                />
-              </FormControl>
-              <FormMessage className="text-sm" />
-            </FormItem>
-          )}
-        />
-        
-        <FormField
-          control={form.control}
-          name="species"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel className="text-base font-medium">{t.speciesLabel}</FormLabel>
-              <Select 
-                onValueChange={field.onChange} 
-                defaultValue={field.value}
-              >
-                <FormControl>
-                  <SelectTrigger className="text-base">
-                    <SelectValue placeholder={t.speciesLabel} />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  <SelectItem value="cat" className="text-base">{t.species.cat}</SelectItem>
-                  <SelectItem value="dog" className="text-base">{t.species.dog}</SelectItem>
-                  <SelectItem value="rabbit" className="text-base">{t.species.rabbit}</SelectItem>
-                  <SelectItem value="hamster" className="text-base">{t.species.hamster}</SelectItem>
-                  <SelectItem value="fish" className="text-base">{t.species.fish}</SelectItem>
-                  <SelectItem value="bird" className="text-base">{t.species.bird}</SelectItem>
-                  <SelectItem value="other" className="text-base">{t.species.other}</SelectItem>
-                </SelectContent>
-              </Select>
-              <FormMessage className="text-sm" />
-            </FormItem>
-          )}
-        />
-        
-        {watchSpecies === 'other' && (
-          <FormField
-            control={form.control}
-            name="otherSpecies"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="text-base font-medium">{t.otherSpeciesLabel}</FormLabel>
-                <FormControl>
-                  <Input 
-                    placeholder={t.otherSpeciesPlaceholder} 
-                    className="text-base" 
-                    {...field} 
+            <FormItem className="flex flex-col">
+              <FormLabel className="text-base font-medium">{t.birthdayLabel}</FormLabel>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <FormControl>
+                    <Button
+                      variant={"outline"}
+                      className={`w-full justify-start text-left font-normal text-base py-2 ${
+                        !field.value && "text-muted-foreground"
+                      }`}
+                      disabled={watchIsEstimatedAge}
+                    >
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {field.value ? (
+                        format(field.value, "PPP")
+                      ) : (
+                        <span>{t.birthdayLabel}</span>
+                      )}
+                    </Button>
+                  </FormControl>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={field.value}
+                    onSelect={field.onChange}
+                    disabled={(date) => date > new Date()}
+                    initialFocus
                   />
-                </FormControl>
-                <FormMessage className="text-sm" />
-              </FormItem>
-            )}
-          />
-        )}
+                </PopoverContent>
+              </Popover>
+              <FormMessage className="text-sm" />
+            </FormItem>
+          )}
+        />
         
         <FormField
           control={form.control}
-          name="breed"
+          name="isEstimatedAge"
           render={({ field }) => (
-            <FormItem>
-              <FormLabel className="text-base font-medium">{t.breedLabel}</FormLabel>
+            <FormItem className="flex flex-row items-center space-x-3 space-y-0 rounded-md border p-4">
               <FormControl>
-                <Input 
-                  placeholder={t.breedPlaceholder} 
-                  className="text-base" 
-                  {...field} 
+                <Checkbox
+                  checked={field.value}
+                  onCheckedChange={(checked) => {
+                    field.onChange(checked);
+                    if (checked) {
+                      form.setValue('birthday', undefined);
+                    } else {
+                      form.setValue('ageYears', 0);
+                      form.setValue('ageMonths', 0);
+                    }
+                  }}
                 />
               </FormControl>
-              <FormMessage className="text-sm" />
+              <div className="space-y-1 leading-none">
+                <FormLabel className="cursor-pointer text-base">
+                  {t.estimatedAgeLabel}
+                </FormLabel>
+              </div>
             </FormItem>
           )}
         />
         
-        <FormField
-          control={form.control}
-          name="gender"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel className="text-base font-medium">{t.genderLabel}</FormLabel>
-              <FormControl>
-                <RadioGroup 
-                  onValueChange={field.onChange} 
-                  defaultValue={field.value} 
-                  className="flex flex-row space-x-4"
-                >
-                  <FormItem className="flex items-center space-x-2">
-                    <RadioGroupItem value="male" id="male" className="text-base" />
-                    <FormLabel htmlFor="male" className="text-base font-normal">{t.male}</FormLabel>
-                  </FormItem>
-                  <FormItem className="flex items-center space-x-2">
-                    <RadioGroupItem value="female" id="female" className="text-base" />
-                    <FormLabel htmlFor="female" className="text-base font-normal">{t.female}</FormLabel>
-                  </FormItem>
-                </RadioGroup>
-              </FormControl>
-              <FormMessage className="text-sm" />
-            </FormItem>
-          )}
-        />
-        
-        <FormField
-          control={form.control}
-          name="fur_color"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel className="text-base font-medium">{t.colorLabel}</FormLabel>
-              <FormControl>
-                <Input 
-                  placeholder={t.colorPlaceholder} 
-                  className="text-base" 
-                  {...field} 
-                />
-              </FormControl>
-              <FormMessage className="text-sm" />
-            </FormItem>
-          )}
-        />
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <FormField
-            control={form.control}
-            name="birthday"
-            render={({ field }) => (
-              <FormItem className="flex flex-col">
-                <FormLabel className="text-base font-medium">{t.birthdayLabel}</FormLabel>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <FormControl>
-                      <Button
-                        variant={"outline"}
-                        className="w-full pl-3.5 text-left font-normal text-base"
-                      >
-                        {field.value ? (
-                          format(field.value, "PPP")
-                        ) : (
-                          <span>{t.birthdayLabel}</span>
-                        )}
-                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                      </Button>
-                    </FormControl>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar
-                      mode="single"
-                      selected={field.value}
-                      onSelect={field.onChange}
-                      disabled={(date) =>
-                        date > new Date() || date < new Date("1900-01-01")
-                      }
-                      initialFocus
-                    />
-                  </PopoverContent>
-                </Popover>
-                <FormMessage className="text-sm" />
-              </FormItem>
-            )}
-          />
-          
-          <FormField
-            control={form.control}
-            name="isEstimatedAge"
-            render={({ field }) => (
-              <FormItem className="flex flex-row items-center justify-between rounded-md border p-3">
-                <div className="space-y-0.5">
-                  <FormLabel className="text-base font-medium">{t.estimatedAgeLabel}</FormLabel>
-                  <FormDescription className="text-sm">
-                    {t.estimatedAgeLabel}
-                  </FormDescription>
-                </div>
-                <FormControl>
-                  <Checkbox 
-                    checked={field.value}
-                    onCheckedChange={field.onChange}
-                  />
-                </FormControl>
-              </FormItem>
-            )}
-          />
-        </div>
-        
-        {form.getValues('isEstimatedAge') && (
+        {watchIsEstimatedAge && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <FormField
               control={form.control}
@@ -405,11 +366,11 @@ export const PetBasicInfoStep: React.FC = () => {
                 <FormItem>
                   <FormLabel className="text-base font-medium">{t.ageLabel} ({t.ageYearsLabel})</FormLabel>
                   <FormControl>
-                    <Input 
+                    <Input
                       type="number"
-                      placeholder="0"
-                      className="text-base"
+                      min="0"
                       {...field}
+                      className="text-base py-2"
                     />
                   </FormControl>
                   <FormMessage className="text-sm" />
@@ -424,11 +385,12 @@ export const PetBasicInfoStep: React.FC = () => {
                 <FormItem>
                   <FormLabel className="text-base font-medium">{t.ageLabel} ({t.ageMonthsLabel})</FormLabel>
                   <FormControl>
-                    <Input 
+                    <Input
                       type="number"
-                      placeholder="0"
-                      className="text-base"
+                      min="0"
+                      max="11"
                       {...field}
+                      className="text-base py-2"
                     />
                   </FormControl>
                   <FormMessage className="text-sm" />
@@ -437,102 +399,47 @@ export const PetBasicInfoStep: React.FC = () => {
             />
           </div>
         )}
-        
-        <FormField
-          control={form.control}
-          name="weight"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel className="text-base font-medium">{t.weightLabel}</FormLabel>
-              <FormControl>
-                <Input 
-                  type="number"
-                  placeholder={t.weightPlaceholder} 
-                  className="text-base" 
-                  {...field} 
-                />
-              </FormControl>
-              <FormMessage className="text-sm" />
-            </FormItem>
-          )}
-        />
-        
-        <FormField
-          control={form.control}
-          name="notes"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel className="text-base font-medium">{t.notesLabel}</FormLabel>
-              <FormControl>
-                <Textarea
-                  placeholder={t.notesPlaceholder}
-                  className="text-base"
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage className="text-sm" />
-            </FormItem>
-          )}
-        />
-        
-        {/* Image Upload Section */}
-        <FormField
-          control={form.control}
-          name="imageUrl"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel className="text-base font-medium">{t.imageLabel}</FormLabel>
-              <div className="mt-2">
-                {imageUrl ? (
-                  <div className="flex flex-col items-center space-y-4">
-                    <div className="relative w-32 h-32 rounded-full overflow-hidden">
-                      <img 
-                        src={imageUrl} 
-                        alt="Pet preview" 
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={() => document.getElementById('pet-image-upload')?.click()}
-                      className="text-sm"
-                    >
-                      <Upload className="mr-2 h-4 w-4" /> {t.changeButton}
-                    </Button>
-                  </div>
-                ) : (
-                  <Button
-                    type="button" 
-                    variant="outline"
-                    onClick={() => document.getElementById('pet-image-upload')?.click()}
-                    className="w-full py-8 border-dashed text-base"
-                    disabled={uploading}
-                  >
-                    <Upload className="mr-2 h-4 w-4" />
-                    {uploading ? 'Uploading...' : t.uploadButton}
-                  </Button>
-                )}
-                <input
-                  id="pet-image-upload"
-                  type="file"
-                  accept="image/*"
-                  className="hidden"
-                  onChange={handleImageUpload}
-                  disabled={uploading}
-                />
-              </div>
-              <FormMessage className="text-sm" />
-            </FormItem>
-          )}
-        />
       </div>
+      
+      <FormField
+        control={form.control}
+        name="weight"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel className="text-base font-medium">{t.weightLabel}</FormLabel>
+            <FormControl>
+              <Input
+                type="number"
+                min="0"
+                step="0.1"
+                placeholder={t.weightPlaceholder}
+                {...field}
+                className="text-base py-2"
+              />
+            </FormControl>
+            <FormMessage className="text-sm" />
+          </FormItem>
+        )}
+      />
+      
+      <FormField
+        control={form.control}
+        name="notes"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel className="text-base font-medium">{t.notesLabel}</FormLabel>
+            <FormControl>
+              <Textarea
+                placeholder={t.notesPlaceholder}
+                rows={4}
+                {...field}
+                className="text-base py-2"
+              />
+            </FormControl>
+            <FormMessage className="text-sm" />
+          </FormItem>
+        )}
+      />
     </div>
-  );
-};
-
-const FormDescription = ({ className, ...props }: React.HTMLAttributes<HTMLParagraphElement>) => {
-  return (
-    <p className="text-sm text-muted-foreground" {...props} />
   );
 };
