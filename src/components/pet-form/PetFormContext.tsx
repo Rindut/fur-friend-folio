@@ -45,7 +45,11 @@ interface PetFormContextType {
 
 const PetFormContext = createContext<PetFormContextType | undefined>(undefined);
 
-export const PetFormProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+interface PetFormProviderProps {
+  children: ReactNode;
+}
+
+export const PetFormProvider: React.FC<PetFormProviderProps> = ({ children }) => {
   const form = useForm<PetFormValues>({
     resolver: zodResolver(petSchema),
     defaultValues: {
