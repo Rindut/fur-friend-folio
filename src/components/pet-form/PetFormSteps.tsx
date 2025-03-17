@@ -20,7 +20,7 @@ export const PetFormSteps: React.FC<PetFormStepsProps> = ({ step, totalSteps }) 
           <div key={index} className="flex items-center">
             <div 
               className={cn(
-                "flex items-center justify-center w-8 h-8 rounded-full border text-sm transition-colors",
+                "flex items-center justify-center w-8 h-8 rounded-full border text-base transition-colors",
                 isActive && "border-lavender bg-lavender/10 text-lavender font-medium",
                 isCompleted && "border-lavender bg-lavender text-white",
                 !isActive && !isCompleted && "border-gray-200 text-gray-400"
@@ -29,7 +29,7 @@ export const PetFormSteps: React.FC<PetFormStepsProps> = ({ step, totalSteps }) 
               {isCompleted ? (
                 <Check className="w-4 h-4" />
               ) : (
-                <span className="text-sm">{stepNumber}</span>
+                <span>{stepNumber}</span>
               )}
             </div>
             
