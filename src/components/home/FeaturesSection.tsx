@@ -56,7 +56,7 @@ const FeaturesSection = ({ t, mounted }: FeaturesSectionProps) => {
             <div className="bg-sage/20 text-sage p-3 rounded-full w-14 h-14 flex items-center justify-center mx-auto mb-4">
               <Calendar className="w-6 h-6" />
             </div>
-            <h3 className="text-xl font-semibold mb-3">{t.dashboard}</h3>
+            <h3 className="text-xl font-semibold mb-3">{t.dashboardFeature}</h3>
             <p className="text-muted-foreground">
               {t.dashboardDesc}
             </p>
