@@ -47,7 +47,7 @@ const PetProfile = () => {
 
   const translations = {
     en: {
-      backToDashboard: 'Back to Dashboard',
+      backToPetFamily: 'Back to Pet Family',
       loading: 'Loading pet profile...',
       petNotFound: 'Pet Not Found',
       petNotFoundDesc: "We couldn't find the pet you're looking for.",
@@ -80,7 +80,7 @@ const PetProfile = () => {
       addReminder: 'Add Reminder'
     },
     id: {
-      backToDashboard: 'Kembali ke Dasbor',
+      backToPetFamily: 'Kembali ke Keluarga Hewan',
       loading: 'Memuat profil hewan...',
       petNotFound: 'Hewan Tidak Ditemukan',
       petNotFoundDesc: 'Kami tidak dapat menemukan hewan yang Anda cari.',
@@ -272,8 +272,8 @@ const PetProfile = () => {
   return (
     <div className="container px-4 mx-auto py-8">
       <Button variant="ghost" asChild className="mb-6">
-        <Link to="/dashboard" className="flex items-center">
-          <ArrowLeft className="w-4 h-4 mr-2" /> {t.backToDashboard}
+        <Link to="/pet-family" className="flex items-center">
+          <ArrowLeft className="w-4 h-4 mr-2" /> {t.backToPetFamily}
         </Link>
       </Button>
 

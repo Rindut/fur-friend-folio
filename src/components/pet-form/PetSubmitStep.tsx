@@ -26,11 +26,17 @@ export const PetSubmitStep: React.FC = () => {
   
   const t = translations[language];
 
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    console.log("Form submit triggered");
+    form.handleSubmit(onSubmit)(e);
+  };
+
   return (
-    <form id="pet-form" onSubmit={form.handleSubmit(onSubmit)}>
-      <div className="text-center py-8">
+    <div className="space-y-6">
+      <div className="text-center py-4">
         <PawPrint className="mx-auto mb-4 h-12 w-12 text-lavender" />
-        <h3 className="text-2xl font-semibold mb-3">{t.pageTitle}</h3>
+        <h3 className="text-xl font-semibold mb-3">{t.pageTitle}</h3>
         <p className="text-base text-muted-foreground mb-2">
           {t.pageDescription}
         </p>
@@ -38,14 +44,17 @@ export const PetSubmitStep: React.FC = () => {
           {t.reviewInfo}
         </p>
       </div>
-      <div className="mt-8 flex justify-center">
+      
+      <div className="mt-6 flex justify-center">
         <Button 
           type="submit" 
+          form="pet-form"
+          onClick={handleSubmit}
           className="bg-lavender hover:bg-lavender/90 text-base py-2 px-6"
         >
           {t.submitButton}
         </Button>
       </div>
-    </form>
+    </div>
   );
 };

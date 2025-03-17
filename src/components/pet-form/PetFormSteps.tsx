@@ -1,5 +1,7 @@
 
 import React from 'react';
+import { cn } from '@/lib/utils';
+import { Check } from 'lucide-react';
 
 interface PetFormStepsProps {
   step: number;
@@ -8,30 +10,40 @@ interface PetFormStepsProps {
 
 export const PetFormSteps: React.FC<PetFormStepsProps> = ({ step, totalSteps }) => {
   return (
-    <div className="w-full mt-4">
-      <div className="flex justify-between mb-2">
-        {Array.from({ length: totalSteps }).map((_, i) => (
-          <div key={i} className="flex flex-col items-center">
+    <div className="flex items-center justify-center space-x-2 pt-4">
+      {Array.from({ length: totalSteps }).map((_, index) => {
+        const stepNumber = index + 1;
+        const isActive = stepNumber === step;
+        const isCompleted = stepNumber < step;
+        
+        return (
+          <div key={index} className="flex items-center">
             <div 
-              className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
-                i + 1 === step 
-                  ? 'bg-lavender text-white' 
-                  : i + 1 < step 
-                    ? 'bg-lavender/20 text-lavender' 
-                    : 'bg-muted text-muted-foreground'
-              }`}
+              className={cn(
+                "flex items-center justify-center w-8 h-8 rounded-full border text-sm transition-colors",
+                isActive && "border-lavender bg-lavender/10 text-lavender font-medium",
+                isCompleted && "border-lavender bg-lavender text-white",
+                !isActive && !isCompleted && "border-gray-200 text-gray-400"
+              )}
             >
-              {i + 1}
+              {isCompleted ? (
+                <Check className="w-4 h-4" />
+              ) : (
+                <span className="text-sm">{stepNumber}</span>
+              )}
             </div>
+            
+            {stepNumber < totalSteps && (
+              <div 
+                className={cn(
+                  "w-12 h-0.5 mx-1",
+                  stepNumber < step ? "bg-lavender" : "bg-gray-200"
+                )}
+              />
+            )}
           </div>
-        ))}
-      </div>
-      <div className="relative w-full bg-muted h-1 rounded-full overflow-hidden">
-        <div 
-          className="absolute top-0 left-0 h-full bg-lavender transition-all duration-300 ease-in-out"
-          style={{ width: `${(step / totalSteps) * 100}%` }}
-        />
-      </div>
+        );
+      })}
     </div>
   );
 };

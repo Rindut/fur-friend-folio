@@ -17,8 +17,8 @@ const HeroSection = ({ t, language }: HeroSectionProps) => {
     if (user) {
       return (
         <Button size="lg" className="rounded-full bg-coral hover:bg-coral/90">
-          <Link to="/dashboard" className="flex items-center gap-2">
-            {t.dashboard} <ArrowRight className="w-4 h-4" />
+          <Link to="/pet-family" className="flex items-center gap-2">
+            {t.petFamily} <ArrowRight className="w-4 h-4" />
           </Link>
         </Button>
       );
