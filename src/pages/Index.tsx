@@ -11,8 +11,8 @@ const Index = () => {
   const [mounted, setMounted] = useState(false);
   const { language } = useLanguage();
   const { user } = useAuth();
-  const translations = getHomeTranslations();
-  const t = translations[language];
+  const translationsData = getHomeTranslations();
+  const t = translationsData[language];
 
   useEffect(() => {
     setMounted(true);

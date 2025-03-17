@@ -3,7 +3,6 @@ import React, { createContext, useState, useEffect, useContext, ReactNode } from
 import { Session, User } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/components/ui/use-toast';
-import { useNavigate } from 'react-router-dom';
 
 interface AuthContextType {
   user: User | null;
@@ -32,7 +31,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
-  const navigate = useNavigate();
 
   useEffect(() => {
     // Get initial session
@@ -66,13 +64,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             title: "Welcome!",
             description: `You've successfully signed in${session.user?.email ? ` as ${session.user.email}` : ''}.`,
           });
-          navigate('/dashboard');
+          // Navigating to dashboard is now handled by the component
         } else if (event === 'SIGNED_OUT') {
           toast({
             title: "Signed out",
             description: "You've been successfully signed out.",
           });
-          navigate('/');
+          // Navigating to home is now handled by the component
         } else if (event === 'USER_UPDATED') {
           toast({
             title: "Profile updated",
@@ -85,7 +83,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     return () => {
       subscription.unsubscribe();
     };
-  }, [toast, navigate]);
+  }, [toast]);
 
   const signUp = async (email: string, password: string, username: string) => {
     const { error } = await supabase.auth.signUp({
@@ -126,8 +124,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         description: error.message,
         variant: "destructive",
       });
-    } else {
-      // Redirect will happen in the onAuthStateChange handler
     }
 
     return { error };
