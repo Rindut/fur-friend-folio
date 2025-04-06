@@ -47,7 +47,7 @@ const FeaturesSection = ({ t, mounted }: FeaturesSectionProps) => {
         </motion.div>
         
         <motion.div 
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8"
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
           variants={containerVariants}
           initial="hidden"
           animate={mounted ? "visible" : "hidden"}
@@ -82,6 +82,7 @@ const FeaturesSection = ({ t, mounted }: FeaturesSectionProps) => {
             </p>
           </motion.div>
           
+          {/* Local Services feature hidden
           <motion.div variants={itemVariants} className="glass-morphism rounded-2xl p-6 text-center">
             <div className="bg-lavender/20 text-lavender p-3 rounded-full w-14 h-14 flex items-center justify-center mx-auto mb-4">
               <Map className="w-6 h-6" />
@@ -91,6 +92,7 @@ const FeaturesSection = ({ t, mounted }: FeaturesSectionProps) => {
               {t.localServicesDesc}
             </p>
           </motion.div>
+          */}
         </motion.div>
       </div>
     </section>

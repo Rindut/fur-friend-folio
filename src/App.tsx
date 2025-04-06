@@ -136,7 +136,9 @@ const App = () => (
                     </ProtectedRoute>
                   } 
                 />
+                {/* Local Services route hidden
                 <Route path="/services" element={<LocalServices />} />
+                */}
                 <Route 
                   path="/analytics" 
                   element={

@@ -77,6 +77,7 @@ const DesktopNavigation = ({ translations }: DesktopNavigationProps) => {
           </>
         )}
         
+        {/* Services link is hidden now
         <NavigationMenuItem>
           <Link 
             to="/services" 
@@ -89,6 +90,7 @@ const DesktopNavigation = ({ translations }: DesktopNavigationProps) => {
             {t.services}
           </Link>
         </NavigationMenuItem>
+        */}
       </NavigationMenuList>
     </NavigationMenu>
   );

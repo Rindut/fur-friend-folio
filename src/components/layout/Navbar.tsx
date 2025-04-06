@@ -51,8 +51,8 @@ const Navbar = () => {
     ];
   }
   
-  // Add services link for all users
-  navLinks.push({ name: t.services, path: '/services', icon: <Map className="w-4 h-4" /> });
+  // Services link is hidden now
+  // navLinks.push({ name: t.services, path: '/services', icon: <Map className="w-4 h-4" /> });
 
   return (
     <header
