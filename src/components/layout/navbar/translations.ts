@@ -1,31 +1,39 @@
 
-export const translations = {
+import { NavbarTranslations } from './types';
+
+export const translations: Record<'en' | 'id', NavbarTranslations> = {
   en: {
     home: 'Home',
     dashboard: 'Dashboard',
     petFamily: 'Pet Family',
+    petManagement: 'Pet Management',
+    addPet: 'Add Pet',
+    health: 'Health',
     petProgress: 'Pet Progress',
-    health: 'Health Tracker',
+    healthRecords: 'Health Records',
     petCareHistory: 'Pet Care History',
     upcomingPetCare: 'Upcoming Pet Care',
-    services: 'Local Services',
+    services: 'Services',
     signIn: 'Sign In',
     signOut: 'Sign Out',
     loggedInAs: 'Logged in as',
-    profile: 'My Profile'
+    profile: 'Profile'
   },
   id: {
     home: 'Beranda',
     dashboard: 'Dasbor',
     petFamily: 'Keluarga Hewan',
+    petManagement: 'Manajemen Hewan',
+    addPet: 'Tambah Hewan',
+    health: 'Kesehatan',
     petProgress: 'Perkembangan Hewan',
-    health: 'Pelacak Kesehatan',
+    healthRecords: 'Catatan Kesehatan',
     petCareHistory: 'Riwayat Perawatan',
     upcomingPetCare: 'Perawatan Mendatang',
-    services: 'Layanan Lokal',
+    services: 'Layanan',
     signIn: 'Masuk',
     signOut: 'Keluar',
     loggedInAs: 'Masuk sebagai',
-    profile: 'Profil Saya'
+    profile: 'Profil'
   }
 };

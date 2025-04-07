@@ -1,7 +1,7 @@
 
-import { cn } from '@/lib/utils';
+import React from 'react';
 import { Link } from 'react-router-dom';
-import { Heart, Calendar, Clock, CheckCircle2, XCircle } from 'lucide-react';
+import { cn } from '@/lib/utils';
 import PetAvatar from './PetAvatar';
 
 export interface PetData {
@@ -11,79 +11,72 @@ export interface PetData {
   breed?: string;
   age?: string;
   imageUrl?: string;
-  upcomingCare?: {
-    type: string;
-    date: string;
-  };
   isActive?: boolean;
 }
 
 interface PetProfileCardProps {
   pet: PetData;
   className?: string;
+  compact?: boolean; // New compact mode
 }
 
-const PetProfileCard = ({ pet, className }: PetProfileCardProps) => {
+const PetProfileCard = ({ pet, className, compact = false }: PetProfileCardProps) => {
   return (
-    <Link to={`/pets/${pet.id}`} className="block outline-none h-full">
-      <div 
-        className={cn(
-          'pet-card group glass-morphism',
-          'p-5 flex flex-col gap-4 pet-card-hover h-full',
-          'border border-slate-200/50',
-          pet.isActive === false ? 'opacity-60' : '',
-          className
-        )}
-      >
-        <div className="flex items-center justify-between">
-          <PetAvatar 
-            src={pet.imageUrl} 
-            name={pet.name} 
-            size="md" 
-          />
-          <div className="flex items-center gap-2">
-            {pet.isActive !== false ? (
-              <span className="flex items-center gap-1 text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full">
-                <CheckCircle2 className="w-3 h-3" />
-                Active
-              </span>
-            ) : (
-              <span className="flex items-center gap-1 text-xs bg-gray-100 text-gray-700 px-2 py-0.5 rounded-full">
-                <XCircle className="w-3 h-3" />
-                Inactive
-              </span>
-            )}
-            <span className="chip chip-primary">
-              {pet.species === 'dog' ? '🐕' : 
-               pet.species === 'cat' ? '🐈' : 
-               pet.species === 'bird' ? '🦜' : 
-               pet.species === 'rabbit' ? '🐇' : 
-               pet.species === 'fish' ? '🐠' : '🐾'} {pet.species}
-            </span>
-          </div>
-        </div>
+    <Link 
+      to={`/pets/${pet.id}`}
+      className={cn(
+        "block glass-morphism rounded-lg p-4 transition-transform hover:scale-[1.01] hover:shadow-md",
+        pet.isActive === false && "opacity-60",
+        className
+      )}
+    >
+      <div className={cn(
+        "flex",
+        compact ? "items-center" : "flex-col items-center"
+      )}>
+        <PetAvatar 
+          src={pet.imageUrl} 
+          name={pet.name} 
+          species={pet.species} 
+          size={compact ? "md" : "lg"}
+          className={compact ? "mr-4" : "mb-4"} 
+        />
         
-        <div>
-          <h3 className="text-lg font-semibold tracking-tight group-hover:text-coral transition-colors">
+        <div className={compact ? "flex-1" : "text-center w-full"}>
+          <h3 className={cn(
+            "font-semibold truncate",
+            compact ? "text-base" : "text-lg mt-2"
+          )}>
             {pet.name}
           </h3>
-          {pet.breed && (
-            <p className="text-sm text-muted-foreground mt-0.5">{pet.breed}</p>
+          
+          {!compact && (
+            <div className="mt-1 text-sm text-muted-foreground">
+              {pet.species.charAt(0).toUpperCase() + pet.species.slice(1)}
+              {pet.breed ? ` · ${pet.breed}` : ''}
+            </div>
+          )}
+          
+          {compact ? (
+            <div className="text-xs text-muted-foreground truncate">
+              {pet.species.charAt(0).toUpperCase() + pet.species.slice(1)}
+              {pet.breed ? ` · ${pet.breed}` : ''}
+              {pet.age ? ` · ${pet.age}` : ''}
+            </div>
+          ) : (
+            pet.age && (
+              <div className="mt-1 text-sm text-muted-foreground">
+                {pet.age}
+              </div>
+            )
+          )}
+          
+          {pet.isActive === false && !compact && (
+            <div className="mt-2 text-xs px-2 py-1 rounded-full bg-amber-100 text-amber-700 inline-block">
+              Inactive
+            </div>
           )}
         </div>
-        
-        {pet.upcomingCare && (
-          <div className="mt-2 pt-3 border-t border-slate-200/50">
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <Calendar className="w-4 h-4 text-coral" />
-              <span>Next: {pet.upcomingCare.type}</span>
-            </div>
-            <div className="flex items-center gap-2 text-xs text-muted-foreground mt-1">
-              <Clock className="w-3 h-3" />
-              <span>{pet.upcomingCare.date}</span>
-            </div>
-          </div>
-        )}
       </div>
     </Link>
   );

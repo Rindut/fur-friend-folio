@@ -11,6 +11,8 @@ interface MobileNavigationProps {
   translations: {
     signIn: string;
     signOut: string;
+    petManagement: string;
+    addPet: string;
   };
   isOpen: boolean;
   onClose: () => void;
@@ -54,6 +56,27 @@ const MobileNavigation = ({
               </Link>
             </div>
           ))}
+          
+          {/* Pet Management section for mobile */}
+          {user && (
+            <div className="flex flex-col">
+              <div className="px-4 py-2 font-medium text-sm text-muted-foreground">
+                {t.petManagement}
+              </div>
+              <Link
+                to="/pets/new"
+                onClick={onClose}
+                className={cn(
+                  'px-4 py-3 rounded-xl transition-all duration-200 flex items-center gap-3 ml-2',
+                  location.pathname === '/pets/new'
+                    ? 'bg-coral/20 text-coral font-medium'
+                    : 'hover:bg-muted/30 text-charcoal/80 hover:text-charcoal'
+                )}
+              >
+                <span className="text-lg">{t.addPet}</span>
+              </Link>
+            </div>
+          )}
           
           {user ? (
             <button

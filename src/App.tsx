@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -54,8 +53,11 @@ const App = () => (
             <main className="pt-20">
               <PageBreadcrumb />
               <Routes>
+                {/* Public routes */}
                 <Route path="/" element={<Index />} />
                 <Route path="/auth" element={<Auth />} />
+                
+                {/* Protected routes - Main sections */}
                 <Route 
                   path="/dashboard" 
                   element={
@@ -64,6 +66,8 @@ const App = () => (
                     </ProtectedRoute>
                   } 
                 />
+                
+                {/* Pet Family / Management */}
                 <Route 
                   path="/pet-family" 
                   element={
@@ -72,6 +76,32 @@ const App = () => (
                     </ProtectedRoute>
                   } 
                 />
+                <Route 
+                  path="/pets/:id" 
+                  element={
+                    <ProtectedRoute>
+                      <PetProfile />
+                    </ProtectedRoute>
+                  } 
+                />
+                <Route 
+                  path="/pets/new" 
+                  element={
+                    <ProtectedRoute>
+                      <AddPet />
+                    </ProtectedRoute>
+                  } 
+                />
+                <Route 
+                  path="/pets/:id/edit" 
+                  element={
+                    <ProtectedRoute>
+                      <EditPet />
+                    </ProtectedRoute>
+                  } 
+                />
+                
+                {/* Health records and reminders */}
                 <Route 
                   path="/health" 
                   element={
@@ -104,30 +134,8 @@ const App = () => (
                     </ProtectedRoute>
                   } 
                 />
-                <Route 
-                  path="/pets/:id" 
-                  element={
-                    <ProtectedRoute>
-                      <PetProfile />
-                    </ProtectedRoute>
-                  } 
-                />
-                <Route 
-                  path="/pets/new" 
-                  element={
-                    <ProtectedRoute>
-                      <AddPet />
-                    </ProtectedRoute>
-                  } 
-                />
-                <Route 
-                  path="/pets/:id/edit" 
-                  element={
-                    <ProtectedRoute>
-                      <EditPet />
-                    </ProtectedRoute>
-                  } 
-                />
+                
+                {/* User Profile */}
                 <Route 
                   path="/profile" 
                   element={
@@ -136,9 +144,8 @@ const App = () => (
                     </ProtectedRoute>
                   } 
                 />
-                {/* Local Services route hidden
-                <Route path="/services" element={<LocalServices />} />
-                */}
+                
+                {/* Other routes */}
                 <Route 
                   path="/analytics" 
                   element={
@@ -147,6 +154,11 @@ const App = () => (
                     </ProtectedRoute>
                   } 
                 />
+                
+                {/* Local Services route hidden
+                <Route path="/services" element={<LocalServices />} />
+                */}
+                
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </main>

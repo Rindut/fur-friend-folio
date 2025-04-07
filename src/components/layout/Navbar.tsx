@@ -7,7 +7,9 @@ import {
   Menu, 
   X,
   Map,
-  Users
+  Users,
+  PawPrint,
+  User
 } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
 import { useAuth } from '@/context/AuthContext';
@@ -45,9 +47,15 @@ const Navbar = () => {
   if (user) {
     navLinks = [
       ...navLinks,
-      // Dashboard menu is hidden as requested
+      { name: t.dashboard, path: '/dashboard', icon: <Home className="w-4 h-4" /> },
       { name: t.petFamily, path: '/pet-family', icon: <Users className="w-4 h-4" /> },
       { name: t.health, path: '/health', icon: <Heart className="w-4 h-4" /> },
+      { name: t.profile, path: '/profile', icon: <User className="w-4 h-4" /> },
+    ];
+    
+    // Add pet management submenu - will be shown in desktop navigation
+    const petManagementLinks = [
+      { name: t.addPet, path: '/pets/new', icon: <PawPrint className="w-4 h-4" /> },
     ];
   }
   
