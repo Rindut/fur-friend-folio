@@ -7,6 +7,7 @@ interface Pet {
   id: string;
   name: string;
   imageUrl?: string;
+  species?: 'dog' | 'cat' | 'bird' | 'rabbit' | 'fish' | 'other';
 }
 
 interface PetSelectorProps {
@@ -43,7 +44,12 @@ const PetSelector = ({
               {pets.map(pet => (
                 <SelectItem key={pet.id} value={pet.id} className="flex items-center gap-2">
                   <div className="flex items-center gap-2">
-                    <PetAvatar src={pet.imageUrl} name={pet.name} size="sm" />
+                    <PetAvatar 
+                      src={pet.imageUrl} 
+                      name={pet.name} 
+                      size="sm" 
+                      species={pet.species || 'other'} 
+                    />
                     <span>{pet.name}</span>
                   </div>
                 </SelectItem>
@@ -68,6 +74,7 @@ const PetSelector = ({
               src={pet.imageUrl} 
               name={pet.name} 
               size="sm" 
+              species={pet.species || 'other'} 
             />
             <span>{pet.name}</span>
           </button>

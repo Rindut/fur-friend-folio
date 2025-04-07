@@ -12,6 +12,7 @@ import AddPetButton from '@/components/ui/AddPetButton';
 import HealthTimeline from '@/components/health/HealthTimeline';
 import { useHealthRecords } from '@/components/health/useHealthRecords';
 import { TimelineEvent } from '@/components/health/HealthTimelineEvent';
+import { RecordType } from '@/components/health/useRecordUtils';
 
 const Dashboard = () => {
   const { user } = useAuth();
@@ -28,7 +29,7 @@ const Dashboard = () => {
       id: record.id,
       title: record.title,
       date: record.date,
-      type: record.type || 'vaccination',
+      type: record.type as RecordType,
       petName: '',
       petId: record.petId || '',
       completed: true
@@ -37,7 +38,7 @@ const Dashboard = () => {
       id: task.id,
       title: task.title,
       date: task.date,
-      type: 'vaccination',
+      type: 'vaccination' as RecordType,
       petName: task.petName || '',
       petId: task.petId || '',
       completed: false

@@ -23,7 +23,7 @@ import { Switch } from '@/components/ui/switch';
 interface PetDetails {
   id: string;
   name: string;
-  species: string;
+  species: 'dog' | 'cat' | 'bird' | 'rabbit' | 'fish' | 'other';
   breed?: string;
   age?: string;
   ageYears?: number;
@@ -289,6 +289,7 @@ const PetProfile = () => {
           <PetAvatar
             src={pet.imageUrl}
             name={pet.name}
+            species={pet.species}
             size="xl"
             className="flex-shrink-0"
           />

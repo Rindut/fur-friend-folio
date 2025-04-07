@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Droplets, Pill, Weight, AlertCircle, Calendar } from 'lucide-react';
@@ -18,6 +17,7 @@ interface Pet {
   id: string;
   name: string;
   imageUrl?: string;
+  species: 'dog' | 'cat' | 'bird' | 'rabbit' | 'fish' | 'other';
 }
 
 type RecordType = 'vaccination' | 'medication' | 'weight' | 'visit';
@@ -94,7 +94,7 @@ const AddHealthRecord = () => {
       try {
         const { data, error } = await supabase
           .from('pets')
-          .select('id, name, image_url')
+          .select('id, name, image_url, species')
           .eq('user_id', user.id)
           .eq('is_active', true)
           .order('created_at', { ascending: true });
@@ -105,10 +105,10 @@ const AddHealthRecord = () => {
           setPets(data.map(pet => ({
             id: pet.id,
             name: pet.name,
-            imageUrl: pet.image_url
+            imageUrl: pet.image_url,
+            species: pet.species as 'dog' | 'cat' | 'bird' | 'rabbit' | 'fish' | 'other'
           })));
           
-          // If a pet ID was provided in URL and it's valid, set it as selected
           if (petIdFromUrl && data.some(pet => pet.id === petIdFromUrl)) {
             setFormData(prev => ({ ...prev, petId: petIdFromUrl }));
           } else if (data.length > 0 && !petIdFromUrl) {
@@ -225,6 +225,9 @@ const AddHealthRecord = () => {
     );
   }
   
+  // Get the currently selected pet to display in the UI
+  const selectedPet = pets.find(pet => pet.id === formData.petId);
+  
   return (
     <div className="min-h-screen pb-20">
       <div className="bg-gradient-to-b from-lavender/20 to-transparent pt-8 pb-12">
@@ -255,6 +258,7 @@ const AddHealthRecord = () => {
                             src={pet.imageUrl} 
                             name={pet.name} 
                             size="sm" 
+                            species={pet.species} 
                           />
                           <span>{pet.name}</span>
                         </button>
