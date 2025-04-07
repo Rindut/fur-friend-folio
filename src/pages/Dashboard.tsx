@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { PawPrint, BarChart, Calendar, Plus, Heart } from 'lucide-react';
@@ -24,15 +23,26 @@ const Dashboard = () => {
   const { healthRecords, upcomingTasks, loading: recordsLoading } = useHealthRecords();
   
   // Convert health records to timeline events
-  const timelineEvents: TimelineEvent[] = [...healthRecords, ...upcomingTasks].map(record => ({
-    id: record.id,
-    title: record.title,
-    date: record.date,
-    type: record.type || 'vaccination',
-    petName: record.petName || '',
-    petId: record.petId || '',
-    completed: !record.upcoming
-  }));
+  const timelineEvents: TimelineEvent[] = [
+    ...healthRecords.map(record => ({
+      id: record.id,
+      title: record.title,
+      date: record.date,
+      type: record.type || 'vaccination',
+      petName: '',
+      petId: record.petId || '',
+      completed: true
+    })),
+    ...upcomingTasks.map(task => ({
+      id: task.id,
+      title: task.title,
+      date: task.date,
+      type: 'vaccination',
+      petName: task.petName || '',
+      petId: task.petId || '',
+      completed: false
+    }))
+  ];
 
   const translations = {
     en: {

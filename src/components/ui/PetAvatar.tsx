@@ -5,6 +5,7 @@ import { PawPrint } from 'lucide-react';
 interface PetAvatarProps {
   src?: string;
   name: string;
+  species: 'dog' | 'cat' | 'bird' | 'rabbit' | 'fish' | 'other';
   size?: 'sm' | 'md' | 'lg' | 'xl';
   status?: 'online' | 'offline';
   className?: string;
@@ -17,6 +18,7 @@ const getInitials = (name: string) => {
 const PetAvatar = ({ 
   src, 
   name, 
+  species,
   size = 'md', 
   status,
   className 
