@@ -26,21 +26,7 @@ export const getHomeTranslations = () => {
       petFamily: 'Your Pet Family',
       viewAll: 'View All',
       petParent: 'Pet Parent',
-      yourPets: 'Your Pets',
-      // New translations for mobile layout
-      halocoins: 'halocoins',
-      balance: 'Balance',
-      coins: 'Coins',
-      chatWithDoctor: 'Chat with Doctor',
-      healthStore: 'Health Store',
-      homecare: 'Homecare',
-      myInsurance: 'My Insurance',
-      halofit: 'Halofit',
-      haloskin: 'Haloskin',
-      sexualHealth: 'Sexual Health',
-      seeAll: 'See All',
-      ongoingPromos: 'Ongoing Promos',
-      healthProducts: 'Health Products'
+      yourPets: 'Your Pets'
     },
     id: {
       tagline: 'Perawatan Lebih Baik, Hewan Lebih Sehat',
@@ -67,21 +53,7 @@ export const getHomeTranslations = () => {
       petFamily: 'Keluarga Hewan Anda',
       viewAll: 'Lihat Semua',
       petParent: 'Pemilik Hewan',
-      yourPets: 'Hewan Peliharaan Anda',
-      // New translations for mobile layout
-      halocoins: 'halocoins',
-      balance: 'Saldo',
-      coins: 'Koin',
-      chatWithDoctor: 'Chat dengan Dokter',
-      healthStore: 'Toko Kesehatan',
-      homecare: 'Perawatan Rumah',
-      myInsurance: 'Asuransi Saya',
-      halofit: 'Halofit',
-      haloskin: 'Haloskin',
-      sexualHealth: 'Kesehatan Seksual',
-      seeAll: 'Lihat Semua',
-      ongoingPromos: 'Promo Berlangsung',
-      healthProducts: 'Produk Kesehatan'
+      yourPets: 'Hewan Peliharaan Anda'
     }
   };
 };
