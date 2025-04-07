@@ -16,6 +16,7 @@ const Index = () => {
 
   useEffect(() => {
     setMounted(true);
+    // Remove any login popups or notifications by not showing them initially
   }, []);
 
   return (

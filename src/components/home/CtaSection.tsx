@@ -26,14 +26,14 @@ const CtaSection = ({ t }: CtaSectionProps) => {
     return (
       <Button size="lg" className="rounded-full bg-coral hover:bg-coral/90">
         <Link to="/auth" className="flex items-center gap-2">
-          {t.signUp} <ArrowRight className="w-4 h-4" />
+          {t.joinAnabulku} <ArrowRight className="w-4 h-4" />
         </Link>
       </Button>
     );
   };
 
   return (
-    <section className="py-20 bg-gradient-to-br from-coral/10 via-white to-lavender/20">
+    <section className="py-12 bg-gradient-to-br from-coral/10 via-white to-lavender/20">
       <div className="container px-4 mx-auto text-center">
         <motion.div
           className="max-w-2xl mx-auto"
@@ -41,9 +41,9 @@ const CtaSection = ({ t }: CtaSectionProps) => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
         >
-          <h2 className="text-3xl sm:text-4xl font-bold mb-6">{t.ctaHeading}</h2>
-          <p className="text-lg text-muted-foreground mb-8">
-            {t.ctaDesc}
+          <h2 className="text-2xl sm:text-3xl font-bold mb-4">{t.ctaHeading}</h2>
+          <p className="text-base text-muted-foreground mb-6">
+            {t.ctaDescAnabulku}
           </p>
           {renderFinalCta()}
         </motion.div>

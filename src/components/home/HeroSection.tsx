@@ -41,41 +41,37 @@ const HeroSection = ({ t, language }: HeroSectionProps) => {
   };
 
   return (
-    <section className="relative py-20 overflow-hidden">
+    <section className="relative py-12 overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-br from-cream via-white to-lavender/30 -z-10" />
       
       <div className="container px-4 mx-auto">
-        <div className="flex flex-col md:flex-row items-center justify-between gap-12">
+        <div className="flex flex-col md:flex-row items-center justify-between gap-8">
           <motion.div 
             className="max-w-xl"
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8 }}
           >
-            <div className="chip chip-primary inline-flex items-center mb-6">
+            <div className="chip chip-primary inline-flex items-center mb-4">
               <PawPrint className="w-4 h-4 mr-1" />
               <span>{t.tagline}</span>
             </div>
             
-            <h1 className="text-5xl md:text-6xl font-bold mb-6 leading-tight">
+            <h1 className="text-4xl md:text-5xl font-bold mb-4 leading-tight">
               {language === 'en' ? 'Keep your pets' : 'Jaga kesayangan Anda agar'}
               <span className="bg-clip-text text-transparent bg-gradient-to-r from-coral to-sage ml-2">
                 {t.heading}
               </span>
             </h1>
             
-            <p className="text-lg text-muted-foreground mb-8">
+            <p className="text-base text-muted-foreground mb-6">
               {t.description}
             </p>
             
             <div className="flex flex-wrap gap-4">
               {renderAuthButtons()}
               
-              <Button size="lg" variant="outline" className="rounded-full">
-                <Link to="/services">
-                  {t.findServices}
-                </Link>
-              </Button>
+              {/* Find Local Services button removed */}
             </div>
           </motion.div>
           
